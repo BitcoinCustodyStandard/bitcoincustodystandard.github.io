@@ -25,7 +25,7 @@
       --btnText:#ffffff;
       --link:#0f62fe;
       --btc:#f7931a;
-      --headerH: 72px; /* used for anchor offset */
+      --headerH: 72px;
     }
     *{box-sizing:border-box}
     body{
@@ -63,7 +63,7 @@
       min-width: 280px;
     }
 
-    /* Logo image (upload bcs-seal.png to repo root) */
+    /* Upload your seal as bcs-seal.png in the repo */
     .logo{
       width:34px;
       height:34px;
@@ -211,7 +211,7 @@
     .card li{ margin: 6px 0; }
     .card p{ margin: 10px 0 0; color: var(--muted); font-size:14px; }
 
-    /* Anchor offset fix for sticky header */
+    /* Fix nav clicks so headings aren't hidden under sticky header */
     section[id]{
       scroll-margin-top: calc(var(--headerH) + 18px);
     }
@@ -222,11 +222,26 @@
       font-size: 18px;
       font-weight: 900;
     }
+
+    /* ✅ NEW: Justified text for Abstract/Purpose (desktop), mobile-safe */
     .text{
       color: var(--muted);
       font-size: 15px;
       max-width: 92ch;
       white-space: pre-line;
+
+      text-align: justify;
+      text-justify: inter-word;
+
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      -ms-hyphens: auto;
+    }
+    @media (max-width: 640px){
+      .text{
+        text-align: left;
+        hyphens: manual;
+      }
     }
 
     .viewerWrap{
@@ -253,8 +268,8 @@
     }
     iframe{
       width:100%;
-      height: 90vh;        /* slightly bigger */
-      min-height: 920px;   /* bigger paper view */
+      height: 90vh;
+      min-height: 920px;
       border:0;
       background:#fff;
     }
@@ -282,7 +297,6 @@
     <div class="wrap">
       <div class="top">
         <div class="brand">
-          <!-- Upload your seal as bcs-seal.png in the repo -->
           <img class="logo" src="bcs-seal.png" alt="Bitcoin Custody Standard seal" />
           <div>
             <h1>Bitcoin Custody Standard</h1>
