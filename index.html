@@ -126,13 +126,19 @@ main{padding:34px 0 60px}
 .kv{
   display:flex;
   justify-content:space-between;
-  padding:8px 10px;
+  padding:10px 14px;
   background:var(--panel);
-  border-radius:10px;
+  border-radius:12px;
   border:1px solid var(--border);
 }
-.k{color:var(--muted)}
-.v{font-weight:800}
+.k{
+  color:var(--muted);
+  font-weight:600;   /* softer than bold */
+}
+
+.v{
+  font-weight:400;   /* normal weight */
+}
 
 /* Anchor offset for sticky header (sections) */
 section[id]{scroll-margin-top:calc(var(--headerH) + 18px)}
