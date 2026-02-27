@@ -130,8 +130,12 @@ main{padding:34px 0 60px}
 /* Anchor offset for sticky header (sections) */
 section[id]{scroll-margin-top:calc(var(--headerH) + 18px)}
 
-/* ✅ Fix HOME: ensure it goes truly to the top */
-#top{scroll-margin-top:0}
+/* ✅ FIX HOME: offset anchor so hero/title isn't hidden under sticky header */
+.top-anchor{
+  position:relative;
+  top: calc(-1 * (var(--headerH) + 18px));
+  height:0;
+}
 
 /* TWO CARDS (metrics + pillars) */
 .grid{
@@ -244,7 +248,6 @@ footer{
         </div>
       </div>
 
-      <!-- ✅ Nav: Home + sections -->
       <nav aria-label="Primary">
         <a href="#top">Home</a>
         <a href="#abstract">Abstract</a>
@@ -252,7 +255,6 @@ footer{
         <a href="#document">Document</a>
       </nav>
 
-      <!-- ✅ Buttons: BOTH are black/white now -->
       <div class="actions">
         <a class="btn primary" href="BCS_Normative.pdf" download>Download PDF</a>
         <a class="btn primary" href="mailto:contact@bitcoincustodystandard.org">Contact</a>
@@ -264,8 +266,8 @@ footer{
 
 <main class="wrap">
 
-  <!-- ✅ True top anchor for Home -->
-  <div id="top"></div>
+  <!-- ✅ Anchor used by Home link with correct offset -->
+  <div id="top" class="top-anchor" aria-hidden="true"></div>
 
   <section class="hero">
     <h2>Bitcoin Custody Standard — Normative Summary</h2>
@@ -285,7 +287,6 @@ footer{
     </div>
   </section>
 
-  <!-- ✅ Restored the two boxes/cards -->
   <section class="grid" aria-label="Overview blocks">
     <div class="card">
       <h3><span class="dot"></span>Key metrics</h3>
