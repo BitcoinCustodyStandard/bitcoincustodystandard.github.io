@@ -1,134 +1,290 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bitcoin Custody Standard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bitcoin Custody Standard — Normative Summary</title>
 
-<style>
-body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #111;
-  background: #fff;
-  line-height: 1.6;
-}
+  <!-- SEO -->
+  <meta name="description" content="Bitcoin Custody Standard (BCS) — Normative Summary (BCS-NS-1.0). A baseline framework for resilient Bitcoin custody architectures and measurement via BCRI, ERI, and XRI." />
+  <meta name="robots" content="index,follow" />
 
-.container {
-  max-width: 900px;
-  margin: 70px auto;
-  padding: 0 20px;
-}
+  <!-- Open Graph / X -->
+  <meta property="og:title" content="Bitcoin Custody Standard — Normative Summary" />
+  <meta property="og:description" content="BCS-NS-1.0 (Normative). Baseline framework for resilient Bitcoin custody and measurement via BCRI, ERI, and XRI." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bitcoincustodystandard.org/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Bitcoin Custody Standard — Normative Summary" />
+  <meta name="twitter:description" content="BCS-NS-1.0 (Normative). Baseline framework for resilient Bitcoin custody and measurement via BCRI, ERI, and XRI." />
 
-h1 {
-  font-size: 34px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0b1220;
+      --muted:#4b5563;
+      --border:#e5e7eb;
+      --panel:#f8fafc;
+      --btn:#111827;
+      --btnText:#ffffff;
+      --link:#0f62fe;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      line-height:1.55;
+    }
+    a{color:var(--link); text-decoration:none}
+    a:hover{text-decoration:underline}
 
-.subtitle {
-  font-size: 18px;
-  color: #555;
-  margin-bottom: 28px;
-}
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 18px;
+    }
 
-.meta {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 26px;
-}
+    /* Top bar */
+    header{
+      border-bottom:1px solid var(--border);
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 0;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 260px;
+    }
+    .mark{
+      width:34px;height:34px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      background: var(--panel);
+      font-weight:800;
+      letter-spacing:.6px;
+    }
+    .brand h1{
+      font-size:16px;
+      margin:0;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .brand .sub{
+      margin:0;
+      font-size:12px;
+      color: var(--muted);
+    }
+    nav{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
 
-.meta strong {
-  color: #000;
-}
+    /* Buttons */
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--text);
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .btn.primary{
+      background:var(--btn);
+      border-color:var(--btn);
+      color:var(--btnText);
+    }
+    .btn:hover{ text-decoration:none; filter:brightness(.98); }
 
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 18px 0 10px;
-}
+    /* Main content */
+    main{
+      padding: 34px 0 60px;
+    }
+    .hero{
+      margin-bottom: 18px;
+    }
+    .hero h2{
+      font-size: 30px;
+      line-height: 1.15;
+      margin: 0 0 10px 0;
+      font-weight: 850;
+    }
+    .hero p{
+      margin: 0 0 14px 0;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 78ch;
+    }
 
-.btn {
-  display: inline-block;
-  padding: 12px 18px;
-  text-decoration: none;
-  font-weight: 600;
-  border-radius: 7px;
-  border: 1px solid #111;
-  color: #111;
-  background: #fff;
-}
+    .meta{
+      border:1px solid var(--border);
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin: 18px 0 22px;
+    }
+    .metaGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px 16px;
+      font-size: 14px;
+    }
+    @media (max-width: 760px){
+      .metaGrid{ grid-template-columns: 1fr; }
+    }
+    .kv{display:flex; justify-content:space-between; gap:10px; padding:8px 10px; border:1px solid var(--border); border-radius:12px; background: var(--panel);}
+    .k{color: var(--muted)}
+    .v{font-weight:700; text-align:right}
 
-.btn.primary {
-  background: #000;
-  color: #fff;
-  border-color: #000;
-}
+    .note{
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
 
-.btn:hover { opacity: 0.88; }
+    /* PDF viewer */
+    .viewerWrap{
+      border:1px solid var(--border);
+      border-radius: 16px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .viewerHead{
+      padding:12px 14px;
+      border-bottom:1px solid var(--border);
+      background: var(--panel);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .viewerHead strong{
+      font-size: 13px;
+      letter-spacing:.22px;
+      text-transform: uppercase;
+    }
+    iframe{
+      width:100%;
+      height: 88vh;
+      min-height: 860px;
+      border:0;
+      background:#fff;
+    }
 
-.pdf-viewer {
-  margin-top: 34px;
-  border-top: 1px solid #eee;
-  padding-top: 26px;
-}
-
-/* Bigger viewer */
-iframe {
-  width: 100%;
-  height: 86vh;
-  min-height: 820px;
-  border: none;
-}
-
-.footer {
-  margin-top: 60px;
-  font-size: 13px;
-  color: #777;
-  border-top: 1px solid #eee;
-  padding-top: 18px;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-</style>
+    footer{
+      border-top:1px solid var(--border);
+      padding: 18px 0;
+      color: var(--muted);
+      font-size: 13px;
+      background:#fff;
+    }
+    .foot{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
+  <header>
+    <div class="wrap">
+      <div class="top">
+        <div class="brand">
+          <div class="mark">BCS</div>
+          <div>
+            <h1>Bitcoin Custody Standard</h1>
+            <p class="sub">Normative Summary (BCS-NS-1.0)</p>
+          </div>
+        </div>
 
-<h1>Bitcoin Custody Standard</h1>
-<div class="subtitle">
-Normative Summary for the Bitcoin Custody Standard (BCS) and the Bitcoin Custody Resilience Index (BCRI).
-</div>
+        <nav aria-label="Primary">
+          <a href="#summary">Summary</a>
+          <a href="#document">Document</a>
+          <a href="mailto:contact@bitcoincustodystandard.org">Contact</a>
+        </nav>
 
-<div class="meta">
-<strong>Document:</strong> BCS-NS-1.0<br>
-<strong>Status:</strong> Published<br>
-<strong>Date:</strong> February 2026<br>
-<strong>Maintainer:</strong> Bitcoin Custody Standard<br>
-<strong>Contact:</strong> <a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a><br>
-<strong>X:</strong> <a href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener">@Bitcoin_custody</a>
-</div>
+        <div class="actions">
+          <!-- Ensure your repo PDF filename matches this -->
+          <a class="btn primary" href="BCS_Normative.pdf" download>Download PDF</a>
+          <a class="btn" href="mailto:contact@bitcoincustodystandard.org">Contact me</a>
+        </div>
+      </div>
+    </div>
+  </header>
 
-<div class="actions">
-  <a class="btn primary" href="BCS_Normative.pdf" target="_blank" rel="noopener">Download PDF</a>
-  <a class="btn" href="mailto:contact@bitcoincustodystandard.org">Contact me</a>
-</div>
+  <main class="wrap">
+    <section id="summary" class="hero">
+      <h2>BCS Normative Summary</h2>
+      <p>
+        This publication defines the normative baseline for resilient Bitcoin custody architectures, and describes
+        how resilience can be measured and communicated via headline metrics including the Bitcoin Custody Resilience
+        Index (BCRI), Entropy Risk Index (ERI), and Exposure Risk Index (XRI).
+      </p>
+    </section>
 
-<div class="pdf-viewer">
-  <!-- Best-effort to hide thumbnails in many viewers (some browsers may ignore) -->
-  <iframe src="BCS_Normative.pdf#pagemode=none&view=FitH" title="BCS Normative Summary PDF"></iframe>
-</div>
+    <section class="meta" aria-label="Document metadata">
+      <div class="metaGrid">
+        <div class="kv"><div class="k">Document</div><div class="v">BCS-NS-1.0</div></div>
+        <div class="kv"><div class="k">Status</div><div class="v">Published</div></div>
+        <div class="kv"><div class="k">Date</div><div class="v">February 2026</div></div>
+        <div class="kv"><div class="k">Maintainer</div><div class="v">Bitcoin Custody Standard</div></div>
+        <div class="kv"><div class="k">Contact</div><div class="v"><a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a></div></div>
+        <div class="kv"><div class="k">X</div><div class="v"><a href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener">@Bitcoin_custody</a></div></div>
+      </div>
+      <div class="note">
+        If the embedded viewer does not load on your device, use <strong>Download PDF</strong> above.
+      </div>
+    </section>
 
-<div class="footer">
-  <div>© Bitcoin Custody Standard. All rights reserved.</div>
-  <div><a href="BCS_Normative.pdf" target="_blank" rel="noopener">Open PDF</a></div>
-</div>
+    <section id="document" class="viewerWrap" aria-label="Embedded PDF">
+      <div class="viewerHead">
+        <strong>Document Viewer</strong>
+        <div>
+          <a href="BCS_Normative.pdf" target="_blank" rel="noopener">Open in new tab</a>
+        </div>
+      </div>
 
-</div>
+      <!-- Best-effort to reduce side thumbnails in many viewers (browser-dependent) -->
+      <iframe src="BCS_Normative.pdf#pagemode=none&view=FitH" title="BCS Normative Summary PDF"></iframe>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="foot">
+        <div>© Bitcoin Custody Standard. All rights reserved.</div>
+        <div><a href="BCS_Normative.pdf" target="_blank" rel="noopener">BCS-NS-1.0 PDF</a></div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
