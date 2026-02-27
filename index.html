@@ -6,17 +6,17 @@
   <title>Bitcoin Custody Standard — Normative Summary</title>
 
   <!-- SEO -->
-  <meta name="description" content="Bitcoin Custody Standard (BCS) — Normative Summary (BCS-NS-1.0). A baseline framework for resilient Bitcoin custody architectures and measurement via BCRI, ERI, and XRI." />
+  <meta name="description" content="Bitcoin Custody Standard (BCS) — Normative Summary (BCS-NS-1.0). A normative framework for resilient Bitcoin custody against Custodial Entropy, measured via BCRI, ERI, and XRI." />
   <meta name="robots" content="index,follow" />
 
   <!-- Open Graph / X -->
   <meta property="og:title" content="Bitcoin Custody Standard — Normative Summary" />
-  <meta property="og:description" content="BCS-NS-1.0 (Normative). Baseline framework for resilient Bitcoin custody and measurement via BCRI, ERI, and XRI." />
+  <meta property="og:description" content="BCS-NS-1.0 (Normative). Framework for custody resilience against Custodial Entropy; metrics: BCRI, ERI, XRI." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://bitcoincustodystandard.org/" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Bitcoin Custody Standard — Normative Summary" />
-  <meta name="twitter:description" content="BCS-NS-1.0 (Normative). Baseline framework for resilient Bitcoin custody and measurement via BCRI, ERI, and XRI." />
+  <meta name="twitter:description" content="BCS-NS-1.0 (Normative). Framework for custody resilience against Custodial Entropy; metrics: BCRI, ERI, XRI." />
 
   <style>
     :root{
@@ -35,21 +35,16 @@
       background:var(--bg);
       color:var(--text);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      line-height:1.55;
+      line-height:1.6;
     }
     a{color:var(--link); text-decoration:none}
     a:hover{text-decoration:underline}
 
-    .wrap{
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 0 18px;
-    }
+    .wrap{ max-width: 980px; margin: 0 auto; padding: 0 18px; }
 
-    /* Top bar */
     header{
       border-bottom:1px solid var(--border);
-      background: #fff;
+      background:#fff;
       position: sticky;
       top: 0;
       z-index: 10;
@@ -81,7 +76,7 @@
     .brand h1{
       font-size:16px;
       margin:0;
-      font-weight:800;
+      font-weight:850;
       letter-spacing:.2px;
     }
     .brand .sub{
@@ -89,6 +84,7 @@
       font-size:12px;
       color: var(--muted);
     }
+
     nav{
       display:flex;
       gap:14px;
@@ -96,7 +92,6 @@
       flex-wrap:wrap;
     }
 
-    /* Buttons */
     .actions{
       display:flex;
       gap:10px;
@@ -112,7 +107,7 @@
       border:1px solid var(--border);
       background:#fff;
       color:var(--text);
-      font-weight:700;
+      font-weight:750;
       white-space:nowrap;
     }
     .btn.primary{
@@ -122,29 +117,51 @@
     }
     .btn:hover{ text-decoration:none; filter:brightness(.98); }
 
-    /* Main content */
-    main{
-      padding: 34px 0 60px;
-    }
-    .hero{
-      margin-bottom: 18px;
-    }
+    main{ padding: 34px 0 60px; }
+
     .hero h2{
       font-size: 30px;
       line-height: 1.15;
       margin: 0 0 10px 0;
-      font-weight: 850;
+      font-weight: 900;
     }
-    .hero p{
-      margin: 0 0 14px 0;
+    .lead{
+      margin: 0 0 18px 0;
       color: var(--muted);
       font-size: 16px;
-      max-width: 78ch;
+      max-width: 85ch;
     }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 18px 0 22px;
+    }
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius: 16px;
+      padding: 14px 16px;
+    }
+    .card h3{
+      margin:0 0 10px 0;
+      font-size: 13px;
+      letter-spacing:.22px;
+      text-transform: uppercase;
+      color:#111827;
+    }
+    .card p{ margin: 0 0 10px 0; color: var(--muted); font-size:14px; }
+    .card ul{ margin:0; padding-left: 18px; color: var(--muted); font-size:14px; }
+    .card li{ margin: 6px 0; }
 
     .meta{
       border:1px solid var(--border);
-      background: #fff;
+      background:#fff;
       border-radius: 16px;
       padding: 14px 16px;
       margin: 18px 0 22px;
@@ -158,18 +175,35 @@
     @media (max-width: 760px){
       .metaGrid{ grid-template-columns: 1fr; }
     }
-    .kv{display:flex; justify-content:space-between; gap:10px; padding:8px 10px; border:1px solid var(--border); border-radius:12px; background: var(--panel);}
+    .kv{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:8px 10px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background: var(--panel);
+    }
     .k{color: var(--muted)}
-    .v{font-weight:700; text-align:right}
+    .v{font-weight:800; text-align:right}
 
-    .note{
-      font-size: 13px;
+    .section{
+      margin-top: 22px;
+    }
+    .section h3{
+      margin:0 0 10px 0;
+      font-size: 18px;
+      font-weight: 850;
+    }
+    .section .text{
       color: var(--muted);
-      margin-top: 10px;
+      font-size: 15px;
+      max-width: 92ch;
+      white-space: pre-line;
     }
 
-    /* PDF viewer */
     .viewerWrap{
+      margin-top: 22px;
       border:1px solid var(--border);
       border-radius: 16px;
       overflow:hidden;
@@ -211,6 +245,8 @@
       gap:10px;
       flex-wrap:wrap;
     }
+
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
   </style>
 </head>
 
@@ -227,7 +263,8 @@
         </div>
 
         <nav aria-label="Primary">
-          <a href="#summary">Summary</a>
+          <a href="#abstract">Abstract</a>
+          <a href="#purpose">Purpose</a>
           <a href="#document">Document</a>
           <a href="mailto:contact@bitcoincustodystandard.org">Contact</a>
         </nav>
@@ -242,27 +279,72 @@
   </header>
 
   <main class="wrap">
-    <section id="summary" class="hero">
+    <section class="hero">
       <h2>BCS Normative Summary</h2>
-      <p>
-        This publication defines the normative baseline for resilient Bitcoin custody architectures, and describes
-        how resilience can be measured and communicated via headline metrics including the Bitcoin Custody Resilience
-        Index (BCRI), Entropy Risk Index (ERI), and Exposure Risk Index (XRI).
+      <p class="lead">
+        The Bitcoin Custody Standard (BCS) is a normative framework for evaluating and strengthening the resilience of Bitcoin custody architectures against Custodial Entropy over time.
       </p>
     </section>
 
     <section class="meta" aria-label="Document metadata">
       <div class="metaGrid">
-        <div class="kv"><div class="k">Document</div><div class="v">BCS-NS-1.0</div></div>
+        <div class="kv"><div class="k">Document</div><div class="v mono">BCS-NS-1.0</div></div>
         <div class="kv"><div class="k">Status</div><div class="v">Published</div></div>
         <div class="kv"><div class="k">Date</div><div class="v">February 2026</div></div>
         <div class="kv"><div class="k">Maintainer</div><div class="v">Bitcoin Custody Standard</div></div>
         <div class="kv"><div class="k">Contact</div><div class="v"><a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a></div></div>
         <div class="kv"><div class="k">X</div><div class="v"><a href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener">@Bitcoin_custody</a></div></div>
       </div>
-      <div class="note">
-        If the embedded viewer does not load on your device, use <strong>Download PDF</strong> above.
+    </section>
+
+    <section class="grid" aria-label="Overview blocks">
+      <div class="card">
+        <h3>Key metrics</h3>
+        <ul>
+          <li><strong>Bitcoin Custody Resilience Index (BCRI):</strong> Structural resilience (0–100, higher is stronger)</li>
+          <li><strong>Entropy Risk Index (ERI):</strong> Time-based structural fragility (0–100, lower is better)</li>
+          <li><strong>Exposure Risk Index (XRI):</strong> Adversarial and visibility risk (0–100, lower is better)</li>
+        </ul>
+        <p style="margin-top:10px;">
+          XRI is advisory and does not form part of core structural conformance requirements.
+        </p>
       </div>
+
+      <div class="card">
+        <h3>Structural pillars</h3>
+        <ul>
+          <li>Cryptographic Integrity</li>
+          <li>Physical Distribution</li>
+          <li>Cognitive Reliability</li>
+          <li>Operational &amp; Dependency Risk</li>
+          <li>Temporal Resilience</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="abstract" class="section">
+      <h3>Abstract</h3>
+      <div class="text">The Bitcoin Custody Standard (BCS) establishes a normative framework for evaluating and strengthening the resilience of Bitcoin custody architectures against Custodial Entropy over time. The Bitcoin Custody Resilience Index (BCRI) is the quantitative assessment instrument aligned with BCS, providing structured scoring across the five structural pillars. BCRI incorporates three headline metrics:
+Bitcoin Custody Resilience Index (BCRI): Structural resilience (0-100, higher is stronger)
+Entropy Risk Index (ERI): Time-based structural fragility (0-100, lower is better)
+Exposure Risk Index (XRI): Adversarial and visibility risk (0-100, lower is better)
+BCS is designed to operate alongside evolving institutional, regulatory, and technological custody frameworks while remaining structurally independent of jurisdiction-specific requirements.</div>
+    </section>
+
+    <section id="purpose" class="section">
+      <h3>Purpose</h3>
+      <div class="text">The Bitcoin Custody Standard (BCS) establishes a normative framework for evaluating and strengthening the resilience of Bitcoin custody architectures against Custodial Entropy over time.
+
+Custodial Entropy is the inevitable structural degradation of custody systems over time due to forgotten knowledge, undocumented changes, technological evolution, shifting life circumstances, coordination complexity, and insufficient review.
+
+Because Bitcoin is a bearer asset with no recovery possible once keys are lost, BCS exists to reduce the probability that Bitcoin holdings (whether managed by individuals, families, fiduciaries, advisors, or institutions) become permanently inaccessible due to preventable Custodial Entropy.
+
+Bitcoin was introduced as a peer-to-peer electronic cash system in which ownership is defined exclusively by control of private keys, without reliance on centralized recovery authorities (Nakamoto, 2008). BCS operates within this foundational architectural constraint.
+
+BCS defines standardized terminology, structural domains, and conformance requirements to support consistent evaluation and long-term preservation of access across custody contexts.
+The Bitcoin Custody Resilience Index (BCRI) is the quantitative assessment instrument aligned with BCS. BCRI provides structured measurement and reporting across the five BCS structural pillars, including assessment of Entropy Risk through a proprietary Entropy Index.
+
+BCS defines the normative framework; BCRI operationalizes that framework through structured scoring and reporting.</div>
     </section>
 
     <section id="document" class="viewerWrap" aria-label="Embedded PDF">
