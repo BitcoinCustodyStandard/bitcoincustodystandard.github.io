@@ -1,283 +1,110 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bitcoin Custody Standard — Normative Summary</title>
-  <meta name="description" content="Bitcoin Custody Standard (BCS) — Normative Summary (BCS-NS-1.0) and embedded PDF." />
-  <style>
-    :root{
-      --bg:#ffffff;
-      --text:#0b1220;
-      --muted:#4b5563;
-      --border:#e5e7eb;
-      --panel:#f8fafc;
-      --link:#0f62fe;
-      --button:#111827;
-      --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      line-height:1.5;
-    }
-    a{color:var(--link); text-decoration:none}
-    a:hover{text-decoration:underline}
-    header{
-      border-bottom:1px solid var(--border);
-      background:linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
-    }
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:28px 18px;
-    }
-    .topbar{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
-    .brand{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      min-width:260px;
-    }
-    .mark{
-      width:34px;height:34px;border-radius:10px;
-      border:1px solid var(--border);
-      background:var(--panel);
-      display:grid;place-items:center;
-      font-weight:700;
-      letter-spacing:.5px;
-    }
-    .titleblock h1{
-      font-size:22px;
-      line-height:1.2;
-      margin:0 0 2px 0;
-      font-weight:700;
-    }
-    .subtitle{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-    }
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid var(--border);
-      background:#fff;
-      color:var(--text);
-      font-weight:600;
-      box-shadow:none;
-    }
-    .btn.primary{
-      background:var(--button);
-      color:#fff;
-      border-color:var(--button);
-    }
-    .btn:hover{ text-decoration:none; filter:brightness(0.98); }
-    main .wrap{ padding:26px 18px 42px; }
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:18px;
-    }
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-    .card{
-      border:1px solid var(--border);
-      border-radius:16px;
-      background:#fff;
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .card .hd{
-      padding:14px 16px;
-      border-bottom:1px solid var(--border);
-      background:var(--panel);
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:flex-start;
-      flex-wrap:wrap;
-    }
-    .card .hd h2{
-      margin:0;
-      font-size:15px;
-      letter-spacing:.2px;
-      text-transform:uppercase;
-      color:#111827;
-    }
-    .tag{
-      display:inline-flex;
-      align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#eef2ff;
-      border:1px solid #e0e7ff;
-      color:#3730a3;
-      font-size:12px;
-      font-weight:700;
-      white-space:nowrap;
-    }
-    .card .bd{
-      padding:16px;
-    }
-    .meta{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-      font-size:14px;
-    }
-    .row{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:12px;
-      background:#fff;
-    }
-    .k{color:var(--muted)}
-    .v{font-weight:600; text-align:right}
-    .note{
-      font-size:13px;
-      color:var(--muted);
-      margin:10px 0 0;
-    }
-    .viewer{
-      width:100%;
-      height:78vh; /* responsive-ish */
-      min-height:560px;
-      border:0;
-      background:#fff;
-    }
-    .viewerWrap{
-      border-top:1px solid var(--border);
-    }
-    .sectionTitle{
-      font-size:16px;
-      margin:0 0 10px 0;
-    }
-    footer{
-      border-top:1px solid var(--border);
-      background:#fff;
-    }
-    footer .wrap{
-      padding:18px;
-      color:var(--muted);
-      font-size:13px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bitcoin Custody Standard</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #111;
+  background: #fff;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 820px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+
+h1 {
+  font-size: 34px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 40px;
+}
+
+.meta {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.meta strong {
+  color: #000;
+}
+
+.download {
+  display: inline-block;
+  padding: 12px 18px;
+  background: #000;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.download:hover {
+  opacity: 0.85;
+}
+
+.pdf-viewer {
+  margin-top: 60px;
+  border-top: 1px solid #eee;
+  padding-top: 40px;
+}
+
+iframe {
+  width: 100%;
+  height: 75vh;
+  border: none;
+}
+
+footer {
+  margin-top: 80px;
+  font-size: 13px;
+  color: #777;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+</style>
 </head>
 
 <body>
-  <header>
-    <div class="wrap">
-      <div class="topbar">
-        <div class="brand">
-          <div class="mark">BCS</div>
-          <div class="titleblock">
-            <h1>Bitcoin Custody Standard</h1>
-            <p class="subtitle">Normative Summary &mdash; publication landing page</p>
-          </div>
-        </div>
+<div class="container">
 
-        <div class="actions">
-          <!-- IMPORTANT: Make sure this filename matches your repo -->
-          <a class="btn primary" href="BCS_Normative.pdf" download>Download PDF</a>
-          <a class="btn" href="BCS_Normative.pdf" target="_blank" rel="noopener">Open PDF</a>
-          <a class="btn" href="mailto:contact@bitcoincustodystandard.org">Contact</a>
-        </div>
-      </div>
-    </div>
-  </header>
+<h1>Bitcoin Custody Standard</h1>
+<div class="subtitle">
+Normative Summary for the Bitcoin Custody Standard (BCS) and the Bitcoin Custody Resilience Index (BCRI).
+</div>
 
-  <main>
-    <div class="wrap">
-      <div class="grid">
-        <!-- LEFT: PDF + brief description -->
-        <section class="card" aria-label="Normative summary">
-          <div class="hd">
-            <h2>BCS Normative Summary</h2>
-            <span class="tag">BCS-NS-1.0 (Normative)</span>
-          </div>
-          <div class="bd">
-            <p style="margin:0 0 10px 0;">
-              This document defines the normative baseline for the Bitcoin Custody Standard (BCS) and its alignment with the
-              Bitcoin Custody Resilience Index (BCRI) scoring instrument.
-            </p>
-            <p class="note" style="margin-top:0;">
-              If the embedded viewer does not load on your device, use <strong>Open PDF</strong> above.
-            </p>
-          </div>
+<div class="meta">
+<strong>Document:</strong> BCS-NS-1.0<br>
+<strong>Status:</strong> Published<br>
+<strong>Date:</strong> February 2026<br>
+<strong>Maintainer:</strong> Bitcoin Custody Standard<br>
+<strong>Contact:</strong> contact@bitcoincustodystandard.org
+</div>
 
-          <div class="viewerWrap">
-            <!-- IMPORTANT: Make sure this filename matches your repo -->
-            <iframe class="viewer" src="BCS_Normative.pdf#view=FitH" title="BCS Normative Summary (PDF viewer)"></iframe>
-          </div>
-        </section>
+<a class="download" href="BCS_Normative.pdf" target="_blank">Download PDF</a>
 
-        <!-- RIGHT: Metadata / status / links -->
-        <aside class="card" aria-label="Publication metadata">
-          <div class="hd">
-            <h2>Publication</h2>
-            <span class="tag">Status: Published</span>
-          </div>
-          <div class="bd">
-            <h3 class="sectionTitle">Document metadata</h3>
-            <div class="meta">
-              <div class="row"><div class="k">Document</div><div class="v">BCS-NS-1.0</div></div>
-              <div class="row"><div class="k">Type</div><div class="v">Normative Summary</div></div>
-              <div class="row"><div class="k">Published</div><div class="v">2026-02-26</div></div>
-              <div class="row"><div class="k">Maintainer</div><div class="v">Bitcoin Custody Standard</div></div>
-              <div class="row"><div class="k">Contact</div><div class="v"><a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a></div></div>
-            </div>
+<div class="pdf-viewer">
+<iframe src="BCS_Normative.pdf"></iframe>
+</div>
 
-            <p class="note">
-              Optional integrity marker (recommended): publish a SHA-256 hash of the PDF here once finalized.
-            </p>
-            <div class="row" style="margin-top:10px;">
-              <div class="k">SHA-256</div>
-              <div class="v"><code>TODO</code></div>
-            </div>
+<footer>
+© Bitcoin Custody Standard. All rights reserved.
+</footer>
 
-            <p class="note" style="margin-top:12px;">
-              You can add additional materials later (e.g., BCRI scoring demo, changelog, methodology) without changing this layout.
-            </p>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </main>
-
-  <footer>
-    <div class="wrap">
-      <div>© Bitcoin Custody Standard. All rights reserved.</div>
-      <div><a href="BCS_Normative.pdf" target="_blank" rel="noopener">BCS-NS-1.0 PDF</a></div>
-    </div>
-  </footer>
+</div>
 </body>
 </html>
