@@ -150,6 +150,16 @@ section[id]{
     scroll-margin-top: calc(var(--headerH) + 60px);
   }
 }
+  /* iPhone anchor fix */
+h3[id]{
+  scroll-margin-top: calc(var(--headerH) + 28px);
+}
+
+@media(max-width:760px){
+  h3[id]{
+    scroll-margin-top: calc(var(--headerH) + 90px);
+  }
+}
 
 /* TWO CARDS (metrics + pillars) */
 .grid{
@@ -349,8 +359,8 @@ footer{
     </div>
   </section>
 
-  <section id="abstract" class="section">
-    <h3>Abstract</h3>
+ <section class="section">
+  <h3 id="abstract">Abstract</h3>
     <div class="text">
 The Bitcoin Custody Standard (BCS) establishes a normative framework for evaluating and strengthening the resilience of Bitcoin custody architectures against Custodial Entropy over time. The Bitcoin Custody Resilience Index (BCRI) is the quantitative assessment instrument aligned with BCS, providing structured scoring across the five structural pillars. BCRI incorporates three headline metrics:
 Bitcoin Custody Resilience Index (BCRI): Structural resilience (0–100, higher is stronger)
@@ -360,8 +370,8 @@ BCS is designed to operate alongside evolving institutional, regulatory, and tec
     </div>
   </section>
 
-  <section id="purpose" class="section">
-    <h3>Purpose</h3>
+ <section class="section">
+  <h3 id="purpose">Purpose</h3>
     <div class="text">
 The Bitcoin Custody Standard (BCS) establishes a normative framework for evaluating and strengthening the resilience of Bitcoin custody architectures against Custodial Entropy over time.
 
