@@ -141,7 +141,15 @@ main{padding:34px 0 60px}
 }
 
 /* Anchor offset for sticky header (sections) */
-section[id]{scroll-margin-top:calc(var(--headerH) + 18px)}
+section[id]{
+  scroll-margin-top: calc(var(--headerH) + 18px);
+}
+
+@media(max-width:760px){
+  section[id]{
+    scroll-margin-top: calc(var(--headerH) + 60px);
+  }
+}
 
 /* TWO CARDS (metrics + pillars) */
 .grid{
