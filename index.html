@@ -274,9 +274,38 @@ iframe{
 
 footer{
   border-top:1px solid var(--border);
-  padding:18px 0;
+  margin-top:28px;
+  padding-top:16px;
+  padding-bottom:24px;
+  text-align:center;
+  line-height:1.35;
+}
+
+footer .title{
+  font-weight:700;
+  margin-bottom:4px;
+}
+
+footer .tagline{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:8px;
+}
+
+footer .version{
+  font-size:14px;
+  margin-bottom:8px;
+}
+
+footer .email{
+  font-size:14px;
+  margin-bottom:4px;
+}
+
+footer .copyright{
   font-size:13px;
   color:var(--muted);
+  margin-top:8px;
 }
 
 /* Mobile header polish (keeps same look, just stacks better) */
@@ -468,32 +497,32 @@ BCS defines the normative framework; BCRI operationalizes that framework through
 
 </main>
 
-<footer class="bcsFooter" aria-label="Site footer">
-  <div class="bcsFooterInner">
-    <div class="bcsFooterTitle">Bitcoin Custody Standard (BCS)</div>
-    <div class="bcsFooterTagline">A normative framework for evaluating Bitcoin custody resilience.</div>
+<footer>
 
-    <div class="bcsFooterMeta">
-      <div class="bcsFooterRow">
-        <span class="bcsFooterLabel">Version</span>
-        <span class="bcsFooterValue">1.0</span>
-      </div>
-      <div class="bcsFooterRow">
-        <span class="bcsFooterLabel">Year</span>
-        <span class="bcsFooterValue">2026</span>
-      </div>
-      <div class="bcsFooterRow">
-        <span class="bcsFooterLabel">Research</span>
-        <a class="bcsFooterLink" href="mailto:research@bitcoincustodystandard.org">research@bitcoincustodystandard.org</a>
-      </div>
-      <div class="bcsFooterRow">
-        <span class="bcsFooterLabel">Contact</span>
-        <a class="bcsFooterLink" href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a>
-      </div>
-    </div>
+<div class="title">
+Bitcoin Custody Standard (BCS)
+</div>
 
-    <div class="bcsFooterLegal">© 2026 Bitcoin Custody Standard. All rights reserved.</div>
-  </div>
+<div class="tagline">
+A normative framework for evaluating Bitcoin custody resilience.
+</div>
+
+<div class="version">
+Version 1.0 — 2026
+</div>
+
+<div class="email">
+Research: <a href="mailto:research@bitcoincustodystandard.org">research@bitcoincustodystandard.org</a>
+</div>
+
+<div class="email">
+Contact: <a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a>
+</div>
+
+<div class="copyright">
+© 2026 Bitcoin Custody Standard. All rights reserved.
+</div>
+
 </footer>
 
 </body>
