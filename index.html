@@ -279,6 +279,96 @@ footer{
   color:var(--muted);
 }
 
+/* ===== Footer (BCS) ===== */
+.bcsFooter{
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border, #e5e5e5);
+}
+
+.bcsFooterInner{
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: center;
+  color: var(--muted, #666);
+  line-height: 1.35;
+  padding: 0 14px;
+}
+
+.bcsFooterTitle{
+  font-weight: 700;
+  color: var(--text, #111);
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.bcsFooterTagline{
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.bcsFooterMeta{
+  display: inline-grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  text-align: left;
+  margin: 0 auto 10px auto;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.02);
+}
+
+.bcsFooterRow{
+  display: contents;
+}
+
+.bcsFooterLabel{
+  font-weight: 600;
+  color: var(--muted, #666);
+  white-space: nowrap;
+}
+
+.bcsFooterValue{
+  color: var(--text, #111);
+}
+
+.bcsFooterLink{
+  color: var(--link, #2563eb);
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.bcsFooterLink:hover{
+  text-decoration: underline;
+}
+
+.bcsFooterLegal{
+  font-size: 13px;
+  color: var(--muted, #777);
+  margin-top: 6px;
+  padding-bottom: 14px;
+}
+
+@media (max-width: 760px){
+  .bcsFooterInner{
+    padding: 0 12px;
+  }
+  .bcsFooterMeta{
+    width: 100%;
+    max-width: 520px;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    text-align: left;
+  }
+  .bcsFooterLabel{
+    display: block;
+    margin-bottom: 2px;
+  }
+}
+
+/* Mobile header polish (keeps same look, just stacks better) */
+
 /* Mobile header polish (keeps same look, just stacks better) */
 /* ABOUT THIS STANDARD (Option B) */
 .about-standard{
