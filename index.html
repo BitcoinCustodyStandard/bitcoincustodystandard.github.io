@@ -223,7 +223,57 @@ h3[id]{
 }
 .card li{margin:6px 0}
 .card p{margin:10px 0 0;color:var(--muted);font-size:14px}
+/* ===== Governance Tiles ===== */
 
+.govGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:14px;
+}
+
+@media(max-width:860px){
+  .govGrid{
+    grid-template-columns:1fr;
+  }
+}
+
+.govCard{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:14px;
+  padding:16px 18px;
+}
+
+.govCard h4{
+  margin:0 0 10px 0;
+  font-size:13px;
+  letter-spacing:.22px;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:700;
+}
+
+.govCard p{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+}
+
+/* Improve orange dot spacing */
+
+.dot{
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:var(--btc);
+  display:inline-block;
+  margin-right:6px;
+  transform:translateY(-1px);
+}
 /* SECTIONS */
 .section{margin-top:26px}
 .section h3{margin-bottom:10px;font-size:18px;font-weight:900}
