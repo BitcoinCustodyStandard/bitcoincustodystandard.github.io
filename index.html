@@ -190,26 +190,11 @@ main{padding:34px 0 60px}
   font-weight:400;   /* normal weight */
 }
 
-/* Anchor offset for sticky header (sections + headings) */
-/* Anchor offset for sticky header (global) */
-html{
-  scroll-padding-top: 220px;
-}
-section[id], h3[id]{
-  scroll-margin-top: 220px;
-}
+/* Anchor offset for sticky header (AUTO: uses real header height) */
+:root{ --headerOffset: 120px; } /* fallback before JS runs */
 
-/* Mobile: header is taller (wraps), so increase header height instead of huge offsets */
-@media(max-width:760px){
-  :root{
-    --headerH: 132px; /* adjust later if needed */
-  }
-
-  section[id],
-  h3[id]{
-    scroll-margin-top: calc(var(--headerH) + 18px);
-  }
-}
+html{ scroll-padding-top: var(--headerOffset); }
+section[id], h3[id]{ scroll-margin-top: var(--headerOffset); }
 /* TWO CARDS (metrics + pillars) */
 .grid{
   display:grid;
@@ -687,6 +672,18 @@ Contact: <a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincust
 </div>
 
 </footer>
-
+<script>
+  (function () {
+    function setHeaderOffset() {
+      const header = document.querySelector("header");
+      if (!header) return;
+      const h = Math.ceil(header.getBoundingClientRect().height);
+      // add a small cushion so headings never clip
+      document.documentElement.style.setProperty("--headerOffset", (h + 14) + "px");
+    }
+    window.addEventListener("load", setHeaderOffset);
+    window.addEventListener("resize", setHeaderOffset);
+  })();
+</script>
 </body>
 </html>
