@@ -679,7 +679,7 @@ Contact: <a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincust
       if (!header) return;
       const h = Math.ceil(header.getBoundingClientRect().height);
       // add a small cushion so headings never clip
-      document.documentElement.style.setProperty("--headerOffset", (h + 14) + "px");
+      document.documentElement.style.setProperty("--headerOffset", (h + 4) + "px");
     }
     window.addEventListener("load", setHeaderOffset);
     window.addEventListener("resize", setHeaderOffset);
