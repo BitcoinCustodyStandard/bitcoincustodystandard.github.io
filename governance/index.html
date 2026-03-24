@@ -6,16 +6,16 @@
 <title>Governance — Bitcoin Custody Standard</title>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="canonical" href="https://bitcoincustodystandard.org/governance/" />
-<meta name="description" content="Bitcoin Custody Standard governance — stewardship, versioning, review cadence, research program, and external contributions policy of the Bitcoin Custody Standard Initiative." />
+<meta name="description" content="Bitcoin Custody Standard governance — stewardship, versioning, review cadence, and change control framework." />
 <meta name="robots" content="index,follow" />
 <meta property="og:title" content="Governance — Bitcoin Custody Standard" />
-<meta property="og:description" content="Stewardship, versioning, review cadence, and research program of the Bitcoin Custody Standard Initiative." />
+<meta property="og:description" content="Governance framework of the Bitcoin Custody Standard Initiative." />
 <meta property="og:type" content="website" />
 <meta property="og:image" content="https://bitcoincustodystandard.org/BCS_twitter_card_1200x630.png" />
 <meta property="og:url" content="https://bitcoincustodystandard.org/governance/" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Governance — Bitcoin Custody Standard" />
-<meta name="twitter:description" content="Stewardship, versioning, review cadence, and research program of the Bitcoin Custody Standard Initiative." />
+<meta name="twitter:description" content="Governance framework of the Bitcoin Custody Standard Initiative." />
 <meta name="twitter:image" content="https://bitcoincustodystandard.org/BCS_twitter_card_1200x630.png" />
 <meta name="twitter:site" content="@Bitcoin_Custody" />
 
@@ -32,36 +32,15 @@
   --btc:#b36b00;
   --headerH:72px;
 }
-@media(max-width:760px){
-  :root{ --headerH: 132px; }
-}
+@media(max-width:760px){ :root{ --headerH:132px; } }
 *{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  line-height:1.6;
-}
-a{color:var(--link); text-decoration:none}
+body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; line-height:1.6; }
+a{color:var(--link);text-decoration:none}
 a:hover{text-decoration:underline}
+p{color:var(--muted);font-size:14px;line-height:1.65;margin:0;}
 .wrap{max-width:980px;margin:0 auto;padding:0 18px}
-header{
-  border-bottom:1px solid var(--border);
-  background:#fff;
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-.top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 0;
-  min-height:var(--headerH);
-  flex-wrap:wrap;
-  gap:12px;
-}
+header{ border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; z-index:10; }
+.top{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; min-height:var(--headerH); flex-wrap:wrap; gap:12px; }
 .brand{ display:flex; align-items:center; gap:12px; }
 .logo{ width:34px; height:34px; border-radius:8px; object-fit:cover; }
 .brand h1{margin:0;font-size:16px;font-weight:900}
@@ -71,61 +50,18 @@ nav a{font-weight:600;color:var(--muted)}
 nav a:hover{color:var(--text);text-decoration:none}
 nav a.active{color:var(--text)}
 .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.btn{
-  padding:9px 14px;
-  border-radius:8px;
-  border:1px solid var(--border);
-  font-weight:800;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  white-space:nowrap;
-}
+.btn{ padding:9px 14px; border-radius:8px; border:1px solid var(--border); font-weight:800; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; }
 .btn.primary{ background:var(--btn); color:var(--btnText); border-color:var(--btn); }
 .btn:hover{text-decoration:none;filter:brightness(.97)}
 main{padding:34px 0 60px}
 .hero{ padding-bottom:18px; border-bottom:1px solid var(--border); margin-bottom:28px; }
-.hero h2{margin:0 0 10px 0;font-size:32px;font-weight:950}
-.lead{margin:0;color:var(--muted);max-width:92ch}
-.dot{ width:7px; height:7px; border-radius:999px; background:var(--btc); display:inline-block; margin-right:6px; transform:translateY(-1px); }
-/* Metadata strip */
-.meta{ border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:28px; }
-.metaGrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; }
-@media(max-width:760px){
-  .metaGrid{ grid-template-columns:1fr; justify-items:center; }
-  .kv{ width:100%; max-width:520px; margin-left:auto; margin-right:auto; }
-  .k{ flex: 0 0 44%; }
-  .v{ flex:1 1 auto; display:flex; justify-content:flex-end; text-align:right; }
-}
-.kv{ display:flex; justify-content:space-between; align-items:flex-start; padding:10px 14px; background:var(--panel); border-radius:12px; border:1px solid var(--border); }
-.k{ color:var(--muted); font-weight:600; flex-shrink:0; padding-right:12px; }
-.v{ font-weight:400; text-align:right; }
-.v a{ display:inline-block; text-align:right; }
-/* Gov cards */
-.govGrid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-@media(max-width:860px){ .govGrid{ grid-template-columns:1fr; } }
-.govCard{ border:1px solid var(--border); background:#fff; border-radius:14px; padding:20px 22px; }
-.govCard h4{ margin:0 0 10px 0; font-size:13px; letter-spacing:.22px; text-transform:uppercase; display:flex; align-items:center; gap:8px; font-weight:700; }
-.govCard p{ margin:0; color:var(--muted); font-size:14px; line-height:1.6; }
-.govCard p + p{ margin-top:10px; }
-/* Full-width section card */
-.section{ margin-top:28px; }
-.section h3{ font-size:18px; font-weight:900; margin:0 0 14px; }
-.fullCard{ border:1px solid var(--border); background:#fff; border-radius:14px; padding:20px 22px; }
-.fullCard h4{ margin:0 0 10px 0; font-size:13px; letter-spacing:.22px; text-transform:uppercase; display:flex; align-items:center; gap:8px; font-weight:700; }
-.fullCard p{ margin:0; color:var(--muted); font-size:14px; line-height:1.6; }
-.fullCard p + p{ margin-top:10px; }
-.divider{ height:1px; background:var(--border); margin:20px 0; }
-/* Publications table */
-.pubList{ display:flex; flex-direction:column; gap:12px; margin-top:4px; }
-.pubRow{ display:flex; flex-direction:column; gap:8px; padding:12px 14px; background:var(--panel); border-radius:12px; border:1px solid var(--border); }
-.pub-id{ font-size:11px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
-.pub-title{ font-size:14px; font-weight:700; color:var(--text); }
-.pubRow-meta{ display:flex; gap:20px; flex-wrap:wrap; font-size:13px; color:var(--muted); }
-.pubRow-meta span strong{ color:var(--text); font-weight:600; }
-.text{ color:var(--muted); font-size:14px; line-height:1.7; }
-:root{ --headerOffset: 120px; }
-html{ scroll-padding-top: var(--headerOffset); }
+.hero h2{margin:0 0 10px 0;font-size:32px;font-weight:950;color:var(--text);}
+.section{ margin-bottom:28px; padding-bottom:28px; border-bottom:1px solid var(--border); }
+.section:last-of-type{ border-bottom:none; }
+.section h3{ font-size:18px; font-weight:900; color:var(--text); margin:0 0 10px; }
+.authority{ margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
+:root{ --headerOffset:120px; }
+html{ scroll-padding-top:var(--headerOffset); }
 footer{ border-top:1px solid var(--border); margin-top:28px; padding-top:16px; padding-bottom:24px; text-align:center; line-height:1.35; }
 footer .title{ font-weight:700; margin-bottom:4px; }
 footer .tagline{ color:var(--muted); font-size:14px; margin-bottom:8px; }
@@ -172,136 +108,37 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
 
   <section class="hero">
     <h2>Governance</h2>
-    <p class="lead">
-      The Bitcoin Custody Standard is maintained by the Bitcoin Custody Standard Initiative (BCSI). This page describes the stewardship model, versioning policy, review cadence, research program, and external contributions framework that govern BCS publications.
-    </p>
+    <p>This page defines the governance, maintenance, and version control framework of the Bitcoin Custody Standard. It establishes how the standard is maintained, reviewed, and updated over time.</p>
   </section>
 
-  <section class="meta" aria-label="Governance metadata">
-    <div class="metaGrid">
-      <div class="kv"><div class="k">Steward</div><div class="v">Bitcoin Custody Standard Initiative (BCSI)</div></div>
-      <div class="kv"><div class="k">Current Publications</div><div class="v">BCS-NS-1.1 · BCS-BR-1.0</div></div>
-      <div class="kv"><div class="k">Next Review (BCS-NS-1.1)</div><div class="v">February 2027</div></div>
-      <div class="kv"><div class="k">Next Review (BCS-BR-1.0)</div><div class="v">March 2027</div></div>
-      <div class="kv"><div class="k">General Contact</div><div class="v"><a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a></div></div>
-      <div class="kv"><div class="k">Research Contact</div><div class="v"><a href="mailto:research@bitcoincustodystandard.org">research@bitcoincustodystandard.org</a></div></div>
-    </div>
-  </section>
+  <div class="section">
+    <h3>Stewardship</h3>
+    <p>The Bitcoin Custody Standard is maintained by the Bitcoin Custody Standard Initiative. The Initiative is responsible for the development, publication, and ongoing maintenance of all normative and benchmark documents.</p>
+  </div>
 
-  <!-- BCS Initiative -->
-  <section class="section" id="initiative">
-    <h3>BCS Initiative</h3>
-    <div class="fullCard">
-      <h4><span class="dot"></span>About the Bitcoin Custody Standard Initiative</h4>
-      <p>
-        The Bitcoin Custody Standard Initiative (BCSI) is the steward of the Bitcoin Custody Standard (BCS) and its associated publications. The BCSI exists to define, maintain, and evolve a rigorous, independent framework for evaluating the structural resilience of Bitcoin custody architectures across time.
-      </p>
-      <p>
-        The BCSI operates as an independent initiative and is not affiliated with any custody provider, financial institution, or regulatory body. Its mandate is the long-term structural integrity of the standard — ensuring that BCS remains analytically sound, practically applicable, and independent of commercial or regulatory influence.
-      </p>
-      <p>
-        The BCSI's work spans three areas: normative framework development, quantitative benchmark research, and public education on custody resilience. All publications are released publicly and are freely citable under the BCS versioned publication model.
-      </p>
-    </div>
-  </section>
+  <div class="section">
+    <h3>Versioning</h3>
+    <p>All BCS documents are versioned. Version numbers reflect controlled updates to the framework. Minor version changes reflect clarifications or refinements, while major version changes reflect substantive updates to the model or structure.</p>
+  </div>
 
-  <!-- BCS Research -->
-  <section class="section" id="research">
-    <h3>BCS Research</h3>
-    <div class="fullCard">
-      <h4><span class="dot"></span>Research Program</h4>
-      <p>
-        The BCS research program supports the development and ongoing refinement of the Bitcoin Custody Standard through empirical analysis, structural modeling, and applied custody research. Research outputs include benchmark datasets, methodology papers, and analytical commentaries on custody risk, structural failure modes, and resilience design.
-      </p>
-      <p>
-        Research is conducted in support of normative framework development and is intended to provide the evidentiary and analytical basis for BCS methodology decisions, including BCRI model parameters, scoring boundaries, and conformance thresholds.
-      </p>
-      <div class="divider"></div>
-      <h4><span class="dot"></span>BCS Research Archive</h4>
-      <p>
-        Research publications and ongoing work related to the Bitcoin Custody Standard are published at the BCS Research Archive on Substack. The archive includes working papers, methodology notes, and commentary on custody resilience topics aligned with the BCS framework.
-      </p>
-      <p>
-        <a href="https://bitcoincustodystandard.substack.com" target="_blank" rel="noopener">BCS Research Archive</a> &nbsp;·&nbsp; <a href="mailto:research@bitcoincustodystandard.org">research@bitcoincustodystandard.org</a>
-      </p>
-    </div>
-  </section>
+  <div class="section">
+    <h3>Review Cycle</h3>
+    <p>The standard is subject to periodic review. Each document includes a scheduled review date. Reviews assess the continued validity of the framework and incorporate necessary updates.</p>
+  </div>
 
-  <!-- Stewardship & Versioning -->
-  <section class="section" id="stewardship">
-    <h3>Stewardship &amp; Versioning</h3>
-    <div class="govGrid">
-      <div class="govCard">
-        <h4><span class="dot"></span>Stewardship</h4>
-        <p>
-          Stewardship of BCS includes maintenance of normative documents, publication of supporting research, and periodic revision of the standard to ensure continued alignment with evolving custody practices, technological developments, and emerging operational risks.
-        </p>
-        <p>
-          Stewardship decisions are made in the interest of the long-term structural integrity of the standard and are independent of any commercial, institutional, or regulatory interest.
-        </p>
-      </div>
-      <div class="govCard">
-        <h4><span class="dot"></span>Versioning</h4>
-        <p>
-          BCS follows a versioned publication model. Each document release is assigned a version identifier of the form <strong>BCS-[type]-[version]</strong>. Conformance claims shall reference the specific BCS version used for assessment and shall not imply applicability to future versions without reassessment.
-        </p>
-        <p>
-          Version increments reflect material changes to normative content. Minor editorial corrections may be issued without a version increment and will be noted in the document record.
-        </p>
-      </div>
-      <div class="govCard">
-        <h4><span class="dot"></span>Review Cadence</h4>
-        <p>
-          Normative documents are reviewed annually. The next scheduled review of <strong>BCS-NS-1.1</strong> is February 2027, and of <strong>BCS-BR-1.0</strong> is March 2027. Reviews may be triggered earlier by significant changes in custody technology, regulatory frameworks, or structural risk conditions.
-        </p>
-      </div>
-      <div class="govCard">
-        <h4><span class="dot"></span>External Contributions</h4>
-        <p>
-          The BCS initiative welcomes constructive feedback and external contributions from researchers, practitioners, and industry participants — including technical review, methodological suggestions, and empirical observations related to custody resilience.
-        </p>
-        <p>
-          General feedback: <a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a><br>
-          Research contributions: <a href="mailto:research@bitcoincustodystandard.org">research@bitcoincustodystandard.org</a>
-        </p>
-      </div>
-    </div>
-  </section>
+  <div class="section">
+    <h3>Change Control</h3>
+    <p>All updates to the standard are managed under a controlled revision process. Changes are incorporated through new versions of the documents. Previous versions remain part of the historical record.</p>
+  </div>
 
-  <!-- Publications -->
-  <section class="section" id="publications">
-    <h3>Publications</h3>
-    <div class="pubList">
-      <div class="pubRow">
-        <div class="pub-id">BCS-NS-1.1 · Normative Summary</div>
-        <div class="pub-title"><a href="/">Bitcoin Custody Standard — Normative Summary</a></div>
-        <div class="pubRow-meta">
-          <span><strong>Version</strong> 1.1</span>
-          <span><strong>Published</strong> March 2026</span>
-          <span><strong>Next Review</strong> February 2027</span>
-          <span><strong>Status</strong> Public, Citable</span>
-        </div>
-      </div>
-      <div class="pubRow">
-        <div class="pub-id">BCS-BR-1.0 · Benchmark Report</div>
-        <div class="pub-title"><a href="/bcri/">BCRI Benchmark Report</a></div>
-        <div class="pubRow-meta">
-          <span><strong>Version</strong> 1.0</span>
-          <span><strong>Published</strong> March 2026</span>
-          <span><strong>Next Review</strong> March 2027</span>
-          <span><strong>Status</strong> Public, Citable</span>
-        </div>
-      </div>
-    </div>
-  </section>
+  <div class="section">
+    <h3>Document Classification</h3>
+    <p>Normative documents define the principles, definitions, and evaluation framework of the Bitcoin Custody Standard. Benchmark reports and research publications apply and extend the framework.</p>
+  </div>
 
-  <!-- Non-Endorsement -->
-  <section class="section" id="policy">
-    <h3>Non-Endorsement Policy</h3>
-    <p class="text">
-      BCS publications benchmark and evaluate custody architecture design types as assessed under the BCS methodology. They do not constitute certification, regulatory guidance, or endorsement of any specific product, implementation, or service provider. Where named examples appear in BCS publications, they are cited as illustrative of the relevant architecture class and do not represent a complete enumeration or endorsement. Conformance claims based on BCS must reference the specific document version used for assessment.
-    </p>
-  </section>
+  <div class="authority">
+    <p>Maintained by the Bitcoin Custody Standard Initiative.</p>
+  </div>
 
 </main>
 
