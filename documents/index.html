@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Documents — Bitcoin Custody Standard</title>
+<title>Document Registry — Bitcoin Custody Standard</title>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="canonical" href="https://bitcoincustodystandard.org/documents/" />
-<meta name="description" content="Bitcoin Custody Standard publications — Normative Summary (BCS-NS-1.1) and BCRI Benchmark Report (BCS-BR-1.0). Public, citable documents." />
+<meta name="description" content="Bitcoin Custody Standard Document Registry — official normative documents and benchmark reports." />
 <meta name="robots" content="index,follow" />
-<meta property="og:title" content="Documents — Bitcoin Custody Standard" />
-<meta property="og:description" content="Bitcoin Custody Standard publications — BCS-NS-1.1 and BCS-BR-1.0." />
+<meta property="og:title" content="Document Registry — Bitcoin Custody Standard" />
+<meta property="og:description" content="Official publications of the Bitcoin Custody Standard — BCS-NS-1.1 and BCS-BR-1.0." />
 <meta property="og:type" content="website" />
 <meta property="og:image" content="https://bitcoincustodystandard.org/BCS_twitter_card_1200x630.png" />
 <meta property="og:url" content="https://bitcoincustodystandard.org/documents/" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Documents — Bitcoin Custody Standard" />
-<meta name="twitter:description" content="Bitcoin Custody Standard publications — BCS-NS-1.1 and BCS-BR-1.0." />
+<meta name="twitter:title" content="Document Registry — Bitcoin Custody Standard" />
+<meta name="twitter:description" content="Official publications of the Bitcoin Custody Standard — BCS-NS-1.1 and BCS-BR-1.0." />
 <meta name="twitter:image" content="https://bitcoincustodystandard.org/BCS_twitter_card_1200x630.png" />
 <meta name="twitter:site" content="@Bitcoin_Custody" />
 
@@ -37,6 +37,7 @@
 body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; line-height:1.6; }
 a{color:var(--link);text-decoration:none}
 a:hover{text-decoration:underline}
+p{color:var(--muted);font-size:14px;line-height:1.65;}
 .wrap{max-width:980px;margin:0 auto;padding:0 18px}
 header{ border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; z-index:10; }
 .top{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; min-height:var(--headerH); flex-wrap:wrap; gap:12px; }
@@ -49,33 +50,29 @@ nav a{font-weight:600;color:var(--muted)}
 nav a:hover{color:var(--text);text-decoration:none}
 nav a.active{color:var(--text)}
 .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.btn{ padding:9px 14px; border-radius:8px; border:1px solid var(--border); font-weight:800; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; gap:6px; }
+.btn{ padding:9px 14px; border-radius:8px; border:1px solid var(--border); font-weight:800; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; }
 .btn.primary{ background:var(--btn); color:var(--btnText); border-color:var(--btn); }
-.btn.secondary{ background:#fff; color:var(--text); border-color:var(--border); }
 .btn:hover{text-decoration:none;filter:brightness(.97)}
 main{padding:34px 0 60px}
 .hero{ padding-bottom:18px; border-bottom:1px solid var(--border); margin-bottom:28px; }
-.hero h2{margin:0 0 10px 0;font-size:32px;font-weight:950}
-.lead{margin:0;color:var(--muted);max-width:92ch}
-.dot{ width:7px; height:7px; border-radius:999px; background:var(--btc); display:inline-block; margin-right:6px; transform:translateY(-1px); }
-
-/* Document callout cards — amber style matching Key Findings */
-.doc-list{ display:flex; flex-direction:column; gap:20px; }
-.doc-card{
+.hero h2{margin:0 0 10px 0;font-size:32px;font-weight:950;color:var(--text);}
+.hero p{margin:0;color:var(--muted);max-width:72ch;}
+.section{margin-bottom:32px;}
+.section h3{font-size:18px;font-weight:900;color:var(--text);margin:0 0 16px;}
+.doc-entry{
   background:#fafafa;
   border:1px solid #e5e5e5;
   border-left:3px solid #c87a2b;
   border-radius:6px;
-  padding:20px 22px;
+  padding:16px 18px;
+  margin-bottom:14px;
 }
-.doc-label{ font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#666; margin:0 0 6px; display:flex; align-items:center; }
-.doc-title{ font-size:18px; font-weight:900; color:#111; margin:0 0 8px; }
-.doc-desc{ color:var(--muted); font-size:14px; margin:0 0 16px; max-width:72ch; line-height:1.6; }
-.doc-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
-.doc-meta{ padding-top:14px; border-top:1px solid #e5e5e5; display:flex; gap:20px; flex-wrap:wrap; }
-.doc-meta-item{ font-size:13px; color:var(--muted); }
-.doc-meta-item strong{ color:#111; font-weight:600; }
-
+.doc-title{font-size:15px;font-weight:700;color:var(--text);margin:0 0 10px;}
+.doc-meta{display:flex;flex-direction:column;gap:3px;margin-bottom:12px;}
+.doc-meta span{font-size:14px;color:var(--muted);}
+.doc-link{font-size:14px;font-weight:600;color:var(--link);}
+.doc-link:hover{text-decoration:underline;}
+.page-footer-note{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);}
 :root{ --headerOffset:120px; }
 html{ scroll-padding-top:var(--headerOffset); }
 footer{ border-top:1px solid var(--border); margin-top:28px; padding-top:16px; padding-bottom:24px; text-align:center; line-height:1.35; }
@@ -84,12 +81,12 @@ footer .tagline{ color:var(--muted); font-size:14px; margin-bottom:8px; }
 footer .version{ font-size:14px; margin-bottom:8px; }
 footer .email{ font-size:14px; margin-bottom:4px; }
 footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
+.dot{ width:7px; height:7px; border-radius:999px; background:var(--btc); display:inline-block; margin-right:6px; transform:translateY(-1px); }
 @media(max-width:760px){
   .top{ flex-direction:column; align-items:stretch; }
   .brand{ justify-content:center; }
   nav{ justify-content:center; }
   .actions{ justify-content:center; }
-  .doc-actions{ flex-direction:column; }
 }
 </style>
 </head>
@@ -124,48 +121,38 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
 <main class="wrap">
 
   <section class="hero">
-    <h2>Documents</h2>
-    <p class="lead">Public, citable publications of the Bitcoin Custody Standard Initiative. All documents follow the BCS versioned publication model.</p>
+    <h2>Document Registry</h2>
+    <p>This page lists the official publications of the Bitcoin Custody Standard, including normative documents and benchmark reports. Each document is versioned, citable, and maintained under the BCS framework.</p>
   </section>
 
-  <div class="doc-list">
-
-    <!-- BCS-NS-1.1 -->
-    <div class="doc-card">
-      <p class="doc-label"><span class="dot"></span>BCS-NS-1.1 · Normative Summary</p>
-      <p class="doc-title">Bitcoin Custody Standard — Normative Summary</p>
-      <p class="doc-desc">The primary normative framework defining how Bitcoin custody resilience is evaluated and measured. Establishes the five structural pillars, the BCRI model, and conformance methodology.</p>
-      <div class="doc-actions">
-        <a class="btn primary" href="/BCS-NS-1.1-2026-03-06.pdf" download>Download PDF</a>
-        <a class="btn secondary" href="/BCS-NS-1.1-2026-03-06.pdf" target="_blank" rel="noopener">Open</a>
-        <a class="btn secondary" href="/">Full page</a>
-      </div>
+  <div class="section">
+    <h3>Normative Documents</h3>
+    <div class="doc-entry">
+      <p class="doc-title">Bitcoin Custody Standard — Normative Summary (BCS-NS-1.1)</p>
       <div class="doc-meta">
-        <div class="doc-meta-item"><strong>Version</strong> 1.1</div>
-        <div class="doc-meta-item"><strong>Published</strong> March 2026</div>
-        <div class="doc-meta-item"><strong>Status</strong> Public, Citable</div>
-        <div class="doc-meta-item"><strong>Next Review</strong> February 2027</div>
+        <span>Version: 1.1</span>
+        <span>Status: Public, Citable</span>
+        <span>Publication Date: February 2026</span>
       </div>
+      <a class="doc-link" href="https://bitcoincustodystandard.org/">→ View Document</a>
     </div>
+  </div>
 
-    <!-- BCS-BR-1.0 -->
-    <div class="doc-card">
-      <p class="doc-label"><span class="dot"></span>BCS-BR-1.0 · Benchmark Report</p>
-      <p class="doc-title">BCRI Benchmark Report</p>
-      <p class="doc-desc">Structural resilience and complexity benchmarks for 14 Bitcoin custody architecture types, evaluated under BCS-NS-1.1. Establishes the efficient frontier of custody resilience across design classes.</p>
-      <div class="doc-actions">
-        <a class="btn primary" href="/BCS-BR-1.0-2026-03.pdf" download>Download PDF</a>
-        <a class="btn secondary" href="/BCS-BR-1.0-2026-03.pdf" target="_blank" rel="noopener">Open</a>
-        <a class="btn secondary" href="/bcri/">Full page</a>
-      </div>
+  <div class="section">
+    <h3>Benchmark Reports</h3>
+    <div class="doc-entry">
+      <p class="doc-title">BCRI Benchmark Report (BCS-BR-1.0)</p>
       <div class="doc-meta">
-        <div class="doc-meta-item"><strong>Version</strong> 1.0</div>
-        <div class="doc-meta-item"><strong>Published</strong> March 2026</div>
-        <div class="doc-meta-item"><strong>Status</strong> Public, Citable</div>
-        <div class="doc-meta-item"><strong>Next Review</strong> March 2027</div>
+        <span>Version: 1.0</span>
+        <span>Status: Public, Citable</span>
+        <span>Publication Date: March 2026</span>
       </div>
+      <a class="doc-link" href="https://bitcoincustodystandard.org/bcri/">→ View Document</a>
     </div>
+  </div>
 
+  <div class="page-footer-note">
+    <p>Maintained by the Bitcoin Custody Standard Initiative.</p>
   </div>
 
 </main>
