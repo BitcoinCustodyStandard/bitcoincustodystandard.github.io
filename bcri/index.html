@@ -167,6 +167,34 @@ footer .copyright{font-size:13px;color:var(--muted);margin-top:8px;}
   padding:14px 16px;width:360px;
   box-shadow:0 8px 32px rgba(0,0,0,0.35);display:none;
 }
+@media(max-width:768px){
+  #bcri-tip{
+    width:calc(100vw - 32px);
+    max-width:420px;
+    left:50% !important;
+    top:50% !important;
+    transform:translate(-50%,-50%);
+    pointer-events:auto;
+    border-radius:12px;
+    padding:18px 20px;
+  }
+  .tip-name{font-size:15px;}
+  .tip-score{font-size:13px;}
+  .tip-cfg{font-size:13px;line-height:1.7;}
+  #bcri-tip-close{display:flex;}
+}
+#bcri-tip-close{
+  display:none;
+  justify-content:flex-end;
+  margin-bottom:10px;
+}
+#bcri-tip-close button{
+  background:rgba(255,255,255,0.15);
+  border:none;color:#fff;
+  font-size:16px;line-height:1;
+  padding:4px 10px;border-radius:6px;
+  cursor:pointer;pointer-events:auto;
+}
 .tip-name{font-size:13px;font-weight:700;color:#f9fafb;margin:0 0 4px;line-height:1.3;}
 .tip-score{font-size:11px;color:#9ca3af;margin:0 0 10px;}
 .tip-lbl{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin:0 0 5px;}
@@ -251,6 +279,7 @@ body { overflow-x: hidden; }
 
 <!-- Tooltip -->
 <div id="bcri-tip">
+  <div id="bcri-tip-close"><button onclick="hideTip()">✕</button></div>
   <p class="tip-name" id="tip-name"></p>
   <p class="tip-score" id="tip-score"></p>
   <p class="tip-lbl">Reference Configuration</p>
@@ -428,8 +457,9 @@ const CONFIGS={
   'Qualified Custodian':'OCC or NYDFS chartered trust. Individual segregated on-chain addresses per client — independently verifiable. FIPS 140-2 Level 3 HSMs. Multi-continental cold storage. Statutory trust law provides bankruptcy remoteness. Highest CS in the benchmark (9.4).',
 };
 const tip=document.getElementById('bcri-tip'),tipName=document.getElementById('tip-name'),tipScore=document.getElementById('tip-score'),tipCfg=document.getElementById('tip-cfg');
-function showTip(e,n,s,c){tipName.textContent=n;tipScore.textContent=s;tipCfg.textContent=c;tip.style.display='block';mvTip(e);}
-function mvTip(e){const x=e.clientX+16,y=e.clientY+16,w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=(x+w>window.innerWidth?e.clientX-w-16:x)+'px';tip.style.top=(y+h>window.innerHeight?e.clientY-h-16:y)+'px';}
+function isMobile(){return window.innerWidth<=768;}
+function showTip(e,n,s,c){tipName.textContent=n;tipScore.textContent=s;tipCfg.textContent=c;tip.style.display='block';if(!isMobile())mvTip(e);}
+function mvTip(e){if(isMobile())return;const x=e.clientX+16,y=e.clientY+16,w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=(x+w>window.innerWidth?e.clientX-w-16:x)+'px';tip.style.top=(y+h>window.innerHeight?e.clientY-h-16:y)+'px';}
 function hideTip(){tip.style.display='none';}
 const rd=[
   {l1:'Self-Managed Multisig',  l2:'— Hi Resilience (Geo)',bcri:97.5,re:39.1,rat:'AAA', z:'Distributed', name:'Self-Managed Multisig — Hi Resilience (Geo)'},
@@ -469,7 +499,7 @@ new Chart(document.getElementById('c1'),{type:'bar',plugins:[lblPlugin,hov],
   data:{labels:rd.map(()=>''),datasets:[{data:rd.map(d=>d.bcri),backgroundColor:rd.map(d=>d.z==='No Sovereignty'?'rgba(0,0,0,0)':ZF[d.z]),borderColor:rd.map(d=>d.z==='No Sovereignty'?'#d1d5db':'transparent'),borderWidth:rd.map(d=>d.z==='No Sovereignty'?1:0),borderRadius:3,borderSkipped:false}]},
   options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{left:8,right:72,top:4,bottom:4}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{min:0,max:100,grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:11,family:'system-ui'}}},y:{grid:{display:false},ticks:{display:false}}}}
 });
-document.getElementById('c1').addEventListener('mousemove',mvTip);document.getElementById('c1').addEventListener('mouseleave',hideTip);
+document.getElementById('c1').addEventListener('mousemove',mvTip);document.getElementById('c1').addEventListener('mouseleave',function(){if(!isMobile())hideTip();});
 
 function fy(cs){return 13.67*Math.pow(cs,1.5)*Math.exp(-0.335*cs);}
 const N=300,cv=[];for(let i=0;i<=N;i++){const cs=i/N*10.5;cv.push({x:+cs.toFixed(3),y:+fy(cs).toFixed(3)});}
@@ -486,7 +516,7 @@ new Chart(document.getElementById('c2'),{type:'scatter',plugins:[bnd,grd,shov],
   data:{datasets:['No Sovereignty','Single-Key','Collaborative','Distributed','Institutional'].map(z=>({label:z,data:fd.filter(d=>d.z===z).map(d=>({x:d.cs,y:d.ere,label:d.label})),backgroundColor:{'No Sovereignty':'rgba(252,165,165,0.85)','Single-Key':'rgba(253,230,138,0.9)','Collaborative':'rgba(191,219,254,0.9)','Distributed':'rgba(187,247,208,0.9)','Institutional':'rgba(233,213,255,0.9)'}[z],borderColor:{'No Sovereignty':'#f87171','Single-Key':'#d97706','Collaborative':'#2563eb','Distributed':'#059669','Institutional':'#7c3aed'}[z],borderWidth:1.5,pointRadius:7,pointHoverRadius:9}))},
   options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{min:0,max:11,title:{display:true,text:'Complexity Score (CS) · Operational burden on custody operator',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:11,family:'system-ui'}}},y:{min:-2,max:36,title:{display:true,text:'Excess Resilience Efficiency (ERE = (BCRI−25)÷√CS)',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:11,family:'system-ui'}}}}}
 });
-document.getElementById('c2').addEventListener('mousemove',mvTip);document.getElementById('c2').addEventListener('mouseleave',hideTip);
+document.getElementById('c2').addEventListener('mousemove',mvTip);document.getElementById('c2').addEventListener('mouseleave',function(){if(!isMobile())hideTip();});
 const md=[{label:'Single-Sig Cold Storage — Regular',cs:2.6,bcri:68.2,z:'Single-Key'},{label:'Single-Sig Cold Storage — Advanced',cs:4.8,bcri:84.1,z:'Single-Key'},{label:'Self-Managed Multisig — Regular (2-of-3)',cs:4.4,bcri:76.6,z:'Distributed'},{label:'Self-Managed Multisig — Advanced (3-of-5)',cs:5.6,bcri:89.6,z:'Distributed'},{label:'Self-Managed Multisig — Hi Resilience (Geo)',cs:6.2,bcri:97.5,z:'Distributed'},{label:'Collaborative Multisig — Assisted (2-of-3)',cs:3.4,bcri:79.2,z:'Collaborative'},{label:'Collaborative Multisig — Peer (2-of-3)',cs:4.6,bcri:82.0,z:'Collaborative'},{label:'Collaborative Multisig — Advised (3-of-5)',cs:5.2,bcri:96.5,z:'Collaborative'},{label:'MPC Custody',cs:7.4,bcri:89.6,z:'Institutional'},{label:'Corporate Bitcoin Treasury',cs:8.2,bcri:72.0,z:'Institutional'},{label:'Regulated Exchange Custody',cs:8.8,bcri:75.5,z:'Institutional'},{label:'Qualified Custodian',cs:9.4,bcri:93.7,z:'Institutional'}];
 const mhov={id:'mhov',afterEvent(chart,args){const e=args.event.native;if(!e)return;if(args.event.type==='mousemove'){const els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},false);if(els.length){const pt=chart.data.datasets[els[0].datasetIndex].data[els[0].index];showTip(e,pt.label,'BCRI '+pt.y+'  ·  CS '+pt.x,CONFIGS[pt.label]||'');chart.canvas.style.cursor='pointer';}else{hideTip();chart.canvas.style.cursor='default';}}else if(args.event.type==='mouseout'){hideTip();}}};
 const qp={id:'qp',beforeDraw(chart){const {ctx,scales:{x,y},chartArea:{left,right,top,bottom}}=chart;const mx=x.getPixelForValue(5),my=y.getPixelForValue(75);ctx.save();[{x1:left,y1:top,x2:mx,y2:my,bg:'rgba(209,250,229,0.45)',tc:'#065f46',sc:'#047857',t:'Efficient Self-Custody',s:'Low Complexity · High Resilience',ly:0.55},{x1:mx,y1:top,x2:right,y2:my,bg:'rgba(237,233,254,0.45)',tc:'#4c1d95',sc:'#6d28d9',t:'Institutional Custody',s:'High Complexity · High Resilience',ly:0.55},{x1:left,y1:my,x2:mx,y2:bottom,bg:'rgba(255,251,235,0.55)',tc:'#92400e',sc:'#b45309',t:'Convenience Custody',s:'Low Complexity · Lower Resilience',ly:0.55},{x1:mx,y1:my,x2:right,y2:bottom,bg:'rgba(254,226,226,0.45)',tc:'#991b1b',sc:'#b91c1c',t:'Diminishing Returns Zone',s:'High Complexity · Lower Resilience',ly:0.55}].forEach(q=>{ctx.fillStyle=q.bg;ctx.fillRect(q.x1,q.y1,q.x2-q.x1,q.y2-q.y1);const cx=(q.x1+q.x2)/2,cy=q.y1+(q.y2-q.y1)*q.ly;const bW=170,bH=36,bX=cx-85,bY=cy-18;ctx.fillStyle='rgba(255,255,255,0.85)';ctx.strokeStyle=q.tc+'55';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,4);ctx.fill();ctx.stroke();ctx.fillStyle=q.tc;ctx.font='600 10px system-ui';ctx.textAlign='center';ctx.fillText(q.t,cx,bY+13);ctx.fillStyle=q.sc;ctx.font='9px system-ui';ctx.fillText(q.s,cx,bY+27);});ctx.setLineDash([]);ctx.strokeStyle='rgba(107,114,128,0.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(mx,top);ctx.lineTo(mx,bottom);ctx.stroke();ctx.beginPath();ctx.moveTo(left,my);ctx.lineTo(right,my);ctx.stroke();ctx.fillStyle='rgba(75,85,99,0.6)';ctx.font='9px system-ui';ctx.textAlign='left';ctx.fillText('Resilience Sufficiency Threshold (75)',left+6,my-4);ctx.restore();}};
@@ -494,8 +524,11 @@ new Chart(document.getElementById('c3'),{type:'scatter',plugins:[qp,mhov],
   data:{datasets:['Single-Key','Distributed','Collaborative','Institutional'].map(z=>({label:z,data:md.filter(d=>d.z===z).map(d=>({x:d.cs,y:d.bcri,label:d.label})),backgroundColor:ZF[z],borderColor:ZB[z],borderWidth:2,pointRadius:10,pointHoverRadius:12}))},
   options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{min:0,max:10,title:{display:true,text:'Complexity Score (CS) · Operational burden on custody operator',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:11,family:'system-ui'}}},y:{min:50,max:100,title:{display:true,text:'BCRI Score (50–100)',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:11,family:'system-ui'}}}}}
 });
-document.getElementById('c3').addEventListener('mousemove',mvTip);document.getElementById('c3').addEventListener('mouseleave',hideTip);
+document.getElementById('c3').addEventListener('mousemove',mvTip);document.getElementById('c3').addEventListener('mouseleave',function(){if(!isMobile())hideTip();});
 
+document.addEventListener('touchend',function(e){
+  if(tip.style.display==='block'&&!tip.contains(e.target)){hideTip();}
+});
 (function(){function setHeaderOffset(){const header=document.querySelector('header');if(!header)return;const h=Math.ceil(header.getBoundingClientRect().height);document.documentElement.style.setProperty('--headerOffset',(h+4)+'px');}window.addEventListener('load',setHeaderOffset);window.addEventListener('resize',setHeaderOffset);})();
 </script>
 </body>
