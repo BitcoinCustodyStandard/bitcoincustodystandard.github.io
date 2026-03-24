@@ -96,7 +96,7 @@ section[id], h3[id]{ scroll-margin-top:var(--headerOffset); }
   border-radius:6px;
   padding:16px 18px;
 }
-.pub-id{ font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#666; margin:0 0 4px; }
+.pub-id{ font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 4px; }
 .pub-title{ font-size:15px; font-weight:900; color:#111; margin:0 0 7px; }
 .pub-desc{ font-size:13px; color:var(--muted); line-height:1.65; margin:0 0 12px; }
 .pub-btns{ display:flex; gap:8px; flex-wrap:wrap; }
@@ -173,7 +173,6 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
   transition:background .12s;
   border-bottom:1px solid var(--border);
 }
-.research-link-item:last-child a { border-bottom:none; }
 .research-link-item a:hover { background:var(--panel); text-decoration:none; }
 .research-link-item a .link-arrow { font-size:11px; color:var(--muted); margin-left:auto; flex-shrink:0; }
 /* Preview card */
@@ -238,7 +237,7 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
   <section class="hero">
     <h2>Bitcoin Custody Standard — Normative Summary</h2>
     <p class="lead">The Bitcoin Custody Standard (BCS) defines a normative framework for evaluating and strengthening the structural resilience of Bitcoin custody architectures across time.</p>
-  <p class="lead" style="margin-top:10px;">This standard is intended for individual and institutional participants responsible for long-term Bitcoin custody.</p>
+  <p class="lead" style="margin-top:10px;">Applicable to individual and institutional Bitcoin custody arrangements and long-term stewardship contexts.</p>
   </section>
 
   <section class="meta" aria-label="Document metadata">
@@ -255,6 +254,19 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
       <div class="kv"><div class="k">Social</div><div class="v"><a href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener">@Bitcoin_custody</a></div></div>
     </div>
   </section>
+
+  <div style="margin-top:14px;padding:14px 18px;border:1px solid var(--border);border-radius:10px;background:var(--panel);">
+    <p style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;">Citable As</p>
+    <p style="font-size:14px;margin:0;line-height:2;">
+      Bitcoin Custody Standard (2026).<br>
+      BCS-NS-1.1 — Normative Summary.<br>
+      Available at: https://bitcoincustodystandard.org/<br>
+      <br>
+      Bitcoin Custody Standard (2026).<br>
+      BCS-BR-1.0 — BCRI Benchmark Report.<br>
+      Available at: https://bitcoincustodystandard.org/bcri/
+    </p>
+  </div>
 
   <!-- SECTION 2 — Existing introductory / about area -->
   <section class="about-standard" aria-label="About the Bitcoin Custody Standard">
@@ -369,20 +381,20 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
         </li>
         <li class="research-link-item">
           <a href="https://bitcoincustodystandard.substack.com/p/reframing-bitcoin-custody-from-device" target="_blank" rel="noopener">
-            The Case for a Bitcoin Standard
+            The Case for a Bitcoin Custody Standard
             <span class="link-arrow">↗</span>
           </a>
           <div class="preview-card">
             <img src="https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fd40662c0-a753-4abc-a7b5-66de6385bf5b_1536x1024.png" alt="The Case for a Bitcoin Standard preview" />
             <div class="preview-body">
-              <p class="preview-title">The Case for a Bitcoin Standard</p>
+              <p class="preview-title">The Case for a Bitcoin Custody Standard</p>
               <p class="preview-sub">Why custody must be evaluated as a system rather than a collection of devices.</p>
             </div>
           </div>
         </li>
         <li class="research-link-item">
           <a href="https://bitcoincustodystandard.substack.com/p/custodial-entropy-the-silent-failure" target="_blank" rel="noopener">
-            Custodial Entropy: The Silent Failure Mode of Bitcoin Custody
+            Custodial Entropy
             <span class="link-arrow">↗</span>
           </a>
           <div class="preview-card">
@@ -395,7 +407,7 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
         </li>
         <li class="research-link-item">
           <a href="https://bitcoincustodystandard.substack.com/p/the-custodial-paradox-the-structural" target="_blank" rel="noopener">
-            The Custodial Paradox: The Structural Trade-Off in Single-Key Bitcoin Custody
+            The Custodial Paradox
             <span class="link-arrow">↗</span>
           </a>
           <div class="preview-card">
@@ -516,19 +528,6 @@ BCS defines the normative framework; BCRI operationalizes that framework through
   </section>
 
   <!-- SECTION 10 — Footer note -->
-  <div style="margin-top:24px;padding:14px 18px;border:1px solid var(--border);border-radius:10px;background:var(--panel);">
-    <p style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#666;margin:0 0 8px;">Citable As</p>
-    <p style="font-size:14px;margin:0;line-height:2;">
-      Bitcoin Custody Standard (2026).<br>
-      BCS-NS-1.1 — Normative Standard.<br>
-      Available at: https://bitcoincustodystandard.org/<br>
-      <br>
-      Bitcoin Custody Standard (2026).<br>
-      BCS-BR-1.0 — BCRI Benchmark Report.<br>
-      Available at: https://bitcoincustodystandard.org/bcri/
-    </p>
-  </div>
-
   <div class="footer-note">
     Version-controlled public standard.<br>
     Benchmark and research publications will expand over time under the BCS framework.
