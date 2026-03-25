@@ -1,1 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Framework Definitions — Bitcoin Custody Standard</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="canonical" href="https://bitcoincustodystandard.org/definitions/" />
+<meta name="description" content="Authoritative definitions of the Bitcoin Custody Standard framework — custody resilience, custodial entropy, BCRI, complexity scoring, and structural failure theory." />
+<meta name="robots" content="index,follow" />
+<meta property="og:title" content="Framework Definitions — Bitcoin Custody Standard" />
+<meta property="og:description" content="Authoritative definitions of the Bitcoin Custody Standard framework — custody resilience, custodial entropy, BCRI, and structural failure theory." />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://bitcoincustodystandard.org/Normative.png" />
+<meta property="og:url" content="https://bitcoincustodystandard.org/definitions/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Framework Definitions — Bitcoin Custody Standard" />
+<meta name="twitter:description" content="Authoritative definitions of the Bitcoin Custody Standard framework." />
+<meta name="twitter:image" content="https://bitcoincustodystandard.org/Normative.png" />
+<meta name="twitter:site" content="@Bitcoin_Custody" />
 
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "DefinedTermSet",
+      "@id": "https://bitcoincustodystandard.org/definitions/",
+      "name": "Bitcoin Custody Standard — Framework Definitions",
+      "description": "Authoritative definitions of terms used in the Bitcoin Custody Standard normative framework.",
+      "url": "https://bitcoincustodystandard.org/definitions/",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Bitcoin Custody Standard Initiative",
+        "url": "https://bitcoincustodystandard.org"
+      },
+      "hasDefinedTerm": [
+        {
+          "@type": "DefinedTerm",
+          "name": "Bitcoin Custody Standard (BCS)",
+          "termCode": "BCS",
+          "description": "A normative framework for evaluating the structural resilience of Bitcoin custody architectures across time.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Custody Architecture",
+          "description": "The structured design describing how private keys, recovery material, participants, devices, and procedures are organized to preserve control over Bitcoin across time.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Custody Resilience",
+          "description": "The ability of a custody system to maintain secure, recoverable, and continuous control of Bitcoin across time under operational, human, environmental, and adversarial stress.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Custodial Entropy",
+          "description": "The progressive degradation of a custody system over time due to knowledge loss, undocumented changes, coordination breakdown, and technological evolution.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Custodial Paradox",
+          "description": "The tension that stronger custody often requires more structure, while greater structure can introduce complexity that itself becomes a source of failure over time.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Bitcoin Custody Resilience Index (BCRI)",
+          "termCode": "BCRI",
+          "description": "A composite score from 0 to 100 measuring overall custody resilience across architecture, coordination, entropy, and exposure.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Architecture Resilience Score (ARS)",
+          "termCode": "ARS",
+          "description": "A structural measure of custody architecture strength across the five BCS pillars: cryptographic integrity, physical distribution, operational dependency, cognitive reliability, and temporal resilience.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Coordination Health Score (CHS)",
+          "termCode": "CHS",
+          "description": "A measure of the reliability and durability of coordination required to execute custody operations and recovery procedures across time.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Entropy Risk Index (ERI)",
+          "termCode": "ERI",
+          "description": "A measure of long-horizon degradation risk arising from operational drift and coordination fragility. Higher ERI indicates greater entropy-related failure risk over time.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Exposure Risk Index (XRI)",
+          "termCode": "XRI",
+          "description": "A measure of how visible, identifiable, and targetable a custody system is under adversarial conditions, including identity linkage, disclosure patterns, and coercion exposure.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Complexity Score (CS)",
+          "termCode": "CS",
+          "description": "A measure of the operational burden imposed by a custody architecture, including setup requirements, maintenance burden, technical expertise, coordination overhead, and recovery complexity.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Resilience Efficiency (RE)",
+          "termCode": "RE",
+          "description": "A measure of resilience produced per unit of complexity. RE = BCRI / √CS",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Excess Resilience Efficiency (ERE)",
+          "termCode": "ERE",
+          "description": "A refined efficiency metric measuring resilience earned above the structural baseline. ERE = (BCRI − 25) / √CS",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Custodial Entropy",
+          "description": "The progressive degradation of a custody system over time due to knowledge loss, undocumented changes, coordination breakdown, and technological evolution.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Single Point of Failure",
+          "description": "Any element whose compromise, loss, or absence can cause catastrophic compromise or permanent loss of access.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        },
+        {
+          "@type": "DefinedTerm",
+          "name": "Resilience Sufficiency Threshold",
+          "description": "The minimum structural resilience level required for a custody architecture to be considered structurally sufficient within the benchmark framework.",
+          "inDefinedTermSet": "https://bitcoincustodystandard.org/definitions/"
+        }
+      ]
+    },
+    {
+      "@type": "WebPage",
+      "name": "Framework Definitions — Bitcoin Custody Standard",
+      "url": "https://bitcoincustodystandard.org/definitions/",
+      "description": "Authoritative definitions of the Bitcoin Custody Standard framework.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Bitcoin Custody Standard",
+        "url": "https://bitcoincustodystandard.org"
+      }
+    }
+  ]
+}
+</script>
+
+<script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+<style>
+:root{
+  --bg:#ffffff;
+  --text:#0b1220;
+  --muted:#4b5563;
+  --border:#e5e7eb;
+  --panel:#f8fafc;
+  --btn:#111827;
+  --btnText:#ffffff;
+  --link:#b36b00;
+  --btc:#b36b00;
+  --amber:#c87a2b;
+  --amber-light:#fdf6ee;
+  --headerH:72px;
+  --headerOffset:120px;
+}
+@media(max-width:760px){ :root{ --headerH:132px; } }
+*{box-sizing:border-box}
+body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; line-height:1.6; overflow-x:hidden; }
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+p{color:var(--muted);font-size:14px;line-height:1.65;margin:0;}
+html{scroll-padding-top:var(--headerOffset);}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+
+/* ── Header ── */
+header{ border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; z-index:100; }
+.top{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; min-height:var(--headerH); flex-wrap:wrap; gap:12px; }
+.brand{display:flex;align-items:center;gap:12px;}
+.logo{width:34px;height:34px;border-radius:8px;object-fit:cover;}
+.brand h1{margin:0;font-size:16px;font-weight:900}
+.brand .sub{margin:0;font-size:12px;color:var(--muted)}
+nav{display:flex;gap:14px;flex-wrap:wrap}
+nav a{font-weight:600;color:var(--muted);font-size:14px;}
+nav a:hover{color:var(--text);text-decoration:none}
+nav a.active{color:var(--text)}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{ padding:9px 14px; border-radius:8px; border:1px solid var(--border); font-weight:800; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; font-size:14px; }
+.btn.primary{ background:var(--btn); color:var(--btnText); border-color:var(--btn); }
+.btn:hover{text-decoration:none;filter:brightness(.97)}
+
+/* ── Hero ── */
+main{padding:34px 0 80px}
+.hero{ padding-bottom:18px; border-bottom:1px solid var(--border); margin-bottom:28px; }
+.hero h2{margin:0 0 10px;font-size:32px;font-weight:950;color:var(--text);}
+.hero p{margin:0;color:var(--muted);max-width:72ch;font-size:15px;}
+.hero-meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;}
+.hero-badge{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:4px 10px;}
+
+/* ── Principle callout ── */
+.principle{
+  margin:0 0 32px;
+  padding:18px 22px;
+  background:var(--amber-light);
+  border:1px solid #e8d5b7;
+  border-left:4px solid var(--amber);
+  border-radius:0 8px 8px 0;
+}
+.principle-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin:0 0 6px;}
+.principle-text{font-size:15px;font-weight:600;color:var(--text);margin:0;line-height:1.5;}
+
+/* ── Section anchors ── */
+.def-section{margin-bottom:40px;}
+.def-section-title{
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--amber);margin:0 0 16px;padding-bottom:8px;
+  border-bottom:1px solid #e8d5b7;
+  display:flex;align-items:center;gap:8px;
+}
+.def-section-title::before{
+  content:'';width:18px;height:2px;background:var(--amber);display:inline-block;flex-shrink:0;
+}
+
+/* ── Definition entries ── */
+.def-entry{
+  border-bottom:1px solid var(--border);
+  padding:16px 0;
+}
+.def-entry:last-child{border-bottom:none;}
+.def-term{
+  font-size:15px;font-weight:800;color:var(--text);
+  display:flex;align-items:center;gap:10px;margin:0 0 6px;
+  cursor:pointer;
+  user-select:none;
+}
+.def-code{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:#fafafa;border:1px solid #e5e5e5;border-radius:3px;
+  padding:2px 7px;color:var(--amber);flex-shrink:0;font-family:monospace;
+}
+.def-body{font-size:14px;color:var(--muted);line-height:1.7;margin:0;}
+.def-note{
+  margin-top:8px;
+  padding:10px 14px;
+  background:var(--panel);
+  border-left:2px solid #e8d5b7;
+  border-radius:0 6px 6px 0;
+  font-size:13px;color:var(--muted);line-height:1.6;
+}
+.def-formula{
+  margin-top:8px;
+  padding:8px 14px;
+  background:#fafafa;
+  border:1px solid #e5e5e5;
+  border-radius:6px;
+  font-family:monospace;font-size:13px;color:var(--text);
+  display:inline-block;
+}
+
+/* ── Sticky mini-nav ── */
+.def-nav{
+  position:sticky;
+  top:calc(var(--headerH) + 8px);
+  z-index:10;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 16px;
+  margin-bottom:28px;
+  display:flex;gap:6px;flex-wrap:wrap;
+  box-shadow:0 1px 4px rgba(0,0,0,.04);
+}
+.def-nav a{
+  font-size:12px;font-weight:600;color:var(--muted);
+  padding:4px 10px;border-radius:5px;border:1px solid transparent;
+  transition:all .12s;text-decoration:none;
+}
+.def-nav a:hover{color:var(--amber);border-color:#e8d5b7;background:var(--amber-light);}
+.def-nav a.active{color:var(--amber);border-color:#e8d5b7;background:var(--amber-light);}
+
+/* ── Two-column layout on desktop ── */
+.def-layout{
+  display:grid;
+  grid-template-columns:200px 1fr;
+  gap:32px;
+  align-items:start;
+}
+.def-sidebar{
+  position:sticky;
+  top:calc(var(--headerH) + 16px);
+}
+.sidebar-nav{
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+}
+.sidebar-nav-title{
+  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);padding:10px 14px;background:var(--panel);
+  border-bottom:1px solid var(--border);
+}
+.sidebar-nav a{
+  display:block;padding:8px 14px;font-size:13px;font-weight:600;
+  color:var(--muted);border-bottom:1px solid var(--border);
+  text-decoration:none;transition:all .1s;
+}
+.sidebar-nav a:last-child{border-bottom:none;}
+.sidebar-nav a:hover{color:var(--amber);background:var(--amber-light);}
+.sidebar-nav a.active{color:var(--amber);background:var(--amber-light);border-left:3px solid var(--amber);}
+
+/* ── Footer ── */
+footer{ border-top:1px solid var(--border); margin-top:28px; padding:16px 0 24px; text-align:center; line-height:1.35; }
+footer .title{font-weight:700;margin-bottom:4px;}
+footer .tagline{color:var(--muted);font-size:14px;margin-bottom:8px;}
+footer .version{font-size:14px;margin-bottom:8px;}
+footer .email{font-size:14px;margin-bottom:4px;}
+footer .copyright{font-size:13px;color:var(--muted);margin-top:8px;}
+
+/* ── Mobile ── */
+@media(max-width:760px){
+  .top{flex-direction:column;align-items:stretch;}
+  .brand{justify-content:center;}
+  nav{justify-content:center;}
+  .actions{justify-content:center;}
+  .hero h2{font-size:24px;}
+  .def-layout{grid-template-columns:1fr;}
+  .def-sidebar{display:none;}
+  .def-nav{top:calc(var(--headerH) + 4px);}
+}
+@media(min-width:761px){
+  .def-nav{display:none;}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <img class="logo" src="/bcs-seal.png" alt="Bitcoin Custody Standard seal">
+        <div>
+          <h1>Bitcoin Custody Standard</h1>
+          <p class="sub">Framework Definitions</p>
+        </div>
+      </div>
+      <nav aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/bcri/">BCRI Benchmark</a>
+        <a href="/documents/">Documents</a>
+        <a href="https://bitcoincustodystandard.substack.com" target="_blank" rel="noopener">Research</a>
+        <a href="/governance/">Governance</a>
+        <a href="/definitions/" class="active">Definitions</a>
+      </nav>
+      <div class="actions">
+        <a class="btn primary" href="/documents/">Documents</a>
+        <a class="btn primary" href="mailto:contact@bitcoincustodystandard.org">Contact</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <h2>Framework Definitions</h2>
+    <p>Authoritative definitions of terms used in the Bitcoin Custody Standard normative framework. This language layer is maintained for consistency across normative documents, benchmark reports, and research publications.</p>
+    <div class="hero-meta">
+      <span class="hero-badge">BCS-NS-1.1 Aligned</span>
+      <span class="hero-badge">AI Retrievable</span>
+      <span class="hero-badge">Version 1.1 — March 2026</span>
+    </div>
+  </section>
+
+  <!-- Core principle -->
+  <div class="principle">
+    <p class="principle-label">Core Principle</p>
+    <p class="principle-text">Custody is not a product. It is a system design problem under constraints.</p>
+  </div>
+
+  <!-- Mobile sticky nav -->
+  <nav class="def-nav" aria-label="Definitions sections">
+    <a href="#core">Core Concepts</a>
+    <a href="#measurement">Measurement</a>
+    <a href="#efficiency">Efficiency</a>
+    <a href="#failure">Failure Theory</a>
+    <a href="#risk">Risk Concepts</a>
+    <a href="#entropy">Entropy Model</a>
+  </nav>
+
+  <!-- Two-column layout -->
+  <div class="def-layout">
+
+    <!-- Sidebar nav (desktop) -->
+    <aside class="def-sidebar" aria-label="Jump to section">
+      <div class="sidebar-nav">
+        <div class="sidebar-nav-title">Sections</div>
+        <a href="#core" class="active">Core Concepts</a>
+        <a href="#measurement">Measurement Layer</a>
+        <a href="#efficiency">Complexity &amp; Efficiency</a>
+        <a href="#failure">Failure Theory</a>
+        <a href="#risk">Risk Concepts</a>
+        <a href="#entropy">Entropy Model</a>
+      </div>
+    </aside>
+
+    <!-- Main definitions content -->
+    <div>
+
+      <!-- SECTION 1: Core Concepts -->
+      <section class="def-section" id="core" aria-labelledby="core-title">
+        <h2 class="def-section-title" id="core-title">Core Concepts</h2>
+
+        <div class="def-entry">
+          <h3 class="def-term">Bitcoin Custody Standard <span class="def-code">BCS</span></h3>
+          <p class="def-body">A normative framework for evaluating the structural resilience of Bitcoin custody architectures across time.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Custody Architecture</h3>
+          <p class="def-body">The structured design describing how private keys, recovery material, participants, devices, and procedures are organized to preserve control over Bitcoin across time.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Custody Resilience</h3>
+          <p class="def-body">The ability of a custody system to maintain secure, recoverable, and continuous control of Bitcoin across time under operational, human, environmental, and adversarial stress.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Custodial Entropy</h3>
+          <p class="def-body">The progressive degradation of a custody system over time due to knowledge loss, undocumented changes, coordination breakdown, and technological evolution.</p>
+          <div class="def-note">Custodial Entropy is the primary long-horizon failure mode the BCS framework is designed to measure and mitigate. A system can be cryptographically secure while quietly becoming unrecoverable.</div>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Security vs Resilience</h3>
+          <p class="def-body">Security measures resistance to compromise at a point in time. Resilience measures whether the system continues to function across time. A system can be secure today and structurally fragile tomorrow.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Custodial Paradox</h3>
+          <p class="def-body">The tension that stronger custody often requires more structure, while greater structure can introduce complexity that itself becomes a source of failure over time.</p>
+          <div class="def-note">The Custodial Paradox means that every improvement inside a single-key design trades one structural risk for another. It cannot be resolved within a single-key framework — only navigated.</div>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Recovery Material</h3>
+          <p class="def-body">All information required to restore or authorize access to Bitcoin funds, including seed phrases, passphrases, descriptors, xpubs, and wallet configuration data.</p>
+        </div>
+      </section>
+
+      <!-- SECTION 2: Measurement Layer -->
+      <section class="def-section" id="measurement" aria-labelledby="measurement-title">
+        <h2 class="def-section-title" id="measurement-title">Measurement Layer</h2>
+
+        <div class="def-entry">
+          <h3 class="def-term">Bitcoin Custody Resilience Index <span class="def-code">BCRI</span></h3>
+          <p class="def-body">A composite score from 0 to 100 measuring overall custody resilience across architecture, coordination, entropy, and exposure.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Architecture Resilience Score <span class="def-code">ARS</span></h3>
+          <p class="def-body">A structural measure of custody architecture strength across the five BCS pillars: cryptographic integrity, physical distribution, operational dependency, cognitive reliability, and temporal resilience.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Coordination Health Score <span class="def-code">CHS</span></h3>
+          <p class="def-body">A measure of the reliability and durability of coordination required to execute custody operations and recovery procedures across time.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Entropy Risk Index <span class="def-code">ERI</span></h3>
+          <p class="def-body">A measure of long-horizon degradation risk arising from operational drift and coordination fragility. Higher ERI indicates greater entropy-related failure risk over time.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Exposure Risk Index <span class="def-code">XRI</span></h3>
+          <p class="def-body">A measure of how visible, identifiable, and targetable a custody system is under adversarial conditions, including identity linkage, disclosure patterns, and coercion exposure.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Exposure Surface</h3>
+          <p class="def-body">The set of observable or inferable signals through which a custody system becomes identifiable, targetable, or vulnerable to pressure.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Effective Architecture Resilience <span class="def-code">EAR</span></h3>
+          <p class="def-body">Architecture resilience after accounting for entropy-related degradation. EAR reflects what the architecture actually delivers over time, not just at initial setup.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Resilience Sufficiency Threshold</h3>
+          <p class="def-body">The minimum structural resilience level required for a custody architecture to be considered structurally sufficient within the benchmark framework. Set at BCRI 75 in the BCS benchmark.</p>
+        </div>
+      </section>
+
+      <!-- SECTION 3: Complexity & Efficiency -->
+      <section class="def-section" id="efficiency" aria-labelledby="efficiency-title">
+        <h2 class="def-section-title" id="efficiency-title">Complexity &amp; Efficiency</h2>
+
+        <div class="def-entry">
+          <h3 class="def-term">Complexity Score <span class="def-code">CS</span></h3>
+          <p class="def-body">A measure of the operational burden imposed by a custody architecture, including setup requirements, maintenance burden, technical expertise, coordination overhead, and recovery complexity.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Resilience Efficiency <span class="def-code">RE</span></h3>
+          <p class="def-body">A measure of resilience produced per unit of complexity. Evaluates how efficiently a custody architecture converts operational complexity into structural resilience.</p>
+          <div class="def-formula">RE = BCRI / √CS</div>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Excess Resilience Efficiency <span class="def-code">ERE</span></h3>
+          <p class="def-body">A refined efficiency metric measuring resilience earned above the structural baseline. In this formulation, 25 represents the baseline floor — ERE isolates earned resilience rather than counting baseline classification structure as a resilience gain.</p>
+          <div class="def-formula">ERE = (BCRI − 25) / √CS</div>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Resilience Efficiency Frontier</h3>
+          <p class="def-body">The analytical curve representing the relationship between operational complexity and resilience efficiency. Within the BCS benchmark, efficiency rises through the low- and moderate-complexity range, peaks near moderate complexity, and declines beyond that point.</p>
+          <div class="def-note">Peak ERE in the benchmark occurs near CS 4.5. Architectures beyond this point deliver diminishing resilience returns per unit of added complexity.</div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: Failure Theory -->
+      <section class="def-section" id="failure" aria-labelledby="failure-title">
+        <h2 class="def-section-title" id="failure-title">Failure Theory</h2>
+
+        <div class="def-entry">
+          <h3 class="def-term">Structural Failure Modes</h3>
+          <p class="def-body">Custody systems fail along two independent dimensions: under-engineering — insufficient redundancy and structural fragility — and over-engineering — excessive or misallocated complexity that weakens resilience.</p>
+          <div class="def-note">A single-axis evaluation framework cannot distinguish between these two failure modes. The BCS two-dimensional framework is designed to identify both.</div>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Single Point of Failure</h3>
+          <p class="def-body">Any element whose compromise, loss, or absence can cause catastrophic compromise or permanent loss of access.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Human Failure Probability</h3>
+          <p class="def-body">The likelihood that loss occurs due to misunderstanding, memory failure, miscommunication, or procedural error.</p>
+        </div>
+      </section>
+
+      <!-- SECTION 5: Risk Concepts -->
+      <section class="def-section" id="risk" aria-labelledby="risk-title">
+        <h2 class="def-section-title" id="risk-title">Risk Concepts</h2>
+
+        <div class="def-entry">
+          <h3 class="def-term">Coordination Risk</h3>
+          <p class="def-body">The risk that custody execution or recovery fails because of excessive complexity, participant dependency, or procedural fragility.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Continuity Risk</h3>
+          <p class="def-body">The risk that Bitcoin becomes inaccessible due to death, incapacity, or inadequate succession planning.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Coercion Risk</h3>
+          <p class="def-body">The risk that control of Bitcoin is compromised under physical, legal, or social pressure.</p>
+        </div>
+      </section>
+
+      <!-- SECTION 6: Entropy Model -->
+      <section class="def-section" id="entropy" aria-labelledby="entropy-title">
+        <h2 class="def-section-title" id="entropy-title">Entropy Model</h2>
+
+        <div class="def-entry">
+          <h3 class="def-term">Entropy Model</h3>
+          <p class="def-body">The analytical framework used to measure custody degradation across time through operational drift and coordination fragility.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Latent Entropy Index <span class="def-code">LEI</span></h3>
+          <p class="def-body">Measures degradation arising from internal operational drift, such as documentation decay, knowledge loss, and software evolution.</p>
+        </div>
+
+        <div class="def-entry">
+          <h3 class="def-term">Coordination Entropy Index <span class="def-code">CEI</span></h3>
+          <p class="def-body">Measures fragility introduced by multi-party coordination, including participant dependency, sequencing requirements, and governance complexity.</p>
+        </div>
+      </section>
+
+    </div><!-- end main content -->
+  </div><!-- end def-layout -->
+
+  <!-- Footer note -->
+  <div style="margin-top:32px;padding:14px 18px;border:1px solid var(--border);border-radius:10px;background:var(--panel);font-size:12px;color:var(--muted);line-height:1.7;text-align:center;">
+    These definitions are maintained under the Bitcoin Custody Standard Initiative. Aligned with BCS-NS-1.1 — Version 1.1 — March 2026.
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="title">Bitcoin Custody Standard (BCS)</div>
+    <div class="tagline">A normative framework for evaluating Bitcoin custody resilience.</div>
+    <div class="tagline">Maintained by the Bitcoin Custody Standard Initiative (BCSI).</div>
+    <div class="version">Version 1.1 — March 2026</div>
+    <div class="email">Research: <a href="mailto:research@bitcoincustodystandard.org">research@bitcoincustodystandard.org</a></div>
+    <div class="email">Contact: <a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a></div>
+    <div class="copyright">© 2026 Bitcoin Custody Standard (BCS). All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+// Sidebar active state on scroll
+(function(){
+  const sections = document.querySelectorAll('.def-section');
+  const sideLinks = document.querySelectorAll('.sidebar-nav a, .def-nav a');
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        sideLinks.forEach(l=>l.classList.remove('active'));
+        const id=e.target.id;
+        sideLinks.forEach(l=>{ if(l.getAttribute('href')==='#'+id) l.classList.add('active'); });
+      }
+    });
+  },{rootMargin:'-20% 0px -70% 0px'});
+  sections.forEach(s=>obs.observe(s));
+})();
+
+// Header offset
+(function(){
+  function setHeaderOffset(){
+    const h=document.querySelector('header');
+    if(!h)return;
+    document.documentElement.style.setProperty('--headerOffset',(Math.ceil(h.getBoundingClientRect().height)+4)+'px');
+  }
+  window.addEventListener('load',setHeaderOffset);
+  window.addEventListener('resize',setHeaderOffset);
+})();
+</script>
+</body>
+</html>
