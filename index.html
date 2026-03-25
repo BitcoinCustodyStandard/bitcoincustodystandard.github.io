@@ -20,18 +20,33 @@
 <meta name="twitter:site" content="@Bitcoin_Custody" />
 <style>
 :root{
-  --bg:#ffffff;
-  --text:#0b1220;
-  --muted:#4b5563;
+  /* Light mode backgrounds */
+  --bg:#fafaf8;
+  --bg2:#f3f4f6;
+  --card:#ffffff;
+  /* Light mode text */
+  --text:#0f172a;
+  --muted:#475569;
+  --tertiary:#94a3b8;
+  /* Accent */
+  --amber:#f59e0b;
+  --amber-hover:#d97706;
+  --amber-lt:#fef3c7;
+  --amber-bd:#fcd34d;
+  /* Borders */
   --border:#e5e7eb;
-  --panel:#f8fafc;
-  --btn:#111827;
+  --border-strong:#cbd5e1;
+  /* Legacy aliases (keep for compatibility) */
+  --panel:var(--bg2);
+  --btn:#0f172a;
   --btnText:#ffffff;
-  --link:#b36b00;
-  --btc:#b36b00;
+  --link:#d97706;
+  --btc:#f59e0b;
+  --amber-lt:#fef3c7;
   --headerH:72px;
+  --headerOffset:120px;
 }
-@media(max-width:760px){ :root{ --headerH:132px; } }
+@media(max-width:760px){:root{--headerH:132px;}} }
 *{box-sizing:border-box}
 body{ margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; line-height:1.6; }
 a{color:var(--link);text-decoration:none}
@@ -200,74 +215,311 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
   .preview-card { display:none !important; }
 }
 
-/* ── Dark mode ── */
-body.dark{
-  --bg:#0f1623;
-  --text:#e8eaf0;
-  --muted:#9ca3af;
-  --border:#1e2a3a;
-  --panel:#151f2e;
-  --btn:#e8eaf0;
-  --btnText:#0f1623;
-  --link:#d4922f;
-  --btc:#d4922f;
-  --amber:#d4922f;
-  --amber-lt:#1a1208;
-  --amber-bd:#3a2a10;
-}
-body.dark header{ background:var(--bg); }
-body.dark .pub-card,
-body.dark .fw-card,
-body.dark .govCard,
-body.dark .about-standard,
-body.dark .card,
-body.dark .research-block,
-body.dark .fullCard,
-body.dark .kv,
-body.dark .meta,
-body.dark .sidebar-nav,
-body.dark .obsBox{ background:var(--panel); border-color:var(--border); }
-body.dark .pub-title{ color:var(--text); }
-body.dark .callout-box{ background:#1a1208; border-color:var(--amber-bd); }
-body.dark .preview-card{ background:#151f2e; border-color:var(--border); }
-body.dark .def-formula{ background:var(--panel); border-color:var(--border); color:var(--text); }
-body.dark .pillar-card{ background:var(--panel); border-color:var(--border); }
-body.dark .hero-badge{ background:var(--panel); border-color:var(--border); }
-body.dark .section-intro{ background:var(--panel); border-color:var(--border); }
-body.dark iframe{ filter:invert(0.9) hue-rotate(180deg); }
-body.dark .about-standard[style*="background:#fff"]{background:var(--panel) !important;}
-body.dark [style*="background:#fff"]{background:var(--panel) !important;}
-body.dark [style*="background:#fafafa"]{background:var(--panel) !important;}
-body.dark [style*="background:#fffbf5"]{background:var(--panel) !important;}
-body.dark .fullCard{background:var(--panel);}
-body.dark .doc-entry{background:var(--panel);}
-body.dark .doc-entry .doc-title{color:var(--text);}
-body.dark .obsBox{background:var(--panel);}
-body.dark .def-note{background:var(--panel);}
-body.dark .hero-badge{background:var(--panel);}
-body.dark .viewerHead{background:var(--panel);}
-body.dark .footer-note{background:var(--panel);}
-body.dark .btn.primary{background:var(--amber);color:#fff;border-color:var(--amber);}
-body.dark .btn.secondary{background:transparent;color:var(--amber);border-color:var(--amber);}
-body.dark .btn.primary:hover,body.dark .btn.secondary:hover{filter:brightness(1.1);}
 
-/* Toggle button */
-.theme-toggle{
-  background:none;
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:8px 11px;
-  cursor:pointer;
-  font-size:16px;
-  line-height:1;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--muted);
-  transition:border-color .15s, background .15s;
-  flex-shrink:0;
+
+
+body.dark{
+  --bg:#0b0f14;
+  --bg2:#111827;
+  --card:#0f172a;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --tertiary:#6b7280;
+  --amber:#f59e0b;
+  --amber-hover:#d97706;
+  --amber-lt:rgba(245,158,11,0.08);
+  --amber-bd:rgba(245,158,11,0.35);
+  --border:#1f2937;
+  --border-strong:#374151;
+  --panel:#111827;
+  --btn:#e5e7eb;
+  --btnText:#0b0f14;
+  --link:#f59e0b;
+  --btc:#f59e0b;
 }
-.theme-toggle:hover{ border-color:var(--amber); background:var(--amber-lt); }
+body.dark header{background:var(--bg);border-color:var(--border);}
+body.dark .about-standard,
+body.dark .about-standard[style*="background"],
+body.dark [style*="background:#fff"],
+body.dark [style*="background: #fff"],
+body.dark [style*="background:#fafafa"],
+body.dark [style*="background:#fffbf5"],
+body.dark [style*="background:#fdf6ee"]{background:var(--card) !important;border-color:var(--border) !important;}
+body.dark .pub-card{background:var(--card);border-color:var(--border);}
+body.dark .fw-card{background:var(--card);border-color:var(--border);}
+body.dark .govCard{background:var(--card);border-color:var(--border);}
+body.dark .card{background:var(--card);border-color:var(--border);}
+body.dark .research-block{background:var(--card);border-color:var(--border);}
+body.dark .fullCard{background:var(--card);border-color:var(--border);}
+body.dark .kv{background:var(--bg2);border-color:var(--border);}
+body.dark .meta{background:var(--bg);border-color:var(--border);}
+body.dark .obsBox{background:var(--bg2);border-color:var(--border);}
+body.dark .callout-box{background:var(--amber-lt);border-color:var(--amber-bd);}
+body.dark .callout-title{color:var(--text);}
+body.dark .preview-card{background:var(--card);border-color:var(--border);}
+body.dark .def-formula{background:var(--bg2);border-color:var(--border);color:var(--text);}
+body.dark .pillar-card{background:var(--card);border-color:var(--border);}
+body.dark .doc-entry{background:var(--card);border-color:var(--border);}
+body.dark .doc-entry .doc-title{color:var(--text);}
+body.dark .hero-badge{background:var(--bg2);border-color:var(--border);}
+body.dark .viewerHead{background:var(--bg2);}
+body.dark .footer-note{background:var(--bg2);border-color:var(--border);}
+body.dark .def-note{background:var(--bg2);border-color:var(--border);}
+body.dark .section-intro{background:var(--bg2);border-color:var(--border);}
+body.dark .principle{background:var(--amber-lt);border-color:var(--amber-bd);}
+body.dark .sidebar-nav{background:var(--card);border-color:var(--border);}
+body.dark .sidebar-label{background:var(--bg2);}
+body.dark .sidebar-nav a{background:var(--card);color:var(--muted);border-color:var(--border);}
+body.dark .sidebar-nav a:hover,body.dark .sidebar-nav a.active{background:var(--amber-lt);color:var(--amber);}
+body.dark .mob-nav{background:var(--bg);border-color:var(--border);}
+body.dark .mob-nav a:hover,body.dark .mob-nav a.active{background:var(--amber-lt);color:var(--amber);}
+body.dark .pub-title{color:var(--text);}
+body.dark .pillar-name{color:var(--text);}
+body.dark .pub-id{color:var(--muted);}
+body.dark .btn.primary{background:var(--amber);color:#0b0f14;border-color:var(--amber);}
+body.dark .btn.secondary{background:transparent;color:var(--amber);border-color:var(--amber);}
+body.dark .btn.primary:hover,body.dark .btn.secondary:hover{filter:brightness(1.08);}
+body.dark iframe{filter:invert(0.88) hue-rotate(180deg);}
+/* Theme toggle */
+.theme-toggle{
+  width:32px;height:32px;
+  border-radius:7px;
+  border:1px solid var(--border);
+  background:transparent;
+  cursor:pointer;
+  font-size:14px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--muted);
+  flex-shrink:0;
+  padding:0;
+  box-shadow:none;
+  outline:none;
+  -webkit-appearance:none;
+  transition:border-color .12s;
+}
+.theme-toggle:hover{border-color:var(--amber);background:var(--amber-lt);}
+.theme-toggle:focus{outline:none;box-shadow:none;}
+
+/* ══════════════════════════════════════════════
+   INSTITUTIONAL REFINEMENT PASS
+   ══════════════════════════════════════════════ */
+
+/* Body & global */
+body{ line-height:1.7; }
+p{ line-height:1.75; max-width:76ch; }
+.lead{ max-width:72ch; line-height:1.75; }
+
+/* ── Buttons — clear hierarchy ── */
+.btn{
+  padding:7px 13px;
+  border-radius:5px;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.01em;
+  border-width:1px;
+}
+.btn.primary{
+  background:var(--amber);
+  color:#0f172a;
+  border-color:var(--amber);
+}
+.btn.secondary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+  font-weight:600;
+}
+.btn.primary:hover{ filter:brightness(1.06); }
+.btn.secondary:hover{ border-color:var(--muted); color:var(--text); filter:none; }
+
+/* Header action buttons — smaller, less dominant */
+.actions .btn{
+  padding:6px 11px;
+  font-size:12px;
+  font-weight:600;
+}
+.actions .btn.primary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+}
+.actions .btn.primary:hover{
+  border-color:var(--muted);
+  color:var(--text);
+  filter:none;
+}
+
+/* ── Cards — flatter, document-like ── */
+.pub-card{
+  border-radius:4px;
+  border-left-width:2px;
+}
+.fw-card{
+  border-radius:4px;
+}
+.govCard{
+  border-radius:4px;
+}
+.about-standard{
+  border-radius:4px;
+}
+.meta{
+  border-radius:4px;
+}
+.kv{
+  border-radius:4px;
+}
+.card{
+  border-radius:4px;
+}
+.research-block{
+  border-radius:4px;
+}
+.callout-box{
+  border-radius:0 4px 4px 0;
+  border-left-width:2px;
+}
+
+/* ── Section spacing — more document-like separation ── */
+.section{ margin-top:36px; }
+.section h3{ margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+
+/* ── Typography hierarchy ── */
+.section h3{ font-size:17px; font-weight:800; letter-spacing:-.01em; }
+.hero h2{ letter-spacing:-.02em; }
+
+/* ── Amber discipline ── */
+.dot{ background:#94a3b8; } /* Dots neutral, not amber */
+.about-standard h3{ font-size:14px; letter-spacing:.06em; }
+.about-h3{ font-size:14px; letter-spacing:.06em; }
+
+/* ── Footer note — very quiet ── */
+.footer-note{
+  border-radius:4px;
+  font-size:11px;
+  opacity:.8;
+}
+
+/* ── Dark mode refinements ── */
+body.dark .btn.primary{
+  background:var(--amber);
+  color:#0b0f14;
+  border-color:var(--amber);
+}
+body.dark .btn.secondary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border-strong);
+}
+body.dark .actions .btn.primary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+}
+body.dark .actions .btn.primary:hover{
+  border-color:var(--muted);
+  color:var(--text);
+}
+body.dark .section h3{ border-color:var(--border); }
+body.dark p{ color:var(--muted); }
+
+/* ══════════════════════════════════════════
+   BITCOIN ORANGE ACCENT SYSTEM
+   ══════════════════════════════════════════ */
+:root{
+  --amber:#f7931a;
+  --amber-hover:#e07c12;
+  --amber-lt:#fff4e5;
+  --amber-bd:#fdba74;
+  --btc:#f7931a;
+  --link:#e07c12;
+}
+body.dark{
+  --amber:#f7931a;
+  --amber-hover:#e07c12;
+  --amber-lt:rgba(247,147,26,0.08);
+  --amber-bd:rgba(247,147,26,0.35);
+  --link:#f7931a;
+}
+
+/* Primary buttons — Bitcoin orange */
+.btn.primary{
+  background:#f7931a;
+  color:#fff;
+  border-color:#f7931a;
+}
+.btn.primary:hover{
+  background:#e07c12;
+  border-color:#e07c12;
+  filter:none;
+}
+
+/* Secondary buttons — subtle orange outline */
+.btn.secondary{
+  background:transparent;
+  color:var(--muted);
+  border-color:rgba(247,147,26,0.35);
+}
+.btn.secondary:hover{
+  border-color:#f7931a;
+  color:#f7931a;
+  filter:none;
+}
+
+/* Header action buttons — quiet */
+.actions .btn.primary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+}
+.actions .btn.primary:hover{
+  border-color:var(--muted);
+  color:var(--text);
+  background:transparent;
+}
+
+/* Links */
+a{ color:#e07c12; }
+a:hover{ color:#f7931a; }
+
+/* Dark mode button overrides */
+body.dark .btn.primary{
+  background:#f7931a;
+  color:#fff;
+  border-color:#f7931a;
+}
+body.dark .btn.primary:hover{
+  background:#e07c12;
+  border-color:#e07c12;
+  filter:none;
+}
+body.dark .btn.secondary{
+  background:transparent;
+  color:var(--muted);
+  border-color:rgba(247,147,26,0.35);
+}
+body.dark .btn.secondary:hover{
+  border-color:#f7931a;
+  color:#f7931a;
+}
+body.dark .actions .btn.primary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+}
+body.dark .actions .btn.primary:hover{
+  border-color:var(--muted);
+  color:var(--text);
+  background:transparent;
+}
+body.dark a{ color:#f7931a; }
+body.dark a:hover{ color:#fdba74; }
+
+/* Nav links stay muted */
+nav a{ color:var(--muted); }
+nav a:hover,nav a.active{ color:var(--text); text-decoration:none; }
+body.dark nav a{ color:var(--muted); }
+body.dark nav a:hover,body.dark nav a.active{ color:var(--text); }
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
@@ -283,6 +535,7 @@ body.dark .btn.primary:hover,body.dark .btn.secondary:hover{filter:brightness(1.
           <h1>Bitcoin Custody Standard</h1>
           <p class="sub">Normative Summary (BCS-NS-1.1)</p>
         </div>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
       </div>
       <nav aria-label="Primary">
         <a href="/">Home</a>
@@ -295,7 +548,6 @@ body.dark .btn.primary:hover,body.dark .btn.secondary:hover{filter:brightness(1.
       <div class="actions">
         <a class="btn primary" href="/documents/">Documents</a>
         <a class="btn primary" href="mailto:contact@bitcoincustodystandard.org">Contact</a>
-        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
       </div>
     </div>
   </div>
