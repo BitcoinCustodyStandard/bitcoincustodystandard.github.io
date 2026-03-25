@@ -199,6 +199,75 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
 @media(max-width:900px) {
   .preview-card { display:none !important; }
 }
+
+/* ── Dark mode ── */
+body.dark{
+  --bg:#0f1623;
+  --text:#e8eaf0;
+  --muted:#9ca3af;
+  --border:#1e2a3a;
+  --panel:#151f2e;
+  --btn:#e8eaf0;
+  --btnText:#0f1623;
+  --link:#d4922f;
+  --btc:#d4922f;
+  --amber:#d4922f;
+  --amber-lt:#1a1208;
+  --amber-bd:#3a2a10;
+}
+body.dark header{ background:var(--bg); }
+body.dark .pub-card,
+body.dark .fw-card,
+body.dark .govCard,
+body.dark .about-standard,
+body.dark .card,
+body.dark .research-block,
+body.dark .fullCard,
+body.dark .kv,
+body.dark .meta,
+body.dark .sidebar-nav,
+body.dark .obsBox{ background:var(--panel); border-color:var(--border); }
+body.dark .pub-title{ color:var(--text); }
+body.dark .callout-box{ background:#1a1208; border-color:var(--amber-bd); }
+body.dark .preview-card{ background:#151f2e; border-color:var(--border); }
+body.dark .def-formula{ background:var(--panel); border-color:var(--border); color:var(--text); }
+body.dark .pillar-card{ background:var(--panel); border-color:var(--border); }
+body.dark .hero-badge{ background:var(--panel); border-color:var(--border); }
+body.dark .section-intro{ background:var(--panel); border-color:var(--border); }
+body.dark iframe{ filter:invert(0.9) hue-rotate(180deg); }
+body.dark .about-standard[style*="background:#fff"]{background:var(--panel) !important;}
+body.dark [style*="background:#fff"]{background:var(--panel) !important;}
+body.dark [style*="background:#fafafa"]{background:var(--panel) !important;}
+body.dark [style*="background:#fffbf5"]{background:var(--panel) !important;}
+body.dark .fullCard{background:var(--panel);}
+body.dark .doc-entry{background:var(--panel);}
+body.dark .doc-entry .doc-title{color:var(--text);}
+body.dark .obsBox{background:var(--panel);}
+body.dark .def-note{background:var(--panel);}
+body.dark .hero-badge{background:var(--panel);}
+body.dark .viewerHead{background:var(--panel);}
+body.dark .footer-note{background:var(--panel);}
+body.dark .btn.primary{background:var(--amber);color:#fff;border-color:var(--amber);}
+body.dark .btn.secondary{background:transparent;color:var(--amber);border-color:var(--amber);}
+body.dark .btn.primary:hover,body.dark .btn.secondary:hover{filter:brightness(1.1);}
+
+/* Toggle button */
+.theme-toggle{
+  background:none;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 11px;
+  cursor:pointer;
+  font-size:16px;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--muted);
+  transition:border-color .15s, background .15s;
+  flex-shrink:0;
+}
+.theme-toggle:hover{ border-color:var(--amber); background:var(--amber-lt); }
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
@@ -226,6 +295,7 @@ footer .copyright{ font-size:13px; color:var(--muted); margin-top:8px; }
       <div class="actions">
         <a class="btn primary" href="/documents/">Documents</a>
         <a class="btn primary" href="mailto:contact@bitcoincustodystandard.org">Contact</a>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
       </div>
     </div>
   </div>
@@ -551,6 +621,25 @@ BCS defines the normative framework; BCRI operationalizes that framework through
     window.addEventListener("load", setHeaderOffset);
     window.addEventListener("resize", setHeaderOffset);
   })();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('theme-toggle');
+  function apply(dark){
+    document.body.classList.toggle('dark',dark);
+    if(btn) btn.textContent=dark?'☀':'🌙';
+  }
+  var saved=localStorage.getItem('bcs-theme');
+  var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  apply(saved==='dark'||(saved===null&&prefersDark));
+  if(btn){
+    btn.addEventListener('click',function(){
+      var dark=!document.body.classList.contains('dark');
+      localStorage.setItem('bcs-theme',dark?'dark':'light');
+      apply(dark);
+    });
+  }
+})();
 </script>
 </body>
 </html>
