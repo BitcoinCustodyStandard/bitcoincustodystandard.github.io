@@ -300,6 +300,22 @@ body.dark
 .res-footer{display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:12px;border-top:1px solid var(--border);background:var(--card);}
 .res-footer a{color:var(--orange);font-weight:600;text-decoration:none;}
 .res-footer a:hover{text-decoration:underline;}
+
+@media(max-width:640px){
+  #bcri-wrap{border-radius:4px;}
+  .hero h1{font-size:22px!important;}
+  .path-grid{grid-template-columns:1fr 1fr!important;}
+  .comp-row{grid-template-columns:1fr 1fr!important;}
+  .out-grid{grid-template-columns:1fr 1fr!important;}
+  .card-grid{grid-template-columns:1fr!important;}
+  .fw-grid{grid-template-columns:1fr!important;}
+  .pillar-grid{grid-template-columns:1fr 1fr!important;}
+}
+@media(max-width:400px){
+  .path-grid{grid-template-columns:1fr!important;}
+  .comp-row{grid-template-columns:1fr!important;}
+  .out-grid{grid-template-columns:1fr!important;}
+}
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Bitcoin Custody Standard", "url": "https://bitcoincustodystandard.org", "description": "A public framework for evaluating the long-horizon resilience of Bitcoin custody systems.", "publisher": {"@type": "Organization", "name": "Bitcoin Custody Standard Initiative", "url": "https://bitcoincustodystandard.org"}}</script>
@@ -381,7 +397,7 @@ body.dark
   <section aria-label="BCRI Structural Model" style="margin-top:28px;">
     <div class="section-title">BCRI Structural Model</div>
     <p class="section-intro">The Bitcoin Custody Resilience Index is constructed from four linked components. Hover any node for its definition — click to pin.</p>
-    <div id="bcri-wrap" style="position:relative;width:100%;background:#0f1c2e;border-radius:6px;overflow:hidden;margin-top:12px;">
+    <div id="bcri-wrap" style="position:relative;width:100%;background:#0f1c2e;border-radius:6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;margin-top:12px;">
       <canvas id="bcri-cv" style="display:block;width:100%;"></canvas>
       <div id="bcri-tip" style="position:absolute;background:#111;border:1px solid #2a2a2a;border-radius:5px;padding:10px 13px;font-size:11px;max-width:200px;pointer-events:none;opacity:0;transition:opacity .12s;z-index:20;line-height:1.6;font-family:system-ui,sans-serif;">
         <div id="bcri-tip-t" style="font-weight:700;color:#f7931a;font-size:12px;margin-bottom:3px;"></div>
@@ -392,7 +408,12 @@ body.dark
   <script>
   (function(){
     var DPR = Math.min(window.devicePixelRatio || 1, 2);
-    var W = 780, H = 520;
+    /* On mobile, use a wider logical canvas so all nodes are visible,
+       and let the container scroll horizontally */
+    var isMobile = window.innerWidth < 640;
+    /* Mobile: tall enough for BCRI at y:490, width fits in scrollable container */
+    var W = isMobile ? 700 : 780;
+    var H = isMobile ? 560 : 520;
     var cv = document.getElementById('bcri-cv');
     if (!cv) return;
     cv.width  = W * DPR;
@@ -424,6 +445,11 @@ body.dark
       eri: {x:580, y:148}, xri:{x:580, y:268},
       chs: {x:580, y:388}, bcri:{x:580, y:490}
     };
+    /* On mobile, shift all nodes up 30px so BCRI has more breathing room */
+    if (isMobile) {
+      Object.keys(BASE).forEach(function(k){ BASE[k].y -= 30; });
+    }
+
     var ORBIT = {
       ci:  {ax:13,ay:11,sx:.00060,sy:.00080,px:.50,py:2.00},
       pd:  {ax:11,ay:10,sx:.00070,sy:.00060,px:1.20,py:.30},
@@ -749,6 +775,8 @@ body.dark
     },{passive:false});
   })();
   </script>
+  <p id="bcri-scroll-hint" style="display:none;text-align:center;font-size:11px;color:var(--dim);margin-top:5px;letter-spacing:.03em;">&#8592; scroll to see all nodes &#8594;</p>
+  <script>(function(){if(window.innerWidth<640){var el=document.getElementById('bcri-scroll-hint');if(el)el.style.display='block';}})();</script>
 
   <!-- CORE PUBLICATIONS -->
   <section style="margin-top:32px;" aria-label="Core Publications">
