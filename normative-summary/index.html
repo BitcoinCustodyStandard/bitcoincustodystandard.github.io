@@ -1,1 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Bitcoin Custody Standard — Normative Summary</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="canonical" href="https://bitcoincustodystandard.org/normative-summary/"/>
+<meta name="description" content="BCS-NS-1.1 — The foundational normative document of the Bitcoin Custody Standard. Defines the framework, five structural pillars, and BCRI measurement methodology."/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:title" content="Bitcoin Custody Standard — Normative Summary"/>
+<meta property="og:description" content="BCS-NS-1.1 — The foundational normative document of the Bitcoin Custody Standard. Defines the framework, five structural pillars, and BCRI measurement methodology."/>
+<meta property="og:type" content="article"/>
+<meta property="og:image" content="https://bitcoincustodystandard.org/Normative.png"/>
+<meta property="og:url" content="https://bitcoincustodystandard.org/normative-summary/"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Bitcoin Custody Standard — Normative Summary"/>
+<meta name="twitter:description" content="BCS-NS-1.1 — The foundational normative document of the Bitcoin Custody Standard. Defines the framework, five structural pillars, and BCRI measurement methodology."/>
+<meta name="twitter:image" content="https://bitcoincustodystandard.org/Normative.png"/>
+<meta name="twitter:site" content="@Bitcoin_Custody"/>
+<style>
+.site-footer{
+  border-top:1px solid var(--border);
+  padding:28px 0 24px;
+  text-align:center;
+  font-size:11px;
+  color:var(--dim);
+  margin-top:48px;
+}
+.site-footer a{color:var(--dim);text-decoration:none;}
+.site-footer a:hover{color:var(--muted);text-decoration:underline;}
+.site-footer .f-nav{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;}
+.site-footer .f-maintained{margin-bottom:4px;font-size:11px;color:var(--dim);}
+.site-footer .f-copy{font-size:11px;color:var(--dim);}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;}
+p{color:var(--muted);font-size:14px;line-height:1.75;margin:0;}
+p+p{margin-top:10px;}
+.section-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.hero h1,.hero h2{font-size:28px;font-weight:900;letter-spacing:-.02em;color:var(--text);margin:0;}
+.hero p,.hero-sub{font-size:15px;color:var(--muted);line-height:1.7;margin-top:10px;}
+h3{font-size:16px;font-weight:800;color:var(--text);margin:0 0 8px;}
+h4{font-size:13px;font-weight:700;color:var(--text);margin:0 0 6px;}
 
+.site-footer{
+  border-top:1px solid var(--border);
+  padding:28px 0 24px;
+  text-align:center;
+  font-size:11px;
+  color:var(--dim);
+  margin-top:48px;
+}
+.site-footer a{color:var(--dim);text-decoration:none;}
+.site-footer a:hover{color:var(--muted);text-decoration:underline;}
+.site-footer .f-nav{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;}
+.site-footer .f-maintained{margin-bottom:4px;font-size:11px;color:var(--dim);}
+.site-footer .f-copy{font-size:11px;color:var(--dim);}
+
+:root {
+  --orange:#f7931a;
+  --orange-dim:rgba(247,147,26,0.10);
+  --orange-line:rgba(247,147,26,0.35);
+  --link:#c97415;
+  /* Light mode backgrounds */
+  --bg:#f5f5f3;
+  --bg2:#f3f4f6;
+  --card:#ffffff;
+  /* Light mode text */
+  --text:#0f172a;
+  --muted:#475569;
+  --tertiary:#94a3b8;
+  /* Accent */
+  --amber:#f59e0b;
+  --amber-hover:#d97706;
+  --amber-lt:#fef3c7;
+  --amber-bd:#fcd34d;
+  /* Borders */
+  --border:#e5e7eb;
+  --border-strong:#cbd5e1;
+  /* Legacy aliases (keep for compatibility) */
+  --panel:var(--bg2);
+  --btn:#0f172a;
+  --btnText:#ffffff;
+  --link:#d97706;
+  --btc:#f59e0b;
+  --amber-lt:#fef3c7;
+  --headerH:72px;
+  --headerOffset:120px;
+}
+@media(max-width:760px){:root{--headerH:132px;}}
+}
+*{box-sizing:border-box}
+
+a{color:var(--link);text-decoration:none}
+
+a:hover{text-decoration:underline}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 0;
+  min-height:var(--headerH);
+  flex-wrap:wrap;
+  gap:12px;
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+.logo{width:34px;height:34px;border-radius:8px;object-fit:cover;}
+.brand h1{margin:0;font-size:16px;font-weight:900}
+.brand .sub{margin:0;font-size:12px;color:var(--muted)}
+nav{display:flex;gap:14px;flex-wrap:wrap}
+nav a{font-weight:600;color:var(--muted)}
+nav a:hover{color:var(--text);text-decoration:none}
+nav a.active{color:var(--text)}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{
+  padding:9px 14px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  font-weight:800;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  
+  gap:6px;
+}
+.btn.primary{background:var(--btn);color:var(--btnText);border-color:var(--btn);}
+.btn:hover{text-decoration:none;filter:brightness(.97)}
+.btn svg{width:14px;height:14px;fill:currentColor;flex-shrink:0;}
+main{padding:34px 0 60px}
+.hero{padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+
+.lead{margin:0;color:var(--muted);max-width:92ch}
+.dot{width:8px;height:8px;border-radius:999px;background:var(--btc);display:inline-block;margin-right:6px;transform:translateY(-1px);}
+/* Metadata strip */
+.meta{border:1px solid var(--border);border-radius:14px;padding:14px;margin:18px 0;}
+.metaGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
+@media(max-width:760px){
+  .metaGrid{grid-template-columns:1fr;justify-items:center;}
+  .kv{width:100%;max-width:520px;margin-left:auto;margin-right:auto;}
+  .k{flex:0 0 44%;}
+  .v{flex:1 1 auto;display:flex;justify-content:flex-end;text-align:right;}
+}
+.kv{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 14px;background:var(--panel);border-radius:12px;border:1px solid var(--border);}
+.k{color:var(--muted);font-weight:600;flex-shrink:0;padding-right:12px;}
+.v{font-weight:400;text-align:right;}
+.v a{display:inline-block;text-align:right;}
+:root{--headerOffset:120px;}
+html{scroll-padding-top:var(--headerOffset);}
+/* Section & cards */
+.section{margin-top:28px;}
+.section h3{font-size:18px;font-weight:900;color:var(--text);margin:0 0 14px;}
+.fullCard{border:1px solid var(--border);background:var(--bg);border-radius:14px;padding:20px 22px;}
+.fullCard h4{margin:0 0 10px 0;font-size:13px;letter-spacing:.22px;text-transform:uppercase;display:flex;align-items:center;gap:8px;font-weight:700;}
+.fullCard p{margin:0;color:var(--muted);font-size:14px;line-height:1.6;}
+.fullCard p+p{margin-top:10px;}
+/* Chart block */
+.chartBlock{margin-bottom:32px;}
+.chartHdr{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.chartLogo{width:32px;height:auto;border-radius:4px;flex-shrink:0;}
+.chartTitle{font-size:14px;font-weight:700;color:var(--text);}
+.chartSub{font-size:12px;color:var(--muted);margin-bottom:12px;padding-left:42px;}
+.chartSub i{margin:0 4px;opacity:.4;font-style:normal;}
+/* Legend */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:12px;color:var(--muted);}
+.li{display:flex;align-items:center;gap:5px;}
+.lsq{width:10px;height:10px;border-radius:2px;display:inline-block;flex-shrink:0;}
+.lci{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;}
+/* Orange observation box */
+.obsBox{
+  margin-top:14px;
+  border:1px solid var(--border);
+  border-left:3px solid var(--btc);
+  border-radius:0 6px 6px 0;
+  padding:11px 15px;
+  display:flex;align-items:flex-start;gap:9px;
+  background:#fffbf5;
+}
+.obsDot{width:8px;height:8px;border-radius:50%;background:var(--btc);flex-shrink:0;margin-top:5px;}
+.obsText{font-size:14px;color:var(--muted);line-height:1.65;}
+/* Findings */
+.callout-box{
+  background:#fafafa;
+  border:1px solid #e5e5e5;
+  border-left:3px solid #c87a2b;
+  border-radius:6px;
+  padding:16px 18px;
+  margin:16px 0;
+}
+.callout-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;}
+.callout-title{font-weight:700;color:var(--text);margin:0 0 6px;font-size:14px;}
+.callout-text{line-height:1.65;font-size:14px;margin:0;}
+/* Doc viewer */
+.viewerWrap{margin-top:14px;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.viewerHead{padding:12px 14px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:800;text-transform:uppercase;}
+.viewerFrame{width:100%;height:90vh;min-height:900px;border:0;display:block;}
+/* Footer */
+footer{border-top:1px solid var(--border);margin-top:28px;padding-top:16px;padding-bottom:24px;text-align:center;line-height:1.35;}
+footer .title{font-weight:700;margin-bottom:4px;}
+footer .tagline{color:var(--muted);font-size:14px;margin-bottom:8px;}
+footer .version{font-size:14px;margin-bottom:8px;}
+footer .email{font-size:14px;margin-bottom:4px;}
+footer .copyright{font-size:13px;color:var(--muted);margin-top:8px;}
+/* Tooltip */
+#bcri-tip{
+  position:fixed;pointer-events:none;z-index:9999;
+  background:rgba(17,24,39,0.96);border-radius:10px;
+  padding:14px 16px;width:360px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.35);display:none;
+}
+@media(max-width:768px){
+  #bcri-tip{
+    width:calc(100vw - 32px);
+    max-width:420px;
+    left:50% !important;
+    top:50% !important;
+    transform:translate(-50%,-50%);
+    pointer-events:auto;
+    border-radius:12px;
+    padding:18px 20px;
+  }
+  .tip-name{font-size:15px;}
+  .tip-score{font-size:13px;}
+  .tip-cfg{font-size:13px;line-height:1.7;}
+  #bcri-tip-close{display:flex;}
+}
+#bcri-tip-close{
+  display:none;
+  justify-content:flex-end;
+  margin-bottom:10px;
+}
+#bcri-tip-close button{
+  background:rgba(255,255,255,0.15);
+  border:none;color:#fff;
+  font-size:16px;line-height:1;
+  padding:4px 10px;border-radius:6px;
+  cursor:pointer;pointer-events:auto;
+}
+.tip-name{font-size:13px;font-weight:700;color:#f9fafb;margin:0 0 4px;line-height:1.3;}
+.tip-score{font-size:11px;color:#9ca3af;margin:0 0 10px;}
+.tip-lbl{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin:0 0 5px;}
+.tip-cfg{font-size:12px;color:#d1d5db;margin:0;line-height:1.65;}
+@media(max-width:760px){
+  .top{flex-direction:column;align-items:stretch;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+  nav{justify-content:center;}
+  .actions{justify-content:center;}
+}
+
+/* ── Mobile responsiveness ── */
+
+
+@media (max-width: 768px) {
+  .metaGrid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .kv {
+    width: 100%;
+    max-width: 420px;
+  }
+  section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .chart-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+  }
+  .chart-inner {
+    min-width: 600px;
+  }
+}
+
+.chart-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+.chart-wrapper canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+
+
+
+body.dark{
+  --bg:#0b0f14;
+  --bg2:#111827;
+  --card:#0f172a;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --tertiary:#6b7280;
+  --amber:#f59e0b;
+  --amber-hover:#d97706;
+  --amber-lt:rgba(245,158,11,0.08);
+  --amber-bd:rgba(245,158,11,0.35);
+  --border:#1f2937;
+  --border-strong:#374151;
+  --panel:#111827;
+  --btn:#e5e7eb;
+  --btnText:#0b0f14;
+  --link:#f59e0b;
+  --btc:#f59e0b;
+}
+body.dark header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+body.dark .about-standard,
+body.dark .about-standard[style*="background"],
+body.dark [style*="background:#fff"],
+body.dark [style*="background: #fff"],
+body.dark [style*="background:#fafafa"],
+body.dark [style*="background:#fffbf5"],
+body.dark [style*="background:#fdf6ee"]{background:var(--card) !important;border-color:var(--border) !important;}
+body.dark .pub-card{background:var(--card);border-color:var(--border);}
+body.dark .fw-card{background:var(--card);border-color:var(--border);}
+body.dark .govCard{background:var(--card);border-color:var(--border);}
+body.dark .card{background:var(--card);border-color:var(--border);}
+body.dark .research-block{background:var(--card);border-color:var(--border);}
+body.dark .fullCard{background:var(--card);border-color:var(--border);}
+body.dark .kv{background:var(--bg2);border-color:var(--border);}
+body.dark .meta{background:var(--bg);border-color:var(--border);}
+body.dark .obsBox{background:var(--bg2);border-color:var(--border);}
+body.dark .callout-box{background:var(--amber-lt);border-color:var(--amber-bd);}
+body.dark .callout-title{color:var(--text);}
+body.dark .preview-card{background:var(--card);border-color:var(--border);}
+body.dark .def-formula{background:var(--bg2);border-color:var(--border);color:var(--text);}
+body.dark .pillar-card{background:var(--card);border-color:var(--border);}
+body.dark .doc-entry{background:var(--card);border-color:var(--border);}
+body.dark .doc-entry .doc-title{color:var(--text);}
+body.dark .hero-badge{background:var(--bg2);border-color:var(--border);}
+body.dark .viewerHead{background:var(--bg2);}
+body.dark .footer-note{background:var(--bg2);border-color:var(--border);}
+body.dark .def-note{background:var(--bg2);border-color:var(--border);}
+body.dark .section-intro{background:var(--bg2);border-color:var(--border);}
+body.dark .principle{background:var(--amber-lt);border-color:var(--amber-bd);}
+body.dark .sidebar-nav{background:var(--card);border-color:var(--border);}
+body.dark .sidebar-label{background:var(--bg2);}
+body.dark .sidebar-nav a{background:var(--card);color:var(--muted);border-color:var(--border);}
+body.dark .sidebar-nav a:hover,body.dark .sidebar-nav a.active{background:var(--amber-lt);color:var(--amber);}
+body.dark .mob-nav{background:var(--bg);border-color:var(--border);}
+body.dark .mob-nav a:hover,body.dark .mob-nav a.active{background:var(--amber-lt);color:var(--amber);}
+body.dark .pub-title{color:var(--text);}
+body.dark .pillar-name{color:var(--text);}
+body.dark .pub-id{color:var(--muted);}
+body.dark .btn.primary{background:var(--amber);color:#0b0f14;border-color:var(--amber);}
+body.dark .btn.secondary{background:transparent;color:var(--amber);border-color:var(--amber);}
+body.dark .btn.primary:hover,body.dark .btn.secondary:hover{filter:brightness(1.08);}
+body.dark iframe{filter:invert(0.88) hue-rotate(180deg);}
+/* Theme toggle */
+.theme-toggle{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;outline:none;-webkit-appearance:none;}
+.theme-toggle:hover{border-color:var(--amber);background:var(--amber-lt);}
+.theme-toggle:focus{outline:none;box-shadow:none;}
+
+/* ══════════════════════════════════════════════
+   INSTITUTIONAL REFINEMENT PASS
+   ══════════════════════════════════════════════ */
+
+/* Body & global */
+
+.lead{ max-width:72ch; line-height:1.75; }
+
+/* ── Buttons — clear hierarchy ── */
+.btn{
+  padding:7px 13px;
+  border-radius:5px;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.01em;
+  border-width:1px;
+}
+.btn.primary{
+  background:var(--amber);
+  color:#0f172a;
+  border-color:var(--amber);
+}
+.btn.secondary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+  font-weight:600;
+}
+.btn.primary:hover{ filter:brightness(1.06); }
+.btn.secondary:hover{ border-color:var(--muted); color:var(--text); filter:none; }
+
+/* Header action buttons — smaller, less dominant */
+.actions .btn{
+  padding:6px 11px;
+  font-size:12px;
+  font-weight:600;
+}
+.actions .btn.primary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+}
+.actions .btn.primary:hover{
+  border-color:var(--muted);
+  color:var(--text);
+  filter:none;
+}
+
+/* ── Cards — flatter, document-like ── */
+.pub-card{
+  border-radius:4px;
+  border-left-width:2px;
+}
+.fw-card{
+  border-radius:4px;
+}
+.govCard{
+  border-radius:4px;
+}
+.about-standard{
+  border-radius:4px;
+}
+.meta{
+  border-radius:4px;
+}
+.kv{
+  border-radius:4px;
+}
+.card{
+  border-radius:4px;
+}
+.research-block{
+  border-radius:4px;
+}
+.callout-box{
+  border-radius:0 4px 4px 0;
+  border-left-width:2px;
+}
+
+/* ── Section spacing — more document-like separation ── */
+.section{ margin-top:36px; }
+.section h3{ margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+
+/* ── Typography hierarchy ── */
+.section h3{ font-size:17px; font-weight:800; letter-spacing:-.01em; }
+
+
+/* ── Amber discipline ── */
+.dot{ background:#f7931a; } /* Dots neutral, not amber */
+.about-standard h3{ font-size:14px; letter-spacing:.06em; }
+.about-h3{ font-size:14px; letter-spacing:.06em; }
+
+/* ── Footer note — very quiet ── */
+.footer-note{
+  border-radius:4px;
+  font-size:11px;
+  opacity:.8;
+}
+
+/* ── Dark mode refinements ── */
+body.dark .btn.primary{
+  background:var(--amber);
+  color:#0b0f14;
+  border-color:var(--amber);
+}
+body.dark .btn.secondary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border-strong);
+}
+body.dark .actions .btn.primary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+}
+body.dark .actions .btn.primary:hover{
+  border-color:var(--muted);
+  color:var(--text);
+}
+body.dark .section h3{ border-color:var(--border); }
+body.dark p{ color:var(--muted); }
+
+/* ══════════════════════════════════════════
+   BITCOIN ORANGE ACCENT SYSTEM
+   ══════════════════════════════════════════ */
+:root{
+  --amber:#f7931a;
+  --amber-hover:#e07c12;
+  --amber-lt:#fff4e5;
+  --amber-bd:#fdba74;
+  --btc:#f7931a;
+  --link:#e07c12;
+}
+body.dark{
+  --amber:#f7931a;
+  --amber-hover:#e07c12;
+  --amber-lt:rgba(247,147,26,0.08);
+  --amber-bd:rgba(247,147,26,0.35);
+  --link:#f7931a;
+}
+
+/* Primary buttons — Bitcoin orange */
+.btn.primary{
+  background:#f7931a;
+  color:#fff;
+  border-color:#f7931a;
+}
+.btn.primary:hover{
+  background:#e07c12;
+  border-color:#e07c12;
+  filter:none;
+}
+
+/* Secondary buttons — subtle orange outline */
+.btn.secondary{
+  background:transparent;
+  color:var(--muted);
+  border-color:rgba(247,147,26,0.35);
+}
+.btn.secondary:hover{
+  border-color:#f7931a;
+  color:#f7931a;
+  filter:none;
+}
+
+/* Header action buttons — quiet */
+.actions .btn.primary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+}
+.actions .btn.primary:hover{
+  border-color:var(--muted);
+  color:var(--text);
+  background:transparent;
+}
+
+/* Links */
+a{ color:#e07c12; }
+a:hover{ color:#f7931a; }
+
+/* Dark mode button overrides */
+body.dark .btn.primary{
+  background:#f7931a;
+  color:#fff;
+  border-color:#f7931a;
+}
+body.dark .btn.primary:hover{
+  background:#e07c12;
+  border-color:#e07c12;
+  filter:none;
+}
+body.dark .btn.secondary{
+  background:transparent;
+  color:var(--muted);
+  border-color:rgba(247,147,26,0.35);
+}
+body.dark .btn.secondary:hover{
+  border-color:#f7931a;
+  color:#f7931a;
+}
+body.dark .actions .btn.primary{
+  background:transparent;
+  color:var(--muted);
+  border-color:var(--border);
+}
+body.dark .actions .btn.primary:hover{
+  border-color:var(--muted);
+  color:var(--text);
+  background:transparent;
+}
+body.dark a{ color:#f7931a; }
+body.dark a:hover{ color:#fdba74; }
+
+/* Nav links stay muted */
+nav a{ color:var(--muted); }
+nav a:hover,nav a.active{ color:var(--text); text-decoration:none; }
+body.dark nav a{ color:var(--muted); }
+body.dark nav a:hover,body.dark nav a.active{ color:var(--text); }
+@media(max-width:680px){.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;max-width:960px;margin:0 auto;gap:12px;flex-wrap:nowrap;}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}.site-nav{display:flex;gap:0;flex-wrap:wrap;flex:1;justify-content:center;}.site-nav a{font-size:12px;font-weight:600;color:var(--muted);padding:4px 8px;border-radius:4px;text-decoration:none;white-space:nowrap;}.hdr-actions{display:flex;align-items:center;flex-shrink:0;}.card-grid{grid-template-columns:1fr!important;}.path-grid{grid-template-columns:1fr 1fr!important;}.hero h1,main.wrap{padding:0 14px;}.metaGrid{grid-template-columns:1fr!important;}.m-pillars,.m-eri-row,.m-xc-row,.m-out-cols{grid-template-columns:1fr!important;}.def-layout{grid-template-columns:1fr!important;}.def-sidebar{display:none!important;}.mob-nav{display:flex!important;}}@media(max-width:380px){.path-grid{grid-template-columns:1fr!important;}.site-nav a{font-size:12px;font-weight:600;color:var(--muted);padding:4px 8px;border-radius:4px;text-decoration:none;white-space:nowrap;}}
+
+.principle-box{padding:14px 18px;border-left:3px solid var(--orange,#f7931a);background:var(--panel);border-radius:0 4px 4px 0;margin:14px 0;}.principle-box p{font-size:15px;font-weight:600;color:var(--text);font-style:italic;line-height:1.55;margin:0;}
+@media(max-width:680px){.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;max-width:960px;margin:0 auto;gap:12px;flex-wrap:nowrap;}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}.site-nav{display:flex;gap:0;flex-wrap:wrap;flex:1;justify-content:center;}.site-nav a{font-size:12px;font-weight:600;color:var(--muted);padding:4px 8px;border-radius:4px;text-decoration:none;white-space:nowrap;}.hdr-actions{display:flex;align-items:center;flex-shrink:0;}.card-grid{grid-template-columns:1fr!important;}.path-grid{grid-template-columns:1fr 1fr!important;}.fw-grid{grid-template-columns:1fr!important;}.hero h1,main.wrap{padding:0 14px;}.m-pillars,.m-eri-row,.m-xc-row,.m-out-cols{grid-template-columns:1fr!important;}.metaGrid{grid-template-columns:1fr!important;}}@media(max-width:380px){.path-grid{grid-template-columns:1fr!important;}.site-nav a{font-size:12px;font-weight:600;color:var(--muted);padding:4px 8px;border-radius:4px;text-decoration:none;white-space:nowrap;}}@media(max-width:680px){.km-grid{grid-template-columns:1fr!important;}}
+</style>
+<script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "name": "Bitcoin Custody Standard \u2014 Normative Summary (BCS-NS-1.1)", "description": "Foundational normative document defining Bitcoin custody resilience evaluation, the five structural pillars, and BCRI methodology.", "version": "1.1", "datePublished": "2026-02-01", "dateModified": "2026-03-01", "url": "https://bitcoincustodystandard.org/normative-summary/", "publisher": {"@type": "Organization", "name": "Bitcoin Custody Standard Initiative"}}</script>
+</head>
+<body>
+<header>
+  <div class="hdr">
+    <a class="brand" href="/">
+      <img class="brand-logo" src="/bcs-seal.png" alt="BCS">
+      <span class="brand-name">Bitcoin Custody Standard</span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/normative-summary/" class="active">Normative Summary</a>
+      <a href="/bcri/">BCRI Benchmark</a>
+      <a href="/documents/">Documents</a>
+      <a href="/outputs/">Outputs</a>
+      <a href="/research/">Research</a>
+      <a href="/definitions/">Definitions</a>
+      <a href="/governance/">Governance</a>
+    </nav>
+    <div class="hdr-actions">
+      <button id="tt" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+
+  <section class="hero">
+    <h2>Bitcoin Custody Standard — Normative Summary</h2>
+    <p class="lead">Version 1.1 &nbsp;·&nbsp; BCS-NS-1.1 &nbsp;·&nbsp; Public Standard &nbsp;·&nbsp; March 2026</p>
+  </section>
+  <p style="font-size:14px;margin:4px 0 14px;">The foundational document of the Bitcoin Custody Standard.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+    <a class="btn primary" href="/BCS-NS-1.1-2026-03-06.pdf" target="_blank" rel="noopener">Download PDF</a>
+    <a class="btn secondary" href="/documents/">Document Registry</a>
+  </div>
+
+  <section class="about-standard" aria-label="Abstract and Purpose" style="margin:18px 0;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--bg);">
+
+    <h3 style="font-size:18px;font-weight:900;color:var(--text);margin:0 0 12px;display:flex;align-items:center;gap:8px;"><span class="dot"></span>Abstract</h3>
+    <p style="margin:0;">The Bitcoin Custody Standard (BCS) defines a normative framework for evaluating the structural resilience of Bitcoin custody architectures across time. The Bitcoin Custody Resilience Index (BCRI) is the quantitative assessment methodology aligned with BCS and used to measure custody resilience under the standard. The framework evaluates custody architectures across the five BCS structural pillars through the Architecture Resilience Score (ARS) while also assessing coordination health (CHS), entropy-related degradation (ERI), and adversarial exposure conditions (XRI). BCS is designed to operate alongside evolving institutional, regulatory, and technological custody frameworks while remaining structurally independent of jurisdiction-specific requirements and legal regimes.</p>
+
+    <div style="height:1px;background:var(--border);margin:14px 0;"></div>
+
+    <h3 style="font-size:18px;font-weight:900;color:var(--text);margin:0 0 12px;display:flex;align-items:center;gap:8px;"><span class="dot"></span>Purpose</h3>
+    <p style="margin:0;">The Bitcoin Custody Standard (BCS) defines a normative framework for evaluating and strengthening the structural resilience of Bitcoin custody architectures across time. Custodial Entropy refers to the progressive structural degradation of custody systems as operational coherence erodes through knowledge loss, undocumented changes, technological evolution, coordination drift, and insufficient review.</p>
+    <p style="margin:10px 0 0;">Because Bitcoin is a bearer asset with no recovery possible once keys are lost, BCS exists to reduce the probability that Bitcoin holdings — whether managed by individuals, families, fiduciaries, advisors, or institutions — become permanently inaccessible due to preventable Custodial Entropy. BCS operates within Bitcoin's foundational constraint that ownership is defined by control of private keys.</p>
+    <p style="margin:10px 0 0;">The Bitcoin Custody Resilience Index (BCRI) operationalizes the BCS framework by providing structured measurement of architecture resilience, coordination reliability, entropy-related degradation, and adversarial exposure.</p>
+    <p style="margin:10px 0 0;">BCS defines the normative framework; BCRI operationalizes that framework through structured scoring and reporting across the five structural pillars.</p>
+
+    <div style="height:1px;background:var(--border);margin:14px 0;"></div>
+
+    <h3 style="font-size:18px;font-weight:900;color:var(--text);margin:0 0 10px;display:flex;align-items:center;gap:8px;"><span class="dot"></span>Core Principle</h3>
+    <div class="principle-box">
+      <p>Bitcoin custody must be evaluated for resilience over time, not security at a point in time.</p>
+    </div>
+
+  </section>
+
+  <!-- KEY METRICS + BCRI STRUCTURAL RESILIENCE MODEL -->
+  <section style="margin-top:28px;" aria-label="Key Metrics and Structural Model">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;" class="km-grid">
+
+      <!-- LEFT: Key Metrics -->
+      <div style="border:1px solid var(--border);border-radius:4px;padding:18px 20px;background:var(--card);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;display:inline-block;"></span>
+          <span style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);">Key Metrics</span>
+        </div>
+        <ul style="list-style:disc;padding-left:16px;display:flex;flex-direction:column;gap:9px;">
+          <li style="font-size:13px;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Bitcoin Custody Resilience Index (BCRI):</strong> Composite resilience output (0–100, higher is stronger)</li>
+          <li style="font-size:13px;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Architecture Resilience Score (ARS):</strong> Structural strength across the five BCS pillars (0–100, higher is stronger)</li>
+          <li style="font-size:13px;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Coordination Health Score (CHS):</strong> Reliability of custody coordination and procedural continuity (0–100, higher is stronger)</li>
+          <li style="font-size:13px;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Entropy Risk Index (ERI):</strong> Long-horizon structural degradation risk (0–100, lower is better)</li>
+          <li style="font-size:13px;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Exposure Risk Index (XRI):</strong> Adversarial exposure and operational visibility risk (0–100, lower is better)</li>
+        </ul>
+        <p style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.65;">ERI and XRI are the primary risk indicators used for conformance evaluation. XRI does not independently determine conformance status but contributes to the overall resilience assessment.</p>
+      </div>
+
+      <!-- RIGHT: BCRI Structural Resilience Model diagram -->
+      <div style="border:1px solid var(--border);border-radius:4px;padding:18px 20px;background:var(--card);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;display:inline-block;"></span>
+          <span style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);">BCRI Structural Resilience Model</span>
+        </div>
+        <img src="/BCRI_Flow_diagram.png"
+             alt="BCRI Structural Resilience Model flowchart showing how BCS Structural Pillars feed into Architecture Resilience and Coordination Health, then into Custody Structural Integrity, then through Latent Entropy Index, Coordination Entropy Index, and Exposure Risk Index into Entropy Risk, and finally into the Bitcoin Custody Resilience Index (BCRI)"
+             style="width:100%;height:auto;display:block;"
+             onerror="this.style.display='none'">
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section" id="definitions">
+    <h3>Definitions</h3>
+    <p style="margin:0;">All framework terms are defined in the BCS Definitions and Glossary — including structural pillars, measurement components, entropy theory, and conformance terminology.</p>
+    <p style="margin:10px 0 0;"><a href="/definitions/" style="font-weight:600;">View Definitions &amp; Glossary →</a></p>
+  </section>
+
+  <section class="section" id="citation">
+    <h3>Citable As</h3>
+    <p style="margin:0;font-size:14px;line-height:2;">
+      Bitcoin Custody Standard (2026).<br>
+      BCS-NS-1.1 — Normative Summary.<br>
+      Available at: https://bitcoincustodystandard.org/normative-summary/
+    </p>
+  </section>
+
+  <section id="document" class="viewerWrap" aria-label="Embedded PDF" style="margin-top:28px;">
+    <div class="viewerHead">
+      <div>Document Viewer</div>
+      <div><a href="/BCS-NS-1.1-2026-03-06.pdf" target="_blank" rel="noopener">Open in new tab</a></div>
+    </div>
+    <iframe class="viewerFrame" src="/BCS-NS-1.1-2026-03-06.pdf#pagemode=none&view=FitH" title="BCS Normative Summary BCS-NS-1.1" loading="lazy"></iframe>
+  </section>
+
+  <section class="meta" aria-label="Document metadata" style="margin-top:28px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px;">Document Record</div>
+    <div class="metaGrid">
+      <div class="kv"><div class="k">Document Type</div><div class="v">Normative Summary</div></div>
+      <div class="kv"><div class="k">Document ID</div><div class="v">BCS-NS-1.1</div></div>
+      <div class="kv"><div class="k">Version</div><div class="v">1.1</div></div>
+      <div class="kv"><div class="k">Publication Date</div><div class="v">Originally released: February 2026<br>Last updated: March 2026</div></div>
+      <div class="kv"><div class="k">Document Class</div><div class="v">Normative Framework</div></div>
+      <div class="kv"><div class="k">Status</div><div class="v">Public, Citable</div></div>
+      <div class="kv"><div class="k">Steward</div><div class="v">Bitcoin Custody Standard Initiative</div></div>
+      <div class="kv"><div class="k">Next Scheduled Review</div><div class="v">February 2027 (or earlier if major revision required)</div></div>
+      <div class="kv"><div class="k">Social</div><div class="v"><a href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener">@Bitcoin_custody</a></div></div>
+      <div class="kv"><div class="k">Contact</div><div class="v"><a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a></div></div>
+    </div>
+  </section>
+
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="f-nav">
+      <a href="/">Home</a>
+      <a href="/normative-summary/">Normative Summary</a>
+      <a href="/bcri/">BCRI Benchmark</a>
+      <a href="/documents/">Documents</a>
+      <a href="/outputs/">Outputs</a>
+      <a href="/research/">Research</a>
+      <a href="/definitions/">Definitions</a>
+      <a href="/governance/">Governance</a>
+    </div>
+    <div class="f-maintained">Maintained by the Bitcoin Custody Standard Initiative (BCSI)</div>
+    <div class="f-copy">
+      © 2026 Bitcoin Custody Standard Initiative
+      &nbsp;&middot;&nbsp;
+      <a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener">@Bitcoin_custody</a>
+    </div>
+  </div>
+</footer>
+<script>function mTInd(el){el.classList.toggle('open');}var _mfo=false;function mFT(){_mfo=!_mfo;var b=document.getElementById('mfbody');var c=document.getElementById('mfcaret');if(b)b.classList.toggle('open',_mfo);if(c)c.style.transform=_mfo?'rotate(180deg)':'';}
+(function(){
+  var btn=document.getElementById('tt');
+  function apply(d){document.body.classList.toggle('dark',d);if(btn)btn.textContent=d?'☀':'🌙';}
+  var s=localStorage.getItem('bcs-theme');
+  apply(s==='dark');
+  if(btn)btn.addEventListener('click',function(){
+    var d=!document.body.classList.contains('dark');
+    localStorage.setItem('bcs-theme',d?'dark':'light');
+    apply(d);
+  });
+  function sh(){var h=document.querySelector('header');if(!h)return;document.documentElement.style.setProperty('--headerOffset',(Math.ceil(h.getBoundingClientRect().height)+4)+'px');}
+  window.addEventListener('load',sh);
+  window.addEventListener('resize',sh);
+})();
+</script>
+</body>
+</html>
