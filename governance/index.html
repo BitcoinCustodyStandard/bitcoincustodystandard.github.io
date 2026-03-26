@@ -282,6 +282,17 @@ body.dark
   .path-tile{padding:16px;}
 }
 
+
+/* ── Governance cards ── */
+.gov-framing{margin:20px 0 4px;padding:14px 18px;border-left:3px solid var(--orange);background:var(--bg2);border-radius:0 4px 4px 0;}
+.gov-framing p{font-size:14px;color:var(--muted);margin:0;line-height:1.7;}
+.gov-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:20px;}
+.gov-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px 22px;}
+.gov-card.wide{grid-column:1/-1;}
+.gov-card h4{font-size:13px;font-weight:800;color:var(--text);margin:0 0 8px;text-transform:uppercase;letter-spacing:.04em;}
+.gov-card p{font-size:13px;color:var(--muted);line-height:1.7;margin:0;}
+.gov-card::before{content:'';display:block;width:24px;height:3px;background:var(--orange);border-radius:2px;margin-bottom:12px;}
+@media(max-width:600px){.gov-grid{grid-template-columns:1fr;}.gov-card.wide{grid-column:1;}}
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Bitcoin Custody Standard — Governance","url":"https://bitcoincustodystandard.org/governance/","description":"Governance, maintenance, and version control framework of the Bitcoin Custody Standard Initiative.","publisher":{"@type":"Organization","name":"Bitcoin Custody Standard Initiative","url":"https://bitcoincustodystandard.org"}}</script>
@@ -314,10 +325,6 @@ body.dark
     <h1>Bitcoin Custody Standard — Governance</h1>
     <p class="hero-sub">Governance, maintenance, and version control framework of the Bitcoin Custody Standard.</p>
   </section>
-
-  <div class="gov-framing">
-    <p>The Bitcoin Custody Standard is maintained as a controlled standard under a versioned publication system.</p>
-  </div>
 
   <div class="gov-grid">
 
