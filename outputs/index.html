@@ -282,6 +282,37 @@ body.dark
   .path-tile{padding:16px;}
 }
 
+
+/* Sample output display */
+.sample-output{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-top:16px;}
+.sample-output-hdr{padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.sample-output-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
+.sample-output-id{font-size:10px;color:var(--dim);font-family:monospace;}
+.sample-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--border);}
+.sample-metric{padding:12px 16px;border-right:1px solid var(--border);}
+.sample-metric:last-child{border-right:none;}
+.sample-metric-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+.sample-metric-value{font-size:20px;font-weight:900;color:var(--text);letter-spacing:-.02em;line-height:1;}
+.sample-metric-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.sample-bar-wrap{padding:12px 16px;border-bottom:1px solid var(--border);}
+.sample-bar-track{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;position:relative;}
+.sample-bar-fill{height:100%;background:var(--orange);border-radius:3px;width:78.4%;}
+.sample-bar-marker{position:absolute;top:-3px;left:75%;width:1px;height:12px;background:var(--border2);}
+.sample-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:4px;}
+.sample-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.sample-col{padding:12px 16px;}
+.sample-col:first-child{border-right:1px solid var(--border);}
+.sample-col-title{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;}
+.sample-col ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.sample-col li{font-size:12px;color:var(--muted);display:flex;align-items:baseline;gap:6px;line-height:1.4;}
+.sample-col li::before{content:'·';color:var(--orange);flex-shrink:0;}
+.sample-note{padding:8px 16px;font-size:10px;color:var(--dim);font-style:italic;border-top:1px solid var(--border);}
+@media(max-width:680px){
+  .sample-metrics{grid-template-columns:1fr!important;}
+  .sample-metric{border-right:none!important;border-bottom:1px solid var(--border);}
+  .sample-cols{grid-template-columns:1fr!important;}
+  .sample-col:first-child{border-right:none;border-bottom:1px solid var(--border);}
+}
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Bitcoin Custody Standard — Outputs","url":"https://bitcoincustodystandard.org/outputs/","description":"Five structured evaluation outputs produced by the Bitcoin Custody Standard framework: BCRI Score, Rating, Frontier Positioning, Gap Analysis, Upgrade Path.","publisher":{"@type":"Organization","name":"Bitcoin Custody Standard Initiative","url":"https://bitcoincustodystandard.org"}}</script>
