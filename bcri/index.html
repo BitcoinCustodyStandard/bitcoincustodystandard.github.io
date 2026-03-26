@@ -282,7 +282,37 @@ body.dark
   .path-tile{padding:16px;}
 }
 
-</style>
+
+/* ── BCRI page specific ── */
+#bcri-tip{position:fixed;background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:10px 13px;font-size:11px;max-width:200px;pointer-events:none;display:none;z-index:20;line-height:1.6;font-family:system-ui,sans-serif;}
+#tip-name{font-weight:700;color:#f7931a;font-size:12px;margin-bottom:4px;}
+#tip-score{font-size:12px;color:#e5e7eb;margin-bottom:2px;}
+#tip-cfg{font-size:11px;color:#9ca3af;line-height:1.5;}
+.chartWrap{position:relative;margin-top:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.viewerWrap{margin-top:14px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.viewerHead{padding:12px 14px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;font-size:12px;font-weight:700;color:var(--text);}
+.viewerHead a{font-size:12px;font-weight:600;color:var(--orange);}
+.viewerFrame{width:100%;height:80vh;min-height:700px;border:0;display:block;}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:12px;color:var(--muted);}
+.li{display:flex;align-items:center;gap:7px;font-size:12px;}
+.lsq,.lci{width:12px;height:12px;border-radius:50%;flex-shrink:0;display:inline-block;}
+@media(max-width:680px){
+  .viewerFrame{height:60vh;min-height:400px;}
+  .legend{gap:8px;font-size:11px;}
+}
+
+@media(max-width:600px){
+  canvas#c1,canvas#c2,canvas#c3{min-width:480px;}
+}
+
+.chartTitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.01em;}
+.chartBlock{margin-top:40px;padding-top:28px;border-top:1px solid var(--border);}
+.chartHdr{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.chartSub{font-size:12px;color:var(--dim);margin:4px 0 12px;}
+.finding{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:0 6px 6px 0;padding:16px 18px;margin-bottom:14px;}
+.findingNum{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin:0 0 6px;}
+.findingText{font-size:13px;color:var(--muted);line-height:1.7;margin:0;}
+body.dark .about-standard{background:var(--card);border-color:var(--border);}</style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"Bitcoin Custody Standard — BCRI Benchmark","url":"https://bitcoincustodystandard.org/bcri/","description":"BCS-BR-1.0 — Bitcoin custody architecture comparison and BCRI scoring benchmark. Resilience efficiency frontier analysis.","publisher":{"@type":"Organization","name":"Bitcoin Custody Standard Initiative","url":"https://bitcoincustodystandard.org"}}</script>
 </head>
@@ -316,7 +346,7 @@ body.dark
   </section>
 
   <!-- ABOUT THIS REPORT — matches homepage .about-standard card exactly -->
-  <section class="about-standard" aria-label="About the BCRI Benchmark Report" style="margin:18px 0;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:#fff;">
+  <section class="about-standard" aria-label="About the BCRI Benchmark Report" style="margin:18px 0;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--card);">
     <h3 style="margin:0 0 10px 0;font-size:13px;letter-spacing:.22px;text-transform:uppercase;display:flex;align-items:center;gap:8px;font-weight:700;"><span class="dot"></span>About This Report</h3>
     <p style="margin:0;color:var(--muted);font-size:14px;line-height:1.6;">
       The BCRI Benchmark Report (BCS-BR-1.0) applies the Bitcoin Custody Resilience Index (BCRI) methodology to 14 Bitcoin custody architecture types — from exchange wallets and hot wallets through single-key cold storage, self-managed multisig, collaborative multisig, and institutional custody — producing scored comparisons across structural resilience and operational complexity. The benchmark is designed to surface the structural conditions that determine whether a custody arrangement will remain accessible, recoverable, and sovereign across time — not just at the moment of setup.
@@ -346,7 +376,8 @@ body.dark
         <span class="li"><span class="lsq" style="background:#bfdbfe;"></span><strong>Collaborative</strong></span>
         <span class="li"><span class="lsq" style="background:#e9d5ff;"></span><strong>Institutional</strong></span>
       </div>
-      <div style="position:relative;width:100%;height:840px;"><canvas id="c1"></canvas></div>
+      <div style="position:relative;width:100%;height:840px;"><div id="bcri-tip"><div id="tip-name"></div><div id="tip-score"></div><div id="tip-cfg"></div></div>
+      <canvas id="c1"></canvas></div>
       <div class="obsBox"><div class="obsDot"></div><p class="obsText">The ranking orders 12 scored architectures by absolute BCRI. Distributed self-custody and collaborative multisig designs occupy the top positions. The RE column shows that BCRI rank and resilience efficiency rank do not align — lower-BCRI architectures can achieve higher efficiency per unit of operational complexity.</p></div>
     </div>
 
@@ -435,7 +466,7 @@ body.dark
       <div>Document Viewer</div>
       <div><a href="/BCS-BR-1.0-2026-03.pdf" target="_blank" rel="noopener">Open in new tab</a></div>
     </div>
-    <iframe class="viewerFrame" src="/BCS-BR-1.0-2026-03.pdf#pagemode=none&view=FitH" title="BCS BCRI Benchmark Report PDF" loading="lazy"></iframe>
+    <iframe class="viewerFrame" style="height:80vh;min-height:700px;" src="/BCS-BR-1.0-2026-03.pdf#pagemode=none&view=FitH" title="BCS BCRI Benchmark Report PDF" loading="lazy"></iframe>
   </section>
 
   <!-- DOCUMENT RECORD -->
@@ -498,7 +529,16 @@ const CONFIGS={
 };
 const tip=document.getElementById('bcri-tip'),tipName=document.getElementById('tip-name'),tipScore=document.getElementById('tip-score'),tipCfg=document.getElementById('tip-cfg');
 function showTip(e,n,s,c){tipName.textContent=n;tipScore.textContent=s;tipCfg.textContent=c;tip.style.display='block';mvTip(e);}
-function mvTip(e){const x=e.clientX+16,y=e.clientY+16,w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=(x+w>window.innerWidth?e.clientX-w-16:x)+'px';tip.style.top=(y+h>window.innerHeight?e.clientY-h-16:y)+'px';}
+function mvTip(e){
+  var cx=e.touches?e.touches[0].clientX:e.clientX;
+  var cy=e.touches?e.touches[0].clientY:e.clientY;
+  var tw=tip.offsetWidth||210, th=tip.offsetHeight||80;
+  var tx=cx+16, ty=cy-10;
+  if(tx+tw>window.innerWidth-10) tx=cx-tw-16;
+  if(ty<6) ty=6;
+  if(ty+th>window.innerHeight-10) ty=cy-th-16;
+  tip.style.left=tx+'px'; tip.style.top=ty+'px';
+}
 function hideTip(){tip.style.display='none';}
 const rd=[
   {l1:'Self-Managed Multisig',  l2:'— Hi Resilience (Geo)',bcri:97.5,re:39.1,rat:'AAA', z:'Distributed', name:'Self-Managed Multisig — Hi Resilience (Geo)'},
@@ -552,7 +592,7 @@ const bnd={id:'bnd',beforeDraw(chart){const {ctx,scales:{x},chartArea:{top,botto
 const fd=[{label:'Exchange Wallet',cs:1.0,ere:0,z:'No Sovereignty'},{label:'Hot Wallet',cs:1.4,ere:0,z:'No Sovereignty'},{label:'Single-Sig Cold Storage — Regular',cs:2.6,ere:26.80,z:'Single-Key'},{label:'Single-Sig Cold Storage — Advanced',cs:4.8,ere:26.95,z:'Single-Key'},{label:'Self-Managed Multisig — Regular (2-of-3)',cs:4.4,ere:24.60,z:'Distributed'},{label:'Self-Managed Multisig — Advanced (3-of-5)',cs:5.6,ere:27.29,z:'Distributed'},{label:'Self-Managed Multisig — Hi Resilience (Geo)',cs:6.2,ere:29.10,z:'Distributed'},{label:'Collaborative Multisig — Assisted (2-of-3)',cs:3.4,ere:29.40,z:'Collaborative'},{label:'Collaborative Multisig — Peer (2-of-3)',cs:4.6,ere:26.55,z:'Collaborative'},{label:'Collaborative Multisig — Advised (3-of-5)',cs:5.2,ere:31.36,z:'Collaborative'},{label:'MPC Custody',cs:7.4,ere:23.74,z:'Institutional'},{label:'Corporate Bitcoin Treasury',cs:8.2,ere:16.40,z:'Institutional'},{label:'Regulated Exchange Custody',cs:8.8,ere:17.02,z:'Institutional'},{label:'Qualified Custodian',cs:9.4,ere:22.42,z:'Institutional'}];
 const shov={id:'shov',afterEvent(chart,args){const e=args.event.native;if(!e)return;if(args.event.type==='mousemove'){const els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},false);if(els.length){const pt=chart.data.datasets[els[0].datasetIndex].data[els[0].index];showTip(e,pt.label,'CS '+pt.x+'  ·  ERE '+pt.y,CONFIGS[pt.label]||'');chart.canvas.style.cursor='pointer';}else{hideTip();chart.canvas.style.cursor='default';}}else if(args.event.type==='mouseout'){hideTip();}}};
 new Chart(document.getElementById('c2'),{type:'scatter',plugins:[bnd,grd,shov],
-  data:{datasets:['No Sovereignty','Single-Key','Collaborative','Distributed','Institutional'].map(z=>({label:z,data:fd.filter(d=>d.z===z).map(d=>({x:d.cs,y:d.ere,label:d.label})),backgroundColor:{'No Sovereignty':'rgba(252,165,165,0.85)','Single-Key':'rgba(253,230,138,0.9)','Collaborative':'rgba(191,219,254,0.9)','Distributed':'rgba(187,247,208,0.9)','Institutional':'rgba(233,213,255,0.9)'}[z],borderColor:{'No Sovereignty':'#f87171','Single-Key':'#d97706','Collaborative':'#2563eb','Distributed':'#059669','Institutional':'#7c3aed'}[z],borderWidth:1.5,pointRadius:7,pointHoverRadius:9}))},
+  data:{datasets:['No Sovereignty','Single-Key','Collaborative','Distributed','Institutional'].map(z=>({label:z,data:fd.filter(d=>d.z===z).map(d=>({x:d.cs,y:d.ere,label:d.label})),backgroundColor:{'No Sovereignty':'rgba(252,165,165,0.85)','Single-Key':'rgba(253,230,138,0.9)','Collaborative':'rgba(191,219,254,0.9)','Distributed':'rgba(187,247,208,0.9)','Institutional':'rgba(233,213,255,0.9)'}[z],borderColor:{'No Sovereignty':'#f87171','Single-Key':'#d97706','Collaborative':'#2563eb','Distributed':'#059669','Institutional':'#7c3aed'}[z],borderWidth:1.5,pointRadius:7,pointHoverRadius:14}))},
   options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{min:0,max:11,title:{display:true,text:'Complexity Score (CS) · Operational burden on custody operator',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:11,family:'system-ui'}}},y:{min:-2,max:36,title:{display:true,text:'Excess Resilience Efficiency (ERE = (BCRI−25)÷√CS)',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:11,family:'system-ui'}}}}}
 });
 document.getElementById('c2').addEventListener('mousemove',mvTip);document.getElementById('c2').addEventListener('mouseleave',hideTip);
@@ -560,12 +600,32 @@ const md=[{label:'Single-Sig Cold Storage — Regular',cs:2.6,bcri:68.2,z:'Singl
 const mhov={id:'mhov',afterEvent(chart,args){const e=args.event.native;if(!e)return;if(args.event.type==='mousemove'){const els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},false);if(els.length){const pt=chart.data.datasets[els[0].datasetIndex].data[els[0].index];showTip(e,pt.label,'BCRI '+pt.y+'  ·  CS '+pt.x,CONFIGS[pt.label]||'');chart.canvas.style.cursor='pointer';}else{hideTip();chart.canvas.style.cursor='default';}}else if(args.event.type==='mouseout'){hideTip();}}};
 const qp={id:'qp',beforeDraw(chart){const {ctx,scales:{x,y},chartArea:{left,right,top,bottom}}=chart;const mx=x.getPixelForValue(5),my=y.getPixelForValue(75);ctx.save();[{x1:left,y1:top,x2:mx,y2:my,bg:'rgba(209,250,229,0.45)',tc:'#065f46',sc:'#047857',t:'Efficient Self-Custody',s:'Low Complexity · High Resilience',ly:0.55},{x1:mx,y1:top,x2:right,y2:my,bg:'rgba(237,233,254,0.45)',tc:'#4c1d95',sc:'#6d28d9',t:'Institutional Custody',s:'High Complexity · High Resilience',ly:0.55},{x1:left,y1:my,x2:mx,y2:bottom,bg:'rgba(255,251,235,0.55)',tc:'#92400e',sc:'#b45309',t:'Convenience Custody',s:'Low Complexity · Lower Resilience',ly:0.55},{x1:mx,y1:my,x2:right,y2:bottom,bg:'rgba(254,226,226,0.45)',tc:'#991b1b',sc:'#b91c1c',t:'Diminishing Returns Zone',s:'High Complexity · Lower Resilience',ly:0.55}].forEach(q=>{ctx.fillStyle=q.bg;ctx.fillRect(q.x1,q.y1,q.x2-q.x1,q.y2-q.y1);const cx=(q.x1+q.x2)/2,cy=q.y1+(q.y2-q.y1)*q.ly;const bW=170,bH=36,bX=cx-85,bY=cy-18;ctx.fillStyle='rgba(255,255,255,0.85)';ctx.strokeStyle=q.tc+'55';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,4);ctx.fill();ctx.stroke();ctx.fillStyle=q.tc;ctx.font='600 10px system-ui';ctx.textAlign='center';ctx.fillText(q.t,cx,bY+13);ctx.fillStyle=q.sc;ctx.font='9px system-ui';ctx.fillText(q.s,cx,bY+27);});ctx.setLineDash([]);ctx.strokeStyle='rgba(107,114,128,0.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(mx,top);ctx.lineTo(mx,bottom);ctx.stroke();ctx.beginPath();ctx.moveTo(left,my);ctx.lineTo(right,my);ctx.stroke();ctx.fillStyle='rgba(75,85,99,0.6)';ctx.font='9px system-ui';ctx.textAlign='left';ctx.fillText('Resilience Sufficiency Threshold (75)',left+6,my-4);ctx.restore();}};
 new Chart(document.getElementById('c3'),{type:'scatter',plugins:[qp,mhov],
-  data:{datasets:['Single-Key','Distributed','Collaborative','Institutional'].map(z=>({label:z,data:md.filter(d=>d.z===z).map(d=>({x:d.cs,y:d.bcri,label:d.label})),backgroundColor:ZF[z],borderColor:ZB[z],borderWidth:2,pointRadius:10,pointHoverRadius:12}))},
+  data:{datasets:['Single-Key','Distributed','Collaborative','Institutional'].map(z=>({label:z,data:md.filter(d=>d.z===z).map(d=>({x:d.cs,y:d.bcri,label:d.label})),backgroundColor:ZF[z],borderColor:ZB[z],borderWidth:2,pointRadius:10,pointHoverRadius:16}))},
   options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{min:0,max:10,title:{display:true,text:'Complexity Score (CS) · Operational burden on custody operator',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:11,family:'system-ui'}}},y:{min:50,max:100,title:{display:true,text:'BCRI Score (50–100)',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:11,family:'system-ui'}}}}}
 });
 document.getElementById('c3').addEventListener('mousemove',mvTip);document.getElementById('c3').addEventListener('mouseleave',hideTip);
 
 (function(){function setHeaderOffset(){const header=document.querySelector('header');if(!header)return;const h=Math.ceil(header.getBoundingClientRect().height);document.documentElement.style.setProperty('--headerOffset',(h+4)+'px');}window.addEventListener('load',setHeaderOffset);window.addEventListener('resize',setHeaderOffset);})();
+
+/* ── Touch support for charts ── */
+(function(){
+  ['c1','c2','c3'].forEach(function(cid){
+    var el=document.getElementById(cid);
+    if(!el) return;
+    el.addEventListener('touchstart',function(e){
+      if(e.touches.length===1) e.preventDefault();
+    },{passive:false});
+    el.addEventListener('touchmove',function(e){
+      if(e.touches.length===1){
+        e.preventDefault();
+        var t=e.touches[0];
+        var fake={clientX:t.clientX,clientY:t.clientY,touches:e.touches};
+        mvTip(fake);
+      }
+    },{passive:false});
+    el.addEventListener('touchend',hideTip);
+  });
+})();
 </script>
 <script>
 function mTInd(el){el.classList.toggle('open');}
