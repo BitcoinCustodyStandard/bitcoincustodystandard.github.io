@@ -282,6 +282,14 @@ body.dark
   .path-tile{padding:16px;}
 }
 
+
+/* ── Document viewer ── */
+.viewerWrap{margin-top:28px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.viewerHead{padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;font-weight:700;color:var(--text);}
+.viewerHead a{font-size:12px;font-weight:600;color:var(--orange);text-decoration:none;}
+.viewerHead a:hover{text-decoration:underline;}
+.viewerFrame{width:100%;height:85vh;min-height:750px;border:0;display:block;}
+@media(max-width:680px){.viewerFrame{height:70vh;min-height:500px;}}
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"Bitcoin Custody Standard — Normative Summary","url":"https://bitcoincustodystandard.org/normative-summary/","description":"BCS-NS-1.1 — The foundational normative document of the Bitcoin Custody Standard. Defines the framework, five structural pillars, and BCRI evaluation methodology.","publisher":{"@type":"Organization","name":"Bitcoin Custody Standard Initiative","url":"https://bitcoincustodystandard.org"}}</script>
