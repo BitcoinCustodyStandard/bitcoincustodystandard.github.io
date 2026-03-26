@@ -21,7 +21,29 @@
 <meta name="twitter:image" content="https://bitcoincustodystandard.org/BCS_twitter_card_1200x630.png" />
 <meta name="twitter:site" content="@Bitcoin_Custody" />
 
-<style>
+<style>/* ── Header ── */
+header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.hdr{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1100px;margin:0 auto;gap:10px;}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+.brand-logo{width:32px;height:32px;border-radius:6px;object-fit:cover;flex-shrink:0;}
+.brand-name{font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;}
+.site-nav{display:flex;gap:0;flex-wrap:wrap;justify-content:center;align-items:center;flex:1;}
+.site-nav a{font-size:13px;font-weight:600;color:var(--muted);padding:5px 10px;border-radius:4px;text-decoration:none;white-space:nowrap;}
+.site-nav a:hover{color:var(--text);background:var(--bg2);}
+.site-nav a.active{color:var(--text);background:var(--bg2);}
+.hdr-actions{display:flex;align-items:center;flex-shrink:0;}
+.theme-toggle{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;outline:none;-webkit-appearance:none;}
+.theme-toggle:hover{border-color:var(--orange);background:var(--orange-dim);}
+@media(max-width:768px){
+  .hdr{padding:10px 14px;gap:8px;}
+  .site-nav{order:3;width:100%;justify-content:center;}
+  .hdr-actions{order:2;}
+  .site-nav a{font-size:12px;padding:4px 8px;}
+}
+@media(max-width:480px){
+  .brand-name{font-size:13px;}
+  .site-nav a{font-size:11px;padding:4px 6px;}
+}
 .site-footer{
   border-top:1px solid var(--border);
   padding:28px 0 24px;
@@ -229,7 +251,7 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
 <header>
   <div class="hdr">
     <a class="brand" href="/">
-      <img class="brand-logo" src="/bcs-seal.png" alt="BCS" width="32" height="32">
+      <img class="brand-logo" src="/bcs-seal.png" alt="BCS">
       <span class="brand-name">Bitcoin Custody Standard</span>
     </a>
     <nav class="site-nav" aria-label="Primary">
