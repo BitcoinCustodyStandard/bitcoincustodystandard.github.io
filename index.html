@@ -71,16 +71,16 @@ a:hover{text-decoration:underline;}
 
 .wrap{max-width:960px;margin:0 auto;padding:0 20px;}
 /* Header */
-header{background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:var(--headerH);max-width:960px;margin:0 auto;gap:16px;flex-wrap:wrap;}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;max-width:960px;margin:0 auto;gap:12px;flex-wrap:nowrap;}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
 .brand-logo{width:28px;height:28px;border-radius:5px;object-fit:cover;}
 .brand-name{font-size:14px;font-weight:800;color:var(--text);}
-.site-nav{display:flex;gap:2px;flex-wrap:wrap;}
-.site-nav a{font-size:12px;font-weight:600;color:var(--muted);padding:5px 9px;border-radius:4px;text-decoration:none;transition:color .12s,background .12s;}
+.site-nav{display:flex;gap:0;flex-wrap:wrap;flex:1;justify-content:center;}
+.site-nav a{font-size:12px;font-weight:600;color:var(--muted);padding:4px 8px;border-radius:4px;text-decoration:none;white-space:nowrap;}
 .site-nav a:hover{color:var(--text);background:var(--bg2);}
 .site-nav a.active{color:var(--text);background:var(--bg2);}
-.hdr-actions{display:flex;align-items:center;gap:8px;}
+.hdr-actions{display:flex;align-items:center;flex-shrink:0;}
 /* Theme toggle */
 .theme-toggle{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;outline:none;-webkit-appearance:none;}
 .theme-toggle:hover{border-color:var(--orange);background:var(--orange-dim);}
@@ -236,6 +236,15 @@ header{background:var(--card);border-bottom:1px solid var(--border);position:sti
 .out-desc{font-size:11px;color:var(--muted);line-height:1.5;}
 @media(max-width:680px){.out-grid{grid-template-columns:1fr 1fr!important;}}
 @media(max-width:380px){.out-grid{grid-template-columns:1fr!important;}}
+@media(max-width:820px){
+  .site-nav a{font-size:11px;padding:3px 6px;}
+}
+@media(max-width:680px){
+  .hdr{flex-wrap:wrap;padding:10px 14px;gap:8px;}
+  .brand{flex:1;}
+  .site-nav{order:3;width:100%;justify-content:center;flex-wrap:wrap;}
+  .hdr-actions{order:2;margin-left:auto;}
+}
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Bitcoin Custody Standard", "url": "https://bitcoincustodystandard.org", "description": "A public framework for evaluating the long-horizon resilience of Bitcoin custody systems.", "publisher": {"@type": "Organization", "name": "Bitcoin Custody Standard Initiative", "url": "https://bitcoincustodystandard.org"}}</script>
@@ -521,41 +530,57 @@ header{background:var(--card);border-bottom:1px solid var(--border);position:sti
 
       var act = hovered || pinned;
 
+      /* Hover rules:
+         pillar key  → light that pillar + ARS only
+         ars         → light all 5 pillars + ARS only (NOT boxes)
+         eri/xri/chs → light that box + ARS + line from ARS + line to BCRI
+         bcri        → light EVERYTHING (Christmas tree)
+      */
+      var bcriAll = act === 'bcri';
+
       /* pillar → ARS lines */
       PILLARS.forEach(function(pl) {
-        var a = act===pl.k || act==='ars';
+        var a = bcriAll || act===pl.k || act==='ars';
         ln(p.ars.x, p.ars.y, p[pl.k].x, p[pl.k].y,
-           '#f7931a', a ? 0.60 : 0.22, [], a ? 1 : 0.6);
+           '#f7931a', a ? 0.65 : 0.18, [], a ? 1.1 : 0.6);
       });
 
-      /* ARS → right boxes */
+      /* ARS → right boxes (dashed) */
       RIGHT.forEach(function(b) {
-        var a = act===b.k || act==='ars';
+        var a = bcriAll || act===b.k;
         ln(p.ars.x+22, p.ars.y, p[b.k].x-79, p[b.k].y,
-           '#f7931a', a ? 0.55 : 0.20, [5,4], a ? 1 : 0.6);
+           '#f7931a', a ? 0.55 : 0.14, [5,4], a ? 1 : 0.6);
       });
 
-      /* right boxes → BCRI */
+      /* right boxes → BCRI (dashed) */
       RIGHT.forEach(function(b) {
-        var a = act===b.k || act==='bcri';
+        var a = bcriAll || act===b.k;
         ln(p[b.k].x, p[b.k].y+31, p.bcri.x, p.bcri.y-29,
-           '#f7931a', a ? 0.50 : 0.16, [3,4], 0.8);
+           '#f7931a', a ? 0.55 : 0.12, [3,4], a ? 1 : 0.7);
       });
 
-      /* draw elements */
+      /* draw pillars */
       PILLARS.forEach(function(pl) {
-        drawPillar(p[pl.k].x, p[pl.k].y, pl.label,
-                   act===pl.k || act==='ars');
+        var a = bcriAll || act===pl.k || act==='ars';
+        drawPillar(p[pl.k].x, p[pl.k].y, pl.label, a);
       });
+
+      /* draw right boxes (ERI/XRI/CHS) */
       RIGHT.forEach(function(b) {
-        drawBox(p[b.k].x, p[b.k].y, b.code, b.title, b.sub,
-                act===b.k || act==='ars' || act==='bcri');
+        var a = bcriAll || act===b.k;
+        drawBox(p[b.k].x, p[b.k].y, b.code, b.title, b.sub, a);
       });
+
+      /* draw ARS — active when: ARS hovered, any pillar hovered, any box hovered, or BCRI */
       drawARS(p.ars.x, p.ars.y,
-              act==='ars' ||
-              PILLARS.some(function(pl){ return act===pl.k; }) ||
-              RIGHT.some(function(b)  { return act===b.k;  }));
-      drawBCRI(p.bcri.x, p.bcri.y, act==='bcri');
+        bcriAll ||
+        act==='ars' ||
+        PILLARS.some(function(pl){ return act===pl.k; }) ||
+        RIGHT.some(function(b)  { return act===b.k;  })
+      );
+
+      /* draw BCRI */
+      drawBCRI(p.bcri.x, p.bcri.y, bcriAll);
 
       /* status dot + label bottom-left */
       ctx.fillStyle = '#10b981';
@@ -563,7 +588,7 @@ header{background:var(--card);border-bottom:1px solid var(--border);position:sti
       ctx.fillStyle = '#4a4a4a';
       ctx.font = '10px system-ui,sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText('Framework active', 28, H-16);
+      ctx.fillText('Custody · Five pillars active', 28, H-16);
       /* title */
       ctx.fillStyle = '#f7931a';
       ctx.font      = '700 11px system-ui,sans-serif';
@@ -571,7 +596,7 @@ header{background:var(--card);border-bottom:1px solid var(--border);position:sti
       ctx.fillText('BCRI STRUCTURAL MODEL', 16, 22);
       ctx.fillStyle = '#444';
       ctx.font      = '10px system-ui,sans-serif';
-      ctx.fillText('hover any node to expand', 16, 35);
+      ctx.fillText('hover any node — click to pin', 16, 35);
 
       requestAnimationFrame(frame);
     }
@@ -783,10 +808,10 @@ header{background:var(--card);border-bottom:1px solid var(--border);position:sti
   <!-- 8. APPLICATION AND EVALUATION -->
   <section style="margin-top:32px;padding-bottom:40px;" aria-label="Application and Evaluation">
     <div class="section-title">Application and Evaluation</div>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:8px;">The Bitcoin Custody Standard defines a public framework for evaluating Bitcoin custody resilience.</p>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:8px;">The scoring methodology is maintained as a controlled model to ensure consistency, comparability, and integrity across assessments.</p>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:8px;">Evaluations are conducted under the Bitcoin Custody Standard framework and administered by the Bitcoin Custody Standard Initiative.</p>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;">The standard is version-controlled, with benchmark and research publications expanding over time.</p>
+    <p style="font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:6px;">The Bitcoin Custody Standard defines a public framework for evaluating Bitcoin custody resilience.</p>
+    <p style="font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:6px;">The scoring methodology is maintained as a controlled model to ensure consistency, comparability, and integrity across assessments.</p>
+    <p style="font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:6px;">Evaluations are conducted under the Bitcoin Custody Standard framework and administered by the Bitcoin Custody Standard Initiative.</p>
+    <p style="font-size:14px;color:var(--muted);line-height:1.5;">The standard is version-controlled, with benchmark and research publications expanding over time.</p>
   </section>
 
 </main>
@@ -816,7 +841,24 @@ header{background:var(--card);border-bottom:1px solid var(--border);position:sti
 function mTInd(el){el.classList.toggle('open');}
 var _mfo=false;
 function mFT(){_mfo=!_mfo;var b=document.getElementById('mfbody');var c=document.getElementById('mfcaret');if(b)b.classList.toggle('open',_mfo);if(c)c.style.transform=_mfo?'rotate(180deg)':'';}
-(function(){var btn=document.getElementById('tt');function apply(d){document.body.classList.toggle('dark',d);if(btn)btn.textContent=d?'☀':'🌙';}var s=localStorage.getItem('bcs-theme');apply(s==='dark');if(btn)btn.addEventListener('click',function(){var d=!document.body.classList.contains('dark');localStorage.setItem('bcs-theme',d?'dark':'light');apply(d);});function sh(){var h=document.querySelector('header');if(!h)return;document.documentElement.style.setProperty('--headerOffset',(Math.ceil(h.getBoundingClientRect().height)+4)+'px');}window.addEventListener('load',sh);window.addEventListener('resize',sh);})();
+(function(){
+  var btn=document.getElementById('tt');
+  function apply(dark){
+    document.body.classList.toggle('dark',dark);
+    if(btn)btn.textContent=dark?'☀':'🌙';
+  }
+  var saved=localStorage.getItem('bcs-theme');
+  var prefersDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
+  apply(saved==='dark'||(saved===null&&prefersDark));
+  if(btn){
+    btn.addEventListener('click',function(){
+      var dark=!document.body.classList.contains('dark');
+      localStorage.setItem('bcs-theme',dark?'dark':'light');
+      apply(dark);
+    });
+  }
+})();
+function sh(){var h=document.querySelector('header');if(!h)return;document.documentElement.style.setProperty('--headerOffset',(Math.ceil(h.getBoundingClientRect().height)+4)+'px');}window.addEventListener('load',sh);window.addEventListener('resize',sh);
 </script>
 </body>
 </html>
