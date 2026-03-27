@@ -21,9 +21,81 @@
 <meta name="twitter:image" content="https://bitcoincustodystandard.org/BCS_twitter_card_1200x630.png" />
 <meta name="twitter:site" content="@Bitcoin_Custody" />
 
-<style>/* ── Header ── */
-header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-.hdr{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1100px;margin:0 auto;gap:10px;}
+<style>
+/* ── CSS Variables ── */
+:root {
+  --orange:#f7931a;
+  --orange-dim:rgba(247,147,26,0.10);
+  --orange-line:rgba(247,147,26,0.35);
+  --bg:#ffffff;
+  --bg2:#f3f4f6;
+  --card:#ffffff;
+  --text:#0b1220;
+  --muted:#4b5563;
+  --dim:#9ca3af;
+  --border:#e5e7eb;
+  --panel:#f8fafc;
+  --btn:#111827;
+  --btnText:#ffffff;
+  --link:#0f62fe;
+  --btc:#f7931a;
+  --headerH:72px;
+}
+@media(max-width:760px){
+  :root{ --headerH:auto; }
+}
+
+/* Dark mode variables */
+body.dark {
+  --bg:#0f1117;
+  --bg2:#1a1d27;
+  --card:#161922;
+  --text:#f9fafb;
+  --muted:#9ca3af;
+  --dim:#6b7280;
+  --border:#2d3148;
+  --panel:#1a1d27;
+  --btn:#f9fafb;
+  --btnText:#0f1117;
+  --link:#60a5fa;
+}
+body.dark .obsBox { background:#1a1d27; }
+body.dark .about-standard { background:var(--card); border-color:var(--border); }
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+  font-size:15px;
+  line-height:1.6;
+  /* FIX: prevent horizontal overflow on mobile */
+  overflow-x:hidden;
+}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+
+/* ── Header ── */
+header{
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:100;
+  /* FIX: ensure header doesn't cause layout shift */
+  width:100%;
+}
+.hdr{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 20px;
+  max-width:1100px;
+  margin:0 auto;
+  gap:10px;
+}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
 .brand-logo{width:32px;height:32px;border-radius:6px;object-fit:cover;flex-shrink:0;}
 .brand-name{font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;}
@@ -32,8 +104,23 @@ header{background:var(--bg);border-bottom:1px solid var(--border);position:stick
 .site-nav a:hover{color:var(--text);background:var(--bg2);}
 .site-nav a.active{color:var(--text);background:var(--bg2);}
 .hdr-actions{display:flex;align-items:center;flex-shrink:0;}
-.theme-toggle{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;outline:none;-webkit-appearance:none;}
+.theme-toggle{
+  width:36px;height:36px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:transparent;
+  cursor:pointer;
+  font-size:16px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--muted);
+  flex-shrink:0;
+  outline:none;
+  -webkit-appearance:none;
+  /* FIX: better tap target */
+  touch-action:manipulation;
+}
 .theme-toggle:hover{border-color:var(--orange);background:var(--orange-dim);}
+
 @media(max-width:768px){
   .hdr{padding:10px 14px;gap:8px;}
   .site-nav{order:3;width:100%;justify-content:center;}
@@ -44,20 +131,8 @@ header{background:var(--bg);border-bottom:1px solid var(--border);position:stick
   .brand-name{font-size:13px;}
   .site-nav a{font-size:11px;padding:4px 6px;}
 }
-.site-footer{
-  border-top:1px solid var(--border);
-  padding:28px 0 24px;
-  text-align:center;
-  font-size:11px;
-  color:var(--dim);
-  margin-top:48px;
-}
-.site-footer a{color:var(--dim);text-decoration:none;}
-.site-footer a:hover{color:var(--muted);text-decoration:underline;}
-.site-footer .f-nav{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;}
-.site-footer .f-maintained{margin-bottom:4px;font-size:11px;color:var(--dim);}
-.site-footer .f-copy{font-size:11px;color:var(--dim);}
-body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;}
+
+/* ── Typography ── */
 p{color:var(--muted);font-size:14px;line-height:1.75;margin:0;}
 p+p{margin-top:10px;}
 .section-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
@@ -66,89 +141,13 @@ p+p{margin-top:10px;}
 h3{font-size:16px;font-weight:800;color:var(--text);margin:0 0 8px;}
 h4{font-size:13px;font-weight:700;color:var(--text);margin:0 0 6px;}
 
-.site-footer{
-  border-top:1px solid var(--border);
-  padding:28px 0 24px;
-  text-align:center;
-  font-size:11px;
-  color:var(--dim);
-  margin-top:48px;
-}
-.site-footer a{color:var(--dim);text-decoration:none;}
-.site-footer a:hover{color:var(--muted);text-decoration:underline;}
-.site-footer .f-nav{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;}
-.site-footer .f-maintained{margin-bottom:4px;font-size:11px;color:var(--dim);}
-.site-footer .f-copy{font-size:11px;color:var(--dim);}
-
-:root {
-  --orange:#f7931a;
-  --orange-dim:rgba(247,147,26,0.10);
-  --orange-line:rgba(247,147,26,0.35);
-  --link:#c97415;
-  --bg:#ffffff;
-  --text:#0b1220;
-  --muted:#4b5563;
-  --border:#e5e7eb;
-  --panel:#f8fafc;
-  --btn:#111827;
-  --btnText:#ffffff;
-  --link:#0f62fe;
-  --btc:#f7931a;
-  --headerH:72px;
-}
-@media(max-width:760px){
-  :root{ --headerH:132px; }
-}
-*{box-sizing:border-box}
-
-a{color:var(--link);text-decoration:none}
-a:hover{text-decoration:underline}
-.wrap{max-width:980px;margin:0 auto;padding:0 18px}
-header{
-  border-bottom:1px solid var(--border);
-  background:var(--card);
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-.top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 0;
-  min-height:var(--headerH);
-  flex-wrap:wrap;
-  gap:12px;
-}
-.brand{display:flex;align-items:center;gap:12px;}
-.logo{width:34px;height:34px;border-radius:8px;object-fit:cover;}
-.brand h1{margin:0;font-size:16px;font-weight:900}
-.brand .sub{margin:0;font-size:12px;color:var(--muted)}
-nav{display:flex;gap:14px;flex-wrap:wrap}
-nav a{font-weight:600;color:var(--muted)}
-nav a:hover{color:var(--text);text-decoration:none}
-nav a.active{color:var(--text)}
-.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.btn{
-  padding:9px 14px;
-  border-radius:8px;
-  border:1px solid var(--border);
-  font-weight:800;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  
-  gap:6px;
-}
-.btn.primary{background:var(--btn);color:var(--btnText);border-color:var(--btn);}
-.btn:hover{text-decoration:none;filter:brightness(.97)}
-.btn svg{width:14px;height:14px;fill:currentColor;flex-shrink:0;}
+/* ── Main ── */
 main{padding:34px 0 60px}
 .hero{padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:18px;}
-
 .lead{margin:0;color:var(--muted);max-width:92ch}
 .dot{width:8px;height:8px;border-radius:999px;background:var(--btc);display:inline-block;margin-right:6px;transform:translateY(-1px);}
-/* Metadata strip */
+
+/* ── Metadata strip ── */
 .meta{border:1px solid var(--border);border-radius:14px;padding:14px;margin:18px 0;}
 .metaGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
 @media(max-width:760px){
@@ -161,28 +160,34 @@ main{padding:34px 0 60px}
 .k{color:var(--muted);font-weight:600;flex-shrink:0;padding-right:12px;}
 .v{font-weight:400;text-align:right;}
 .v a{display:inline-block;text-align:right;}
+
+/* ── Scroll offset for sticky header ── */
 :root{--headerOffset:120px;}
 html{scroll-padding-top:var(--headerOffset);}
-/* Section & cards */
+
+/* ── Sections & cards ── */
 .section{margin-top:28px;}
 .section h3{font-size:18px;font-weight:900;margin:0 0 14px;}
 .fullCard{border:1px solid var(--border);background:var(--card);border-radius:14px;padding:20px 22px;}
 .fullCard h4{margin:0 0 10px 0;font-size:13px;letter-spacing:.22px;text-transform:uppercase;display:flex;align-items:center;gap:8px;font-weight:700;}
 .fullCard p{margin:0;color:var(--muted);font-size:14px;line-height:1.6;}
 .fullCard p+p{margin-top:10px;}
-/* Chart block */
+
+/* ── Chart block ── */
 .chartBlock{margin-top:40px;padding-top:28px;border-top:1px solid var(--border);}
 .chartHdr{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
 .chartLogo{width:32px;height:auto;border-radius:4px;flex-shrink:0;}
 .chartTitle{font-size:14px;font-weight:700;color:var(--text);}
 .chartSub{font-size:12px;color:var(--muted);margin-bottom:12px;padding-left:42px;}
 .chartSub i{margin:0 4px;opacity:.4;font-style:normal;}
-/* Legend */
+
+/* ── Legend ── */
 .legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:12px;color:var(--muted);}
 .li{display:flex;align-items:center;gap:5px;}
 .lsq,.lci{width:12px;height:12px;border-radius:50%;flex-shrink:0;display:inline-block;}
 .lci{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;}
-/* Orange observation box */
+
+/* ── Orange observation box ── */
 .obsBox{
   margin-top:14px;
   border:1px solid var(--border);
@@ -194,32 +199,93 @@ html{scroll-padding-top:var(--headerOffset);}
 }
 .obsDot{width:8px;height:8px;border-radius:50%;background:var(--btc);flex-shrink:0;margin-top:5px;}
 .obsText{font-size:13px;color:var(--muted);line-height:1.65;}
-/* Findings */
+
+/* ── Findings ── */
 .finding{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:0 6px 6px 0;padding:16px 18px;margin-bottom:14px;}
 .findingNum{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin:0 0 6px;}
 .findingText{font-size:13px;color:var(--muted);line-height:1.7;margin:0;}
-/* Doc viewer */
+
+/* ── Doc viewer ── */
 .viewerWrap{margin-top:14px;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
 .viewerHead{padding:12px 14px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:800;text-transform:uppercase;}
 .viewerFrame{width:100%;height:90vh;min-height:900px;border:0;display:block;}
-/* Footer */
-footer{border-top:1px solid var(--border);margin-top:28px;padding-top:16px;padding-bottom:24px;text-align:center;line-height:1.35;}
-footer .title{font-weight:700;margin-bottom:4px;}
-footer .tagline{color:var(--muted);font-size:14px;margin-bottom:8px;}
-footer .version{font-size:14px;margin-bottom:8px;}
-footer .email{font-size:14px;margin-bottom:4px;}
-footer .copyright{font-size:13px;color:var(--muted);margin-top:8px;}
-/* Tooltip */
+
+/* ── Footer ── */
+.site-footer{
+  border-top:1px solid var(--border);
+  padding:28px 0 24px;
+  text-align:center;
+  font-size:11px;
+  color:var(--dim);
+  margin-top:48px;
+}
+.site-footer a{color:var(--dim);text-decoration:none;}
+.site-footer a:hover{color:var(--muted);text-decoration:underline;}
+.site-footer .f-nav{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;}
+.site-footer .f-maintained{margin-bottom:4px;font-size:11px;color:var(--dim);}
+.site-footer .f-copy{font-size:11px;color:var(--dim);}
+
+/* ── Tooltip ── */
 #bcri-tip{
-  position:fixed;pointer-events:none;z-index:9999;
-  background:rgba(17,24,39,0.96);border-radius:10px;
-  padding:14px 16px;width:360px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.35);display:none;
+  position:fixed;
+  pointer-events:none;
+  z-index:9999;
+  background:rgba(17,24,39,0.96);
+  border-radius:10px;
+  padding:14px 16px;
+  width:300px;
+  max-width:calc(100vw - 32px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.35);
+  display:none;
 }
 .tip-name{font-size:13px;font-weight:700;color:#f9fafb;margin:0 0 4px;line-height:1.3;}
 .tip-score{font-size:11px;color:#9ca3af;margin:0 0 10px;}
 .tip-lbl{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin:0 0 5px;}
 .tip-cfg{font-size:12px;color:#d1d5db;margin:0;line-height:1.65;}
+
+/* ── MOBILE: Chart scroll wrapper ── */
+.chart-scroll-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* Mobile: allow horizontal scroll on charts */
+@media(max-width:768px){
+  .chart-scroll-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    /* FIX: scroll indicator hint */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .chart-scroll-wrap::after {
+    content: '← Swipe to explore →';
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    color: var(--dim);
+    padding: 6px 0 2px;
+    letter-spacing: .04em;
+  }
+  /* Chart 1 (bar) needs more height per item on mobile */
+  #c1-wrap {
+    min-width: 560px;
+  }
+  #c2-wrap, #c3-wrap {
+    min-width: 480px;
+  }
+  /* FIX: legend wraps better on mobile */
+  .legend {
+    gap: 10px;
+    font-size: 11px;
+  }
+  /* FIX: chart title smaller on mobile */
+  .chartTitle { font-size: 13px; }
+  .chartSub { font-size: 11px; padding-left: 0; }
+  .chartHdr { flex-wrap: wrap; }
+}
+
+/* ── Responsive header ── */
 @media(max-width:760px){
   .top{flex-direction:column;align-items:stretch;}
   .brand{justify-content:center;}
@@ -232,15 +298,20 @@ footer .copyright{font-size:13px;color:var(--muted);margin-top:8px;}
   .site-nav{justify-content:center;flex-wrap:wrap;gap:1px;}
   .site-nav a{font-size:11px;padding:4px 6px;}
   .hdr-actions{display:flex;justify-content:center;}
-  main.wrap{padding:0 14px;}
-  .hero h1,
 }
 @media(max-width:380px){
   .site-nav a{font-size:10px;padding:3px 5px;}
 }
 
-body.dark .about-standard{background:var(--card);border-color:var(--border);}
-@media(max-width:600px){canvas#c1,canvas#c2,canvas#c3{min-width:480px;}}
+/* ── Tap dismiss overlay (mobile) ── */
+#tip-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: transparent;
+}
+#tip-overlay.active { display: block; }
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "name": "BCRI Benchmark Report (BCS-BR-1.0)", "description": "Applies the Bitcoin Custody Standard framework across 14 benchmark custody architectures to evaluate structural resilience and operational complexity.", "version": "1.0", "datePublished": "2026-03-01", "url": "https://bitcoincustodystandard.org/bcri/", "publisher": {"@type": "Organization", "name": "Bitcoin Custody Standard Initiative"}}</script>
@@ -277,6 +348,8 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
   <p class="tip-lbl">Reference Configuration</p>
   <p class="tip-cfg" id="tip-cfg"></p>
 </div>
+<!-- Tap-away overlay for mobile tooltip dismiss -->
+<div id="tip-overlay"></div>
 
 <main class="wrap">
 
@@ -294,14 +367,13 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
     <p style="margin:10px 0 0;color:var(--muted);font-size:14px;line-height:1.6;">
       Each architecture is evaluated across five orthogonal structural pillars: Cryptographic Integrity, Physical Distribution, Operational Dependency, Cognitive Reliability, and Temporal Resilience. These pillars are aggregated into four structural components — Architecture Resilience (ARS), Coordination Health (CHS), Entropy Resilience (ERS), and Exposure Resilience (XRS) — to produce a composite BCRI score from 0 to 100. The Temporal Resilience pillar specifically captures Custodial Entropy: the progressive structural degradation that occurs as documentation lapses, procedures drift, hardware ages, and coordination coherence erodes over time — independent of any external attack or security incident.
     </p>
-    
   </section>
   </section>
 
   <!-- BENCHMARK EXHIBITS -->
-<section class="section" id="benchmark">
+  <section class="section" id="benchmark">
     <div class="section-title">Benchmark Exhibits</div>
-    <p style="color:var(--muted);font-size:14px;margin:0 0 22px;">Three exhibits presenting the full BCRI benchmark dataset. Hover any bar or dot for the full reference configuration from Annex A.</p>
+    <p style="color:var(--muted);font-size:14px;margin:0 0 22px;">Three exhibits presenting the full BCRI benchmark dataset. Tap any bar or dot for the full reference configuration from Annex A.</p>
 
     <!-- Chart 1 -->
     <div class="chartBlock">
@@ -309,7 +381,7 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
         <img class="chartLogo" src="/BCS_logo_Short_Rounded_edges.png" alt="BCS" onerror="this.style.display='none'">
         <span class="chartTitle">Bitcoin Custody Architecture Benchmark Ranking (BCRI)</span>
       </div>
-      <p class="chartSub">All 14 benchmark architectures <i>·</i> Benchmark Ranking <i>·</i> BCS 2026</p>
+      <p class="chartSub">All 14 benchmark architectures · Benchmark Ranking · BCS 2026</p>
       <div class="legend">
         <span class="li"><span class="lsq" style="background:repeating-linear-gradient(45deg,#d1d5db,#d1d5db 2px,#f9fafb 2px,#f9fafb 5px);border:0.5px solid #9ca3af;"></span><strong>No Sovereignty</strong></span>
         <span class="li"><span class="lsq" style="background:#fde68a;"></span><strong>Single-Key</strong></span>
@@ -317,7 +389,12 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
         <span class="li"><span class="lsq" style="background:#bfdbfe;"></span><strong>Collaborative</strong></span>
         <span class="li"><span class="lsq" style="background:#e9d5ff;"></span><strong>Institutional</strong></span>
       </div>
-      <div style="position:relative;width:100%;height:840px;"><canvas id="c1"></canvas></div>
+      <!-- FIX: horizontal scroll wrapper for mobile -->
+      <div class="chart-scroll-wrap">
+        <div id="c1-wrap" style="position:relative;width:100%;height:840px;">
+          <canvas id="c1"></canvas>
+        </div>
+      </div>
       <div class="obsBox"><div class="obsDot"></div><p class="obsText">The ranking orders 12 scored architectures by absolute BCRI. Distributed self-custody and collaborative multisig designs occupy the top positions. The RE column shows that BCRI rank and resilience efficiency rank do not align — lower-BCRI architectures can achieve higher efficiency per unit of operational complexity.</p></div>
     </div>
 
@@ -327,7 +404,7 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
         <img class="chartLogo" src="/BCS_logo_Short_Rounded_edges.png" alt="BCS" onerror="this.style.display='none'">
         <span class="chartTitle">BCRI Resilience Efficiency Frontier</span>
       </div>
-      <p class="chartSub">All 14 benchmark architectures <i>·</i> Benchmark Analysis <i>·</i> BCS 2026</p>
+      <p class="chartSub">All 14 benchmark architectures · Benchmark Analysis · BCS 2026</p>
       <div class="legend">
         <span class="li"><span class="lci" style="background:#fca5a5;border:1.5px solid #f87171;"></span><strong>No Sovereignty</strong></span>
         <span class="li"><span class="lci" style="background:#fde68a;border:1.5px solid #d97706;"></span><strong>Single-Key</strong></span>
@@ -335,7 +412,11 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
         <span class="li"><span class="lci" style="background:#bbf7d0;border:1.5px solid #059669;"></span><strong>Distributed</strong></span>
         <span class="li"><span class="lci" style="background:#e9d5ff;border:1.5px solid #7c3aed;"></span><strong>Institutional</strong></span>
       </div>
-      <div style="position:relative;width:100%;height:520px;"><canvas id="c2"></canvas></div>
+      <div class="chart-scroll-wrap">
+        <div id="c2-wrap" style="position:relative;width:100%;height:520px;">
+          <canvas id="c2"></canvas>
+        </div>
+      </div>
       <div class="obsBox"><div class="obsDot"></div><p class="obsText">ERE rises steeply from CS 1.0 to the frontier peak near CS 4.5, then declines. Institutional architectures cluster to the right of the peak, producing lower resilience efficiency despite strong absolute BCRI scores. Beyond the peak, added complexity yields diminishing resilience returns.</p></div>
     </div>
 
@@ -345,20 +426,23 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
         <img class="chartLogo" src="/BCS_logo_Short_Rounded_edges.png" alt="BCS" onerror="this.style.display='none'">
         <span class="chartTitle">Bitcoin Custody Architecture Map — Complexity vs Structural Resilience (BCRI)</span>
       </div>
-      <p class="chartSub">12 benchmark architectures <i>·</i> Benchmark Analysis <i>·</i> BCS 2026</p>
+      <p class="chartSub">12 benchmark architectures · Benchmark Analysis · BCS 2026</p>
       <div class="legend">
         <span class="li"><span class="lci" style="background:#fde68a;border:1.5px solid #d97706;"></span><strong>Single-Key</strong></span>
         <span class="li"><span class="lci" style="background:#bbf7d0;border:1.5px solid #059669;"></span><strong>Distributed</strong></span>
         <span class="li"><span class="lci" style="background:#bfdbfe;border:1.5px solid #2563eb;"></span><strong>Collaborative</strong></span>
         <span class="li"><span class="lci" style="background:#e9d5ff;border:1.5px solid #7c3aed;"></span><strong>Institutional</strong></span>
       </div>
-      <div style="position:relative;width:100%;height:520px;"><canvas id="c3"></canvas></div>
+      <div class="chart-scroll-wrap">
+        <div id="c3-wrap" style="position:relative;width:100%;height:520px;">
+          <canvas id="c3"></canvas>
+        </div>
+      </div>
       <div class="obsBox"><div class="obsDot"></div><p class="obsText">The architecture map divides the design space into four structurally distinct quadrants. Two architectures fall below the Resilience Sufficiency Threshold at markedly different complexity levels — confirming that sub-threshold outcomes arise from distinct structural causes requiring different corrective interventions.</p></div>
     </div>
   </section>
 
-
-  <!-- WHAT THIS MEASURES / APPLICATION / CITABLE -->
+  <!-- METHODOLOGY AND CITATION -->
   <section style="margin-top:32px;" aria-label="Methodology and Citation">
     <div class="section-title">Methodology and Citation</div>
   <section class="about-standard" style="margin:18px 0;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--bg);">
@@ -381,7 +465,6 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
   </section>
 
   <!-- KEY FINDINGS -->
-<!-- KEY FINDINGS -->
   <section class="section" id="findings">
     <div class="section-title">Key Findings</div>
     <div class="finding">
@@ -397,10 +480,6 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
       <p class="findingText"><strong>Custody failure is two-dimensional.</strong> Under-engineered systems fail through lack of structural redundancy. Over-engineered systems fail through misallocated complexity and concentration risk. Each requires a different corrective intervention. A single-axis evaluation framework will misdiagnose the second failure mode every time.</p>
     </div>
   </section>
-
-  <!-- DOCUMENT VIEWER -->
-  
-
 
   <!-- DOCUMENT VIEWER -->
   <section id="document" class="viewerWrap" aria-label="Embedded PDF" style="margin-top:28px;">
@@ -450,12 +529,25 @@ body.dark .about-standard{background:var(--card);border-color:var(--border);}
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const ZF={'No Sovereignty':'#f3f4f6','Single-Key':'#fde68a','Distributed':'#bbf7d0','Collaborative':'#bfdbfe','Institutional':'#e9d5ff'};
-const ZB={'Single-Key':'#d97706','Distributed':'#059669','Collaborative':'#2563eb','Institutional':'#7c3aed'};
-function rBg(r){return{'AAA':'#14532d','AA+':'#166534','AA':'#15803d','A+':'#16a34a','A':'#22c55e','A-':'#86efac','BBB+':'#d97706','BBB':'#ea580c','BBB-':'#f97316','Floor':'#dc2626'}[r]||'#6b7280';}
-const CONFIGS={
+/* ─────────────────────────────────────────────
+   MOBILE DETECTION
+───────────────────────────────────────────── */
+var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+/* ─────────────────────────────────────────────
+   DATA
+───────────────────────────────────────────── */
+var ZF={'No Sovereignty':'#f3f4f6','Single-Key':'#fde68a','Distributed':'#bbf7d0','Collaborative':'#bfdbfe','Institutional':'#e9d5ff'};
+var ZB={'Single-Key':'#d97706','Distributed':'#059669','Collaborative':'#2563eb','Institutional':'#7c3aed'};
+
+function rBg(r){
+  return{'AAA':'#14532d','AA+':'#166534','AA':'#15803d','A+':'#16a34a','A':'#22c55e','A-':'#86efac','BBB+':'#d97706','BBB':'#ea580c','BBB-':'#f97316','Floor':'#dc2626'}[r]||'#6b7280';
+}
+
+var CONFIGS={
   'Exchange Wallet':'Client account on a centralized exchange. The exchange holds all private keys in omnibus pools. The client owns a ledger balance only — not on-chain Bitcoin. In the event of insolvency, the client becomes an unsecured creditor.',
   'Hot Wallet':'Software wallet on a smartphone or desktop. Single private key in device memory or cloud backup. Internet-connected at all times. Device compromise or cloud breach results in immediate, unrecoverable total loss.',
   'Single-Sig Cold Storage — Regular':'Single air-gapped hardware device (Coldcard, Ledger, Trezor). Seed on stamped metal. Third-party node for broadcast. No multisig. Single geographic location. One device loss or seed compromise is unrecoverable.',
@@ -471,106 +563,516 @@ const CONFIGS={
   'Regulated Exchange Custody':'~98% cold storage via industrial-scale MPC (Coinbase model as best-case reference). Omnibus pooling — no individual on-chain addresses. SOC 2 Type II and PCAOB audits annually. OFAC compliance screening on all transactions.',
   'Qualified Custodian':'OCC or NYDFS chartered trust. Individual segregated on-chain addresses per client — independently verifiable. FIPS 140-2 Level 3 HSMs. Multi-continental cold storage. Statutory trust law provides bankruptcy remoteness. Highest CS in the benchmark (9.4).',
 };
-const tip=document.getElementById('bcri-tip'),tipName=document.getElementById('tip-name'),tipScore=document.getElementById('tip-score'),tipCfg=document.getElementById('tip-cfg');
-function showTip(e,n,s,c){tipName.textContent=n;tipScore.textContent=s;tipCfg.textContent=c;tip.style.display='block';mvTip(e);}
-function mvTip(e){const x=e.clientX+16,y=e.clientY+16,w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=(x+w>window.innerWidth?e.clientX-w-16:x)+'px';tip.style.top=(y+h>window.innerHeight?e.clientY-h-16:y)+'px';}
-function hideTip(){tip.style.display='none';}
-const rd=[
-  {l1:'Self-Managed Multisig',  l2:'— Hi Resilience (Geo)',bcri:97.5,re:39.1,rat:'AAA', z:'Distributed', name:'Self-Managed Multisig — Hi Resilience (Geo)'},
-  {l1:'Collaborative Multisig', l2:'— Advised (3-of-5)',  bcri:96.5,re:42.3,rat:'AA+', z:'Collaborative',name:'Collaborative Multisig — Advised (3-of-5)'},
-  {l1:'Qualified',              l2:'Custodian',           bcri:93.7,re:30.6,rat:'AA',  z:'Institutional', name:'Qualified Custodian'},
-  {l1:'Self-Managed Multisig',  l2:'— Advanced (3-of-5)', bcri:89.6,re:37.9,rat:'A+',  z:'Distributed',  name:'Self-Managed Multisig — Advanced (3-of-5)'},
-  {l1:'MPC',                    l2:'Custody',             bcri:89.6,re:32.9,rat:'A+',  z:'Institutional', name:'MPC Custody'},
-  {l1:'Single-Sig Cold Storage',l2:'— Advanced',          bcri:84.1,re:38.4,rat:'A',   z:'Single-Key',   name:'Single-Sig Cold Storage — Advanced'},
-  {l1:'Collaborative Multisig', l2:'— Peer (2-of-3)',     bcri:82.0,re:38.2,rat:'A-',  z:'Collaborative',name:'Collaborative Multisig — Peer (2-of-3)'},
-  {l1:'Collaborative Multisig', l2:'— Assisted (2-of-3)', bcri:79.2,re:43.0,rat:'BBB+',z:'Collaborative',name:'Collaborative Multisig — Assisted (2-of-3)'},
-  {l1:'Self-Managed Multisig',  l2:'— Regular (2-of-3)',  bcri:76.6,re:36.5,rat:'BBB+',z:'Distributed',  name:'Self-Managed Multisig — Regular (2-of-3)'},
-  {l1:'Regulated Exchange',     l2:'Custody',             bcri:75.5,re:25.4,rat:'BBB+',z:'Institutional', name:'Regulated Exchange Custody'},
-  {l1:'Corporate Bitcoin',      l2:'Treasury',            bcri:72.0,re:25.1,rat:'BBB', z:'Institutional', name:'Corporate Bitcoin Treasury'},
-  {l1:'Single-Sig Cold Storage',l2:'— Regular',           bcri:68.2,re:42.3,rat:'BBB-',z:'Single-Key',   name:'Single-Sig Cold Storage — Regular'},
-  {l1:'Exchange',               l2:'Wallet',              bcri:25.0,re:null, rat:'Floor',z:'No Sovereignty',name:'Exchange Wallet'},
-  {l1:'Hot',                    l2:'Wallet',              bcri:25.0,re:null, rat:'Floor',z:'No Sovereignty',name:'Hot Wallet'},
-];
-const lblPlugin={id:'lbl',afterDraw(chart){
-  const {ctx,scales:{x,y}}=chart;ctx.save();
-  rd.forEach((d,i)=>{
-    const yp=y.getPixelForValue(i),bH=18,bY=yp-9,rW=42,rX=4;
-    ctx.fillStyle=rBg(d.rat);ctx.beginPath();ctx.roundRect(rX,bY,rW,bH,3);ctx.fill();
-    ctx.fillStyle='#fff';ctx.font='700 10px system-ui';ctx.textAlign='center';ctx.fillText(d.rat,rX+rW/2,bY+12);
-    const tx=rX+rW+6;
-    ctx.fillStyle='#111827';ctx.font='600 11px system-ui';ctx.textAlign='left';ctx.fillText(d.l1,tx,yp-3);
-    ctx.fillStyle='#374151';ctx.font='11px system-ui';ctx.fillText(d.l2,tx,yp+10);
-    if(d.bcri>25){const mid=(x.getPixelForValue(0)+x.getPixelForValue(d.bcri))/2;ctx.font='700 10px system-ui';ctx.fillStyle='rgba(17,24,39,0.72)';ctx.textAlign='center';ctx.fillText('BCRI '+d.bcri.toFixed(1),mid,yp+4);}
-    if(d.re!==null){const xE=x.getPixelForValue(d.bcri),rpX=xE+6,rpW=50;ctx.fillStyle='#f9fafb';ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(rpX,bY,rpW,bH,3);ctx.fill();ctx.stroke();ctx.fillStyle='#374151';ctx.font='700 10px system-ui';ctx.textAlign='center';ctx.fillText('RE '+d.re.toFixed(1),rpX+rpW/2,bY+12);}
-  });ctx.restore();
-}};
-const hov={id:'hov',afterEvent(chart,args){
-  const e=args.event.native;if(!e)return;
-  if(args.event.type==='mousemove'){const els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},false);if(els.length){const d=rd[els[0].index];showTip(e,d.name,'BCRI '+d.bcri+' · '+d.rat+(d.re?' · RE '+d.re:''),CONFIGS[d.name]||'');chart.canvas.style.cursor='pointer';}else{hideTip();chart.canvas.style.cursor='default';}}
-  else if(args.event.type==='mouseout'){hideTip();}
-}};
-new Chart(document.getElementById('c1'),{type:'bar',plugins:[lblPlugin,hov],
-  data:{labels:rd.map(()=>''),datasets:[{data:rd.map(d=>d.bcri),backgroundColor:rd.map(d=>d.z==='No Sovereignty'?'rgba(0,0,0,0)':ZF[d.z]),borderColor:rd.map(d=>d.z==='No Sovereignty'?'#d1d5db':'transparent'),borderWidth:rd.map(d=>d.z==='No Sovereignty'?1:0),borderRadius:3,borderSkipped:false}]},
-  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{left:8,right:72,top:4,bottom:4}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{min:0,max:100,grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:11,family:'system-ui'}}},y:{grid:{display:false},ticks:{display:false}}}}
-});
-document.getElementById('c1').addEventListener('mousemove',mvTip);document.getElementById('c1').addEventListener('mouseleave',hideTip);
 
-function fy(cs){return 13.67*Math.pow(cs,1.5)*Math.exp(-0.335*cs);}
-const N=300,cv=[];for(let i=0;i<=N;i++){const cs=i/N*10.5;cv.push({x:+cs.toFixed(3),y:+fy(cs).toFixed(3)});}
-const grd={id:'grd',beforeDatasetsDraw(chart){
-  const {ctx,scales:{x,y}}=chart;ctx.save();
-  for(let i=0;i<cv.length-1;i++){const t=i/(cv.length-1);const p1={px:x.getPixelForValue(cv[i].x),py:y.getPixelForValue(cv[i].y)};const p2={px:x.getPixelForValue(cv[i+1].x),py:y.getPixelForValue(cv[i+1].y)};let r,g,b;if(t<0.12){r=220;g=38;b=38;}else if(t<0.25){const p=(t-.12)/.13;r=Math.round(220+(239-220)*p);g=Math.round(38+(120-38)*p);b=38;}else if(t<0.38){const p=(t-.25)/.13;r=Math.round(239+(253-239)*p);g=Math.round(120+(186-120)*p);b=Math.round(38+(7-38)*p);}else if(t<0.48){const p=(t-.38)/.10;r=Math.round(253+(134-253)*p);g=Math.round(186+(239-186)*p);b=Math.round(7+(77-7)*p);}else if(t<0.58){r=134;g=239;b=128;}else if(t<0.70){const p=(t-.58)/.12;r=Math.round(134+(217-134)*p);g=Math.round(239+(249-239)*p);b=Math.round(128+(99-128)*p);}else if(t<0.82){const p=(t-.70)/.12;r=Math.round(217+(250-217)*p);g=Math.round(249+(204-249)*p);b=Math.round(99+(21-99)*p);}else{const p=(t-.82)/.18;r=Math.round(250+(220-250)*p);g=Math.round(204+(38-204)*p);b=Math.round(21+(38-21)*p);}ctx.strokeStyle=`rgb(${r},${g},${b})`;ctx.lineWidth=3.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();ctx.moveTo(p1.px,p1.py);ctx.lineTo(p2.px,p2.py);ctx.stroke();}
-  const ppx=x.getPixelForValue(4.5),ppy=y.getPixelForValue(28.9);ctx.fillStyle='#166634';ctx.beginPath();ctx.arc(ppx,ppy,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ppx,ppy,2.5,0,Math.PI*2);ctx.fill();
-  const lbl='Peak  CS 4.5 · ERE 28.9';ctx.font='700 10px system-ui';const bW=ctx.measureText(lbl).width+16,bH=18,bX=ppx-bW/2-28,bY=ppy-30;ctx.fillStyle='#f0fdf4';ctx.strokeStyle='#16a34a';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,4);ctx.fill();ctx.stroke();ctx.fillStyle='#15803d';ctx.textAlign='left';ctx.fillText(lbl,bX+8,bY+12);ctx.restore();
-}};
-const bnd={id:'bnd',beforeDraw(chart){const {ctx,scales:{x},chartArea:{top,bottom}}=chart;ctx.save();[{f:0,t:1.5,c:'rgba(254,202,202,0.2)',n:'No Sovereignty',fc:'#b91c1c'},{f:1.5,t:3.5,c:'rgba(253,230,138,0.18)',n:'Single-Key',fc:'#92400e'},{f:3.5,t:5.5,c:'rgba(191,219,254,0.18)',n:'Collaborative',fc:'#1e40af'},{f:5.5,t:7.2,c:'rgba(187,247,208,0.18)',n:'Distributed',fc:'#065f46'},{f:7.2,t:11,c:'rgba(233,213,255,0.18)',n:'Institutional',fc:'#4c1d95'}].forEach(z=>{const x1=x.getPixelForValue(z.f),x2=x.getPixelForValue(z.t);ctx.fillStyle=z.c;ctx.fillRect(x1,top,x2-x1,bottom-top);ctx.fillStyle=z.fc;ctx.font='700 10px system-ui';ctx.textAlign='center';ctx.fillText(z.n,(x1+x2)/2,top+14);});ctx.restore();}};
-const fd=[{label:'Exchange Wallet',cs:1.0,ere:0,z:'No Sovereignty'},{label:'Hot Wallet',cs:1.4,ere:0,z:'No Sovereignty'},{label:'Single-Sig Cold Storage — Regular',cs:2.6,ere:26.80,z:'Single-Key'},{label:'Single-Sig Cold Storage — Advanced',cs:4.8,ere:26.95,z:'Single-Key'},{label:'Self-Managed Multisig — Regular (2-of-3)',cs:4.4,ere:24.60,z:'Distributed'},{label:'Self-Managed Multisig — Advanced (3-of-5)',cs:5.6,ere:27.29,z:'Distributed'},{label:'Self-Managed Multisig — Hi Resilience (Geo)',cs:6.2,ere:29.10,z:'Distributed'},{label:'Collaborative Multisig — Assisted (2-of-3)',cs:3.4,ere:29.40,z:'Collaborative'},{label:'Collaborative Multisig — Peer (2-of-3)',cs:4.6,ere:26.55,z:'Collaborative'},{label:'Collaborative Multisig — Advised (3-of-5)',cs:5.2,ere:31.36,z:'Collaborative'},{label:'MPC Custody',cs:7.4,ere:23.74,z:'Institutional'},{label:'Corporate Bitcoin Treasury',cs:8.2,ere:16.40,z:'Institutional'},{label:'Regulated Exchange Custody',cs:8.8,ere:17.02,z:'Institutional'},{label:'Qualified Custodian',cs:9.4,ere:22.42,z:'Institutional'}];
-const shov={id:'shov',afterEvent(chart,args){const e=args.event.native;if(!e)return;if(args.event.type==='mousemove'){const els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},false);if(els.length){const pt=chart.data.datasets[els[0].datasetIndex].data[els[0].index];showTip(e,pt.label,'CS '+pt.x+'  ·  ERE '+pt.y,CONFIGS[pt.label]||'');chart.canvas.style.cursor='pointer';}else{hideTip();chart.canvas.style.cursor='default';}}else if(args.event.type==='mouseout'){hideTip();}}};
-new Chart(document.getElementById('c2'),{type:'scatter',plugins:[bnd,grd,shov],
-  data:{datasets:['No Sovereignty','Single-Key','Collaborative','Distributed','Institutional'].map(z=>({label:z,data:fd.filter(d=>d.z===z).map(d=>({x:d.cs,y:d.ere,label:d.label})),backgroundColor:{'No Sovereignty':'rgba(252,165,165,0.85)','Single-Key':'rgba(253,230,138,0.9)','Collaborative':'rgba(191,219,254,0.9)','Distributed':'rgba(187,247,208,0.9)','Institutional':'rgba(233,213,255,0.9)'}[z],borderColor:{'No Sovereignty':'#f87171','Single-Key':'#d97706','Collaborative':'#2563eb','Distributed':'#059669','Institutional':'#7c3aed'}[z],borderWidth:1.5,pointRadius:7,pointHoverRadius:14}))},
-  options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{min:0,max:11,title:{display:true,text:'Complexity Score (CS) · Operational burden on custody operator',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:11,family:'system-ui'}}},y:{min:-2,max:36,title:{display:true,text:'Excess Resilience Efficiency (ERE = (BCRI−25)÷√CS)',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:11,family:'system-ui'}}}}}
-});
-document.getElementById('c2').addEventListener('mousemove',mvTip);document.getElementById('c2').addEventListener('mouseleave',hideTip);
-const md=[{label:'Single-Sig Cold Storage — Regular',cs:2.6,bcri:68.2,z:'Single-Key'},{label:'Single-Sig Cold Storage — Advanced',cs:4.8,bcri:84.1,z:'Single-Key'},{label:'Self-Managed Multisig — Regular (2-of-3)',cs:4.4,bcri:76.6,z:'Distributed'},{label:'Self-Managed Multisig — Advanced (3-of-5)',cs:5.6,bcri:89.6,z:'Distributed'},{label:'Self-Managed Multisig — Hi Resilience (Geo)',cs:6.2,bcri:97.5,z:'Distributed'},{label:'Collaborative Multisig — Assisted (2-of-3)',cs:3.4,bcri:79.2,z:'Collaborative'},{label:'Collaborative Multisig — Peer (2-of-3)',cs:4.6,bcri:82.0,z:'Collaborative'},{label:'Collaborative Multisig — Advised (3-of-5)',cs:5.2,bcri:96.5,z:'Collaborative'},{label:'MPC Custody',cs:7.4,bcri:89.6,z:'Institutional'},{label:'Corporate Bitcoin Treasury',cs:8.2,bcri:72.0,z:'Institutional'},{label:'Regulated Exchange Custody',cs:8.8,bcri:75.5,z:'Institutional'},{label:'Qualified Custodian',cs:9.4,bcri:93.7,z:'Institutional'}];
-const mhov={id:'mhov',afterEvent(chart,args){const e=args.event.native;if(!e)return;if(args.event.type==='mousemove'){const els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},false);if(els.length){const pt=chart.data.datasets[els[0].datasetIndex].data[els[0].index];showTip(e,pt.label,'BCRI '+pt.y+'  ·  CS '+pt.x,CONFIGS[pt.label]||'');chart.canvas.style.cursor='pointer';}else{hideTip();chart.canvas.style.cursor='default';}}else if(args.event.type==='mouseout'){hideTip();}}};
-const qp={id:'qp',beforeDraw(chart){const {ctx,scales:{x,y},chartArea:{left,right,top,bottom}}=chart;const mx=x.getPixelForValue(5),my=y.getPixelForValue(75);ctx.save();[{x1:left,y1:top,x2:mx,y2:my,bg:'rgba(209,250,229,0.45)',tc:'#065f46',sc:'#047857',t:'Efficient Self-Custody',s:'Low Complexity · High Resilience',ly:0.55},{x1:mx,y1:top,x2:right,y2:my,bg:'rgba(237,233,254,0.45)',tc:'#4c1d95',sc:'#6d28d9',t:'Institutional Custody',s:'High Complexity · High Resilience',ly:0.55},{x1:left,y1:my,x2:mx,y2:bottom,bg:'rgba(255,251,235,0.55)',tc:'#92400e',sc:'#b45309',t:'Convenience Custody',s:'Low Complexity · Lower Resilience',ly:0.55},{x1:mx,y1:my,x2:right,y2:bottom,bg:'rgba(254,226,226,0.45)',tc:'#991b1b',sc:'#b91c1c',t:'Diminishing Returns Zone',s:'High Complexity · Lower Resilience',ly:0.55}].forEach(q=>{ctx.fillStyle=q.bg;ctx.fillRect(q.x1,q.y1,q.x2-q.x1,q.y2-q.y1);const cx=(q.x1+q.x2)/2,cy=q.y1+(q.y2-q.y1)*q.ly;const bW=170,bH=36,bX=cx-85,bY=cy-18;ctx.fillStyle='rgba(255,255,255,0.85)';ctx.strokeStyle=q.tc+'55';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,4);ctx.fill();ctx.stroke();ctx.fillStyle=q.tc;ctx.font='600 10px system-ui';ctx.textAlign='center';ctx.fillText(q.t,cx,bY+13);ctx.fillStyle=q.sc;ctx.font='9px system-ui';ctx.fillText(q.s,cx,bY+27);});ctx.setLineDash([]);ctx.strokeStyle='rgba(107,114,128,0.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(mx,top);ctx.lineTo(mx,bottom);ctx.stroke();ctx.beginPath();ctx.moveTo(left,my);ctx.lineTo(right,my);ctx.stroke();ctx.fillStyle='rgba(75,85,99,0.6)';ctx.font='9px system-ui';ctx.textAlign='left';ctx.fillText('Resilience Sufficiency Threshold (75)',left+6,my-4);ctx.restore();}};
-new Chart(document.getElementById('c3'),{type:'scatter',plugins:[qp,mhov],
-  data:{datasets:['Single-Key','Distributed','Collaborative','Institutional'].map(z=>({label:z,data:md.filter(d=>d.z===z).map(d=>({x:d.cs,y:d.bcri,label:d.label})),backgroundColor:ZF[z],borderColor:ZB[z],borderWidth:2,pointRadius:10,pointHoverRadius:16}))},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{min:0,max:10,title:{display:true,text:'Complexity Score (CS) · Operational burden on custody operator',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:11,family:'system-ui'}}},y:{min:50,max:100,title:{display:true,text:'BCRI Score (50–100)',font:{size:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:11,family:'system-ui'}}}}}
-});
-document.getElementById('c3').addEventListener('mousemove',mvTip);document.getElementById('c3').addEventListener('mouseleave',hideTip);
+/* ─────────────────────────────────────────────
+   TOOLTIP LOGIC — unified desktop hover + mobile tap
+───────────────────────────────────────────── */
+var tip = document.getElementById('bcri-tip');
+var tipName = document.getElementById('tip-name');
+var tipScore = document.getElementById('tip-score');
+var tipCfg = document.getElementById('tip-cfg');
+var tipOverlay = document.getElementById('tip-overlay');
+var tipVisible = false;
 
-(function(){function setHeaderOffset(){const header=document.querySelector('header');if(!header)return;const h=Math.ceil(header.getBoundingClientRect().height);document.documentElement.style.setProperty('--headerOffset',(h+4)+'px');}window.addEventListener('load',setHeaderOffset);window.addEventListener('resize',setHeaderOffset);})();
+function positionTip(clientX, clientY) {
+  var w = tip.offsetWidth || 300;
+  var h = tip.offsetHeight || 160;
+  var vw = window.innerWidth;
+  var vh = window.innerHeight;
+  var margin = 16;
 
-/* ── Touch support for charts ── */
-(function(){
-  ['c1','c2','c3'].forEach(function(cid){
-    var el=document.getElementById(cid);
-    if(!el) return;
-    el.addEventListener('touchstart',function(e){
-      if(e.touches.length===1) e.preventDefault();
-    },{passive:false});
-    el.addEventListener('touchmove',function(e){
-      if(e.touches.length===1){
-        e.preventDefault();
-        var t=e.touches[0];
-        var fake={clientX:t.clientX,clientY:t.clientY,touches:e.touches};
-        mvTip(fake);
-      }
-    },{passive:false});
-    el.addEventListener('touchend',hideTip);
+  // On mobile, position above the finger to avoid being obscured
+  var x, y;
+  if (isMobile) {
+    x = clientX - w / 2;
+    y = clientY - h - 24; // above finger
+    // if it would go off top, put it below
+    if (y < margin) { y = clientY + 24; }
+  } else {
+    x = clientX + 16;
+    y = clientY + 16;
+  }
+
+  // Clamp within viewport
+  if (x + w > vw - margin) { x = vw - w - margin; }
+  if (x < margin) { x = margin; }
+  if (y + h > vh - margin) { y = vh - h - margin; }
+  if (y < margin) { y = margin; }
+
+  tip.style.left = x + 'px';
+  tip.style.top = y + 'px';
+}
+
+function showTip(clientX, clientY, name, score, cfg) {
+  tipName.textContent = name;
+  tipScore.textContent = score;
+  tipCfg.textContent = cfg;
+  tip.style.display = 'block';
+  tipVisible = true;
+  // small delay so offsetHeight is computed
+  requestAnimationFrame(function() {
+    positionTip(clientX, clientY);
   });
+  if (isMobile) {
+    tipOverlay.classList.add('active');
+  }
+}
+
+function hideTip() {
+  tip.style.display = 'none';
+  tipVisible = false;
+  tipOverlay.classList.remove('active');
+}
+
+function mvTip(e) {
+  if (tipVisible && !isMobile) {
+    positionTip(e.clientX, e.clientY);
+  }
+}
+
+// Tap overlay dismisses tooltip on mobile
+tipOverlay.addEventListener('click', hideTip);
+
+/* ─────────────────────────────────────────────
+   CHART DATA
+───────────────────────────────────────────── */
+var rd=[
+  {l1:'Self-Managed Multisig',  l2:'— Hi Resilience (Geo)', bcri:97.5,re:39.1,rat:'AAA',  z:'Distributed',   name:'Self-Managed Multisig — Hi Resilience (Geo)'},
+  {l1:'Collaborative Multisig', l2:'— Advised (3-of-5)',    bcri:96.5,re:42.3,rat:'AA+',  z:'Collaborative', name:'Collaborative Multisig — Advised (3-of-5)'},
+  {l1:'Qualified',              l2:'Custodian',              bcri:93.7,re:30.6,rat:'AA',   z:'Institutional', name:'Qualified Custodian'},
+  {l1:'Self-Managed Multisig',  l2:'— Advanced (3-of-5)',   bcri:89.6,re:37.9,rat:'A+',   z:'Distributed',   name:'Self-Managed Multisig — Advanced (3-of-5)'},
+  {l1:'MPC',                    l2:'Custody',                bcri:89.6,re:32.9,rat:'A+',   z:'Institutional', name:'MPC Custody'},
+  {l1:'Single-Sig Cold Storage',l2:'— Advanced',             bcri:84.1,re:38.4,rat:'A',    z:'Single-Key',    name:'Single-Sig Cold Storage — Advanced'},
+  {l1:'Collaborative Multisig', l2:'— Peer (2-of-3)',        bcri:82.0,re:38.2,rat:'A-',   z:'Collaborative', name:'Collaborative Multisig — Peer (2-of-3)'},
+  {l1:'Collaborative Multisig', l2:'— Assisted (2-of-3)',    bcri:79.2,re:43.0,rat:'BBB+', z:'Collaborative', name:'Collaborative Multisig — Assisted (2-of-3)'},
+  {l1:'Self-Managed Multisig',  l2:'— Regular (2-of-3)',     bcri:76.6,re:36.5,rat:'BBB+', z:'Distributed',   name:'Self-Managed Multisig — Regular (2-of-3)'},
+  {l1:'Regulated Exchange',     l2:'Custody',                bcri:75.5,re:25.4,rat:'BBB+', z:'Institutional', name:'Regulated Exchange Custody'},
+  {l1:'Corporate Bitcoin',      l2:'Treasury',               bcri:72.0,re:25.1,rat:'BBB',  z:'Institutional', name:'Corporate Bitcoin Treasury'},
+  {l1:'Single-Sig Cold Storage',l2:'— Regular',              bcri:68.2,re:42.3,rat:'BBB-', z:'Single-Key',    name:'Single-Sig Cold Storage — Regular'},
+  {l1:'Exchange',               l2:'Wallet',                 bcri:25.0,re:null,rat:'Floor',z:'No Sovereignty',name:'Exchange Wallet'},
+  {l1:'Hot',                    l2:'Wallet',                 bcri:25.0,re:null,rat:'Floor',z:'No Sovereignty',name:'Hot Wallet'},
+];
+
+/* ─────────────────────────────────────────────
+   CHART 1 — Bar ranking
+───────────────────────────────────────────── */
+var lblPlugin={
+  id:'lbl',
+  afterDraw: function(chart) {
+    var ctx=chart.ctx, x=chart.scales.x, y=chart.scales.y;
+    ctx.save();
+    // FIX: scale font sizes for mobile
+    var fs = isMobile ? 9 : 11;
+    var fs2 = isMobile ? 9 : 11;
+    var rW = isMobile ? 36 : 42;
+    var rX = isMobile ? 2 : 4;
+
+    rd.forEach(function(d,i){
+      var yp=y.getPixelForValue(i), bH=18, bY=yp-9;
+      ctx.fillStyle=rBg(d.rat);
+      ctx.beginPath();ctx.roundRect(rX,bY,rW,bH,3);ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.font='700 '+fs+'px system-ui';
+      ctx.textAlign='center';
+      ctx.fillText(d.rat, rX+rW/2, bY+12);
+
+      var tx=rX+rW+5;
+      ctx.fillStyle='#111827';
+      ctx.font='600 '+fs2+'px system-ui';
+      ctx.textAlign='left';
+      ctx.fillText(d.l1, tx, yp-3);
+      ctx.fillStyle='#374151';
+      ctx.font=fs2+'px system-ui';
+      ctx.fillText(d.l2, tx, yp+10);
+
+      if(d.bcri>25){
+        var mid=(x.getPixelForValue(0)+x.getPixelForValue(d.bcri))/2;
+        ctx.font='700 '+fs+'px system-ui';
+        ctx.fillStyle='rgba(17,24,39,0.72)';
+        ctx.textAlign='center';
+        ctx.fillText('BCRI '+d.bcri.toFixed(1), mid, yp+4);
+      }
+      if(d.re!==null){
+        var xE=x.getPixelForValue(d.bcri), rpX=xE+5, rpW=isMobile?42:50;
+        ctx.fillStyle='#f9fafb';
+        ctx.strokeStyle='#e5e7eb';
+        ctx.lineWidth=1;
+        ctx.beginPath();ctx.roundRect(rpX,bY,rpW,bH,3);ctx.fill();ctx.stroke();
+        ctx.fillStyle='#374151';
+        ctx.font='700 '+fs+'px system-ui';
+        ctx.textAlign='center';
+        ctx.fillText('RE '+d.re.toFixed(1), rpX+rpW/2, bY+12);
+      }
+    });
+    ctx.restore();
+  }
+};
+
+/* Unified interaction plugin for chart 1 */
+var c1Hov={
+  id:'c1Hov',
+  afterEvent: function(chart, args) {
+    if(isMobile) return; // mobile handled separately
+    var e=args.event.native;
+    if(!e) return;
+    if(args.event.type==='mousemove'){
+      var els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},false);
+      if(els.length){
+        var d=rd[els[0].index];
+        showTip(e.clientX,e.clientY,d.name,'BCRI '+d.bcri+' · '+d.rat+(d.re?' · RE '+d.re:''),CONFIGS[d.name]||'');
+        chart.canvas.style.cursor='pointer';
+      } else {
+        hideTip();
+        chart.canvas.style.cursor='default';
+      }
+    } else if(args.event.type==='mouseout'){
+      hideTip();
+    }
+  }
+};
+
+var chart1 = new Chart(document.getElementById('c1'),{
+  type:'bar',
+  plugins:[lblPlugin, c1Hov],
+  data:{
+    labels:rd.map(function(){return '';}),
+    datasets:[{
+      data:rd.map(function(d){return d.bcri;}),
+      backgroundColor:rd.map(function(d){return d.z==='No Sovereignty'?'rgba(0,0,0,0)':ZF[d.z];}),
+      borderColor:rd.map(function(d){return d.z==='No Sovereignty'?'#d1d5db':'transparent';}),
+      borderWidth:rd.map(function(d){return d.z==='No Sovereignty'?1:0;}),
+      borderRadius:3,
+      borderSkipped:false
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    responsive:true,
+    maintainAspectRatio:false,
+    layout:{padding:{left:8,right:72,top:4,bottom:4}},
+    plugins:{legend:{display:false},tooltip:{enabled:false}},
+    scales:{
+      x:{min:0,max:100,grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:11,family:'system-ui'}}},
+      y:{grid:{display:false},ticks:{display:false}}
+    }
+  }
+});
+
+/* Mobile tap handler for chart 1 */
+document.getElementById('c1').addEventListener('touchend', function(e){
+  e.preventDefault();
+  var touch = e.changedTouches[0];
+  var els = chart1.getElementsAtEventForMode(touch, 'nearest', {intersect:false}, false);
+  if(els.length){
+    var d = rd[els[0].index];
+    if(tipVisible && tipName.textContent === d.name){
+      hideTip();
+    } else {
+      showTip(touch.clientX, touch.clientY, d.name, 'BCRI '+d.bcri+' · '+d.rat+(d.re?' · RE '+d.re:''), CONFIGS[d.name]||'');
+    }
+  } else {
+    hideTip();
+  }
+}, {passive:false});
+
+document.getElementById('c1').addEventListener('mousemove', mvTip);
+document.getElementById('c1').addEventListener('mouseleave', hideTip);
+
+/* ─────────────────────────────────────────────
+   CHART 2 — Efficiency frontier
+───────────────────────────────────────────── */
+function fy(cs){return 13.67*Math.pow(cs,1.5)*Math.exp(-0.335*cs);}
+var N=300, cv=[];
+for(var i=0;i<=N;i++){var cs=i/N*10.5; cv.push({x:+cs.toFixed(3),y:+fy(cs).toFixed(3)});}
+
+var grd={
+  id:'grd',
+  beforeDatasetsDraw: function(chart){
+    var ctx=chart.ctx, x=chart.scales.x, y=chart.scales.y;
+    ctx.save();
+    for(var i=0;i<cv.length-1;i++){
+      var t=i/(cv.length-1);
+      var p1={px:x.getPixelForValue(cv[i].x),py:y.getPixelForValue(cv[i].y)};
+      var p2={px:x.getPixelForValue(cv[i+1].x),py:y.getPixelForValue(cv[i+1].y)};
+      var r,g,b;
+      if(t<0.12){r=220;g=38;b=38;}
+      else if(t<0.25){var p=(t-.12)/.13;r=Math.round(220+(239-220)*p);g=Math.round(38+(120-38)*p);b=38;}
+      else if(t<0.38){var p=(t-.25)/.13;r=Math.round(239+(253-239)*p);g=Math.round(120+(186-120)*p);b=Math.round(38+(7-38)*p);}
+      else if(t<0.48){var p=(t-.38)/.10;r=Math.round(253+(134-253)*p);g=Math.round(186+(239-186)*p);b=Math.round(7+(77-7)*p);}
+      else if(t<0.58){r=134;g=239;b=128;}
+      else if(t<0.70){var p=(t-.58)/.12;r=Math.round(134+(217-134)*p);g=Math.round(239+(249-239)*p);b=Math.round(128+(99-128)*p);}
+      else if(t<0.82){var p=(t-.70)/.12;r=Math.round(217+(250-217)*p);g=Math.round(249+(204-249)*p);b=Math.round(99+(21-99)*p);}
+      else{var p=(t-.82)/.18;r=Math.round(250+(220-250)*p);g=Math.round(204+(38-204)*p);b=Math.round(21+(38-21)*p);}
+      ctx.strokeStyle='rgb('+r+','+g+','+b+')';
+      ctx.lineWidth=3.5;ctx.lineJoin='round';ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(p1.px,p1.py);ctx.lineTo(p2.px,p2.py);ctx.stroke();
+    }
+    var ppx=x.getPixelForValue(4.5),ppy=y.getPixelForValue(28.9);
+    ctx.fillStyle='#166634';ctx.beginPath();ctx.arc(ppx,ppy,5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ppx,ppy,2.5,0,Math.PI*2);ctx.fill();
+    var lbl='Peak  CS 4.5 · ERE 28.9';
+    ctx.font='700 10px system-ui';
+    var bW=ctx.measureText(lbl).width+16,bH=18,bX=ppx-bW/2-28,bY=ppy-30;
+    ctx.fillStyle='#f0fdf4';ctx.strokeStyle='#16a34a';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,4);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#15803d';ctx.textAlign='left';ctx.fillText(lbl,bX+8,bY+12);
+    ctx.restore();
+  }
+};
+
+var bnd={
+  id:'bnd',
+  beforeDraw: function(chart){
+    var ctx=chart.ctx, x=chart.scales.x, top=chart.chartArea.top, bottom=chart.chartArea.bottom;
+    ctx.save();
+    [{f:0,t:1.5,c:'rgba(254,202,202,0.2)',n:'No Sovereignty',fc:'#b91c1c'},
+     {f:1.5,t:3.5,c:'rgba(253,230,138,0.18)',n:'Single-Key',fc:'#92400e'},
+     {f:3.5,t:5.5,c:'rgba(191,219,254,0.18)',n:'Collaborative',fc:'#1e40af'},
+     {f:5.5,t:7.2,c:'rgba(187,247,208,0.18)',n:'Distributed',fc:'#065f46'},
+     {f:7.2,t:11,c:'rgba(233,213,255,0.18)',n:'Institutional',fc:'#4c1d95'}
+    ].forEach(function(z){
+      var x1=x.getPixelForValue(z.f), x2=x.getPixelForValue(z.t);
+      ctx.fillStyle=z.c;ctx.fillRect(x1,top,x2-x1,bottom-top);
+      ctx.fillStyle=z.fc;ctx.font='700 10px system-ui';ctx.textAlign='center';
+      ctx.fillText(z.n,(x1+x2)/2,top+14);
+    });
+    ctx.restore();
+  }
+};
+
+var fd=[
+  {label:'Exchange Wallet',cs:1.0,ere:0,z:'No Sovereignty'},
+  {label:'Hot Wallet',cs:1.4,ere:0,z:'No Sovereignty'},
+  {label:'Single-Sig Cold Storage — Regular',cs:2.6,ere:26.80,z:'Single-Key'},
+  {label:'Single-Sig Cold Storage — Advanced',cs:4.8,ere:26.95,z:'Single-Key'},
+  {label:'Self-Managed Multisig — Regular (2-of-3)',cs:4.4,ere:24.60,z:'Distributed'},
+  {label:'Self-Managed Multisig — Advanced (3-of-5)',cs:5.6,ere:27.29,z:'Distributed'},
+  {label:'Self-Managed Multisig — Hi Resilience (Geo)',cs:6.2,ere:29.10,z:'Distributed'},
+  {label:'Collaborative Multisig — Assisted (2-of-3)',cs:3.4,ere:29.40,z:'Collaborative'},
+  {label:'Collaborative Multisig — Peer (2-of-3)',cs:4.6,ere:26.55,z:'Collaborative'},
+  {label:'Collaborative Multisig — Advised (3-of-5)',cs:5.2,ere:31.36,z:'Collaborative'},
+  {label:'MPC Custody',cs:7.4,ere:23.74,z:'Institutional'},
+  {label:'Corporate Bitcoin Treasury',cs:8.2,ere:16.40,z:'Institutional'},
+  {label:'Regulated Exchange Custody',cs:8.8,ere:17.02,z:'Institutional'},
+  {label:'Qualified Custodian',cs:9.4,ere:22.42,z:'Institutional'}
+];
+
+var shov={
+  id:'shov',
+  afterEvent: function(chart, args){
+    if(isMobile) return;
+    var e=args.event.native;
+    if(!e) return;
+    if(args.event.type==='mousemove'){
+      var els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},false);
+      if(els.length){
+        var pt=chart.data.datasets[els[0].datasetIndex].data[els[0].index];
+        showTip(e.clientX,e.clientY,pt.label,'CS '+pt.x+'  ·  ERE '+pt.y,CONFIGS[pt.label]||'');
+        chart.canvas.style.cursor='pointer';
+      } else {
+        hideTip();chart.canvas.style.cursor='default';
+      }
+    } else if(args.event.type==='mouseout'){hideTip();}
+  }
+};
+
+var chart2 = new Chart(document.getElementById('c2'),{
+  type:'scatter',
+  plugins:[bnd,grd,shov],
+  data:{
+    datasets:['No Sovereignty','Single-Key','Collaborative','Distributed','Institutional'].map(function(z){
+      return {
+        label:z,
+        data:fd.filter(function(d){return d.z===z;}).map(function(d){return {x:d.cs,y:d.ere,label:d.label};}),
+        backgroundColor:{'No Sovereignty':'rgba(252,165,165,0.85)','Single-Key':'rgba(253,230,138,0.9)','Collaborative':'rgba(191,219,254,0.9)','Distributed':'rgba(187,247,208,0.9)','Institutional':'rgba(233,213,255,0.9)'}[z],
+        borderColor:{'No Sovereignty':'#f87171','Single-Key':'#d97706','Collaborative':'#2563eb','Distributed':'#059669','Institutional':'#7c3aed'}[z],
+        borderWidth:1.5,
+        // FIX: larger hit radius on mobile
+        pointRadius: isMobile ? 10 : 7,
+        pointHoverRadius: isMobile ? 16 : 14
+      };
+    })
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    layout:{padding:{top:28}},
+    plugins:{legend:{display:false},tooltip:{enabled:false}},
+    scales:{
+      x:{min:0,max:11,title:{display:true,text:'Complexity Score (CS)',font:{size:isMobile?9:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:isMobile?9:11,family:'system-ui'}}},
+      y:{min:-2,max:36,title:{display:true,text:'ERE = (BCRI−25)÷√CS',font:{size:isMobile?9:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:isMobile?9:11,family:'system-ui'}}}
+    }
+  }
+});
+
+/* Mobile tap for chart 2 */
+document.getElementById('c2').addEventListener('touchend', function(e){
+  e.preventDefault();
+  var touch = e.changedTouches[0];
+  var els = chart2.getElementsAtEventForMode(touch,'nearest',{intersect:false},false);
+  if(els.length){
+    var pt = chart2.data.datasets[els[0].datasetIndex].data[els[0].index];
+    if(tipVisible && tipName.textContent === pt.label){ hideTip(); }
+    else { showTip(touch.clientX, touch.clientY, pt.label,'CS '+pt.x+'  ·  ERE '+pt.y, CONFIGS[pt.label]||''); }
+  } else { hideTip(); }
+}, {passive:false});
+document.getElementById('c2').addEventListener('mousemove', mvTip);
+document.getElementById('c2').addEventListener('mouseleave', hideTip);
+
+/* ─────────────────────────────────────────────
+   CHART 3 — Architecture map
+───────────────────────────────────────────── */
+var md=[
+  {label:'Single-Sig Cold Storage — Regular',cs:2.6,bcri:68.2,z:'Single-Key'},
+  {label:'Single-Sig Cold Storage — Advanced',cs:4.8,bcri:84.1,z:'Single-Key'},
+  {label:'Self-Managed Multisig — Regular (2-of-3)',cs:4.4,bcri:76.6,z:'Distributed'},
+  {label:'Self-Managed Multisig — Advanced (3-of-5)',cs:5.6,bcri:89.6,z:'Distributed'},
+  {label:'Self-Managed Multisig — Hi Resilience (Geo)',cs:6.2,bcri:97.5,z:'Distributed'},
+  {label:'Collaborative Multisig — Assisted (2-of-3)',cs:3.4,bcri:79.2,z:'Collaborative'},
+  {label:'Collaborative Multisig — Peer (2-of-3)',cs:4.6,bcri:82.0,z:'Collaborative'},
+  {label:'Collaborative Multisig — Advised (3-of-5)',cs:5.2,bcri:96.5,z:'Collaborative'},
+  {label:'MPC Custody',cs:7.4,bcri:89.6,z:'Institutional'},
+  {label:'Corporate Bitcoin Treasury',cs:8.2,bcri:72.0,z:'Institutional'},
+  {label:'Regulated Exchange Custody',cs:8.8,bcri:75.5,z:'Institutional'},
+  {label:'Qualified Custodian',cs:9.4,bcri:93.7,z:'Institutional'}
+];
+
+var mhov={
+  id:'mhov',
+  afterEvent: function(chart,args){
+    if(isMobile) return;
+    var e=args.event.native;
+    if(!e) return;
+    if(args.event.type==='mousemove'){
+      var els=chart.getElementsAtEventForMode(e,'nearest',{intersect:true},false);
+      if(els.length){
+        var pt=chart.data.datasets[els[0].datasetIndex].data[els[0].index];
+        showTip(e.clientX,e.clientY,pt.label,'BCRI '+pt.y+'  ·  CS '+pt.x,CONFIGS[pt.label]||'');
+        chart.canvas.style.cursor='pointer';
+      } else { hideTip(); chart.canvas.style.cursor='default'; }
+    } else if(args.event.type==='mouseout'){ hideTip(); }
+  }
+};
+
+var qp={
+  id:'qp',
+  beforeDraw: function(chart){
+    var ctx=chart.ctx, x=chart.scales.x, y=chart.scales.y;
+    var left=chart.chartArea.left, right=chart.chartArea.right;
+    var top=chart.chartArea.top, bottom=chart.chartArea.bottom;
+    var mx=x.getPixelForValue(5), my=y.getPixelForValue(75);
+    ctx.save();
+    [
+      {x1:left,y1:top,x2:mx,y2:my,bg:'rgba(209,250,229,0.45)',tc:'#065f46',sc:'#047857',t:'Efficient Self-Custody',s:'Low Complexity · High Resilience',ly:0.55},
+      {x1:mx,y1:top,x2:right,y2:my,bg:'rgba(237,233,254,0.45)',tc:'#4c1d95',sc:'#6d28d9',t:'Institutional Custody',s:'High Complexity · High Resilience',ly:0.55},
+      {x1:left,y1:my,x2:mx,y2:bottom,bg:'rgba(255,251,235,0.55)',tc:'#92400e',sc:'#b45309',t:'Convenience Custody',s:'Low Complexity · Lower Resilience',ly:0.55},
+      {x1:mx,y1:my,x2:right,y2:bottom,bg:'rgba(254,226,226,0.45)',tc:'#991b1b',sc:'#b91c1c',t:'Diminishing Returns Zone',s:'High Complexity · Lower Resilience',ly:0.55}
+    ].forEach(function(q){
+      ctx.fillStyle=q.bg;
+      ctx.fillRect(q.x1,q.y1,q.x2-q.x1,q.y2-q.y1);
+      var cx=(q.x1+q.x2)/2, cy=q.y1+(q.y2-q.y1)*q.ly;
+      var bW=isMobile?130:170, bH=36, bX=cx-bW/2, bY=cy-18;
+      ctx.fillStyle='rgba(255,255,255,0.85)';ctx.strokeStyle=q.tc+'55';ctx.lineWidth=1;
+      ctx.beginPath();ctx.roundRect(bX,bY,bW,bH,4);ctx.fill();ctx.stroke();
+      ctx.fillStyle=q.tc;ctx.font='600 '+(isMobile?9:10)+'px system-ui';ctx.textAlign='center';ctx.fillText(q.t,cx,bY+13);
+      ctx.fillStyle=q.sc;ctx.font=(isMobile?8:9)+'px system-ui';ctx.fillText(q.s,cx,bY+27);
+    });
+    ctx.setLineDash([]);ctx.strokeStyle='rgba(107,114,128,0.5)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(mx,top);ctx.lineTo(mx,bottom);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(left,my);ctx.lineTo(right,my);ctx.stroke();
+    ctx.fillStyle='rgba(75,85,99,0.6)';ctx.font='9px system-ui';ctx.textAlign='left';
+    ctx.fillText('Resilience Sufficiency Threshold (75)',left+6,my-4);
+    ctx.restore();
+  }
+};
+
+var chart3 = new Chart(document.getElementById('c3'),{
+  type:'scatter',
+  plugins:[qp, mhov],
+  data:{
+    datasets:['Single-Key','Distributed','Collaborative','Institutional'].map(function(z){
+      return {
+        label:z,
+        data:md.filter(function(d){return d.z===z;}).map(function(d){return {x:d.cs,y:d.bcri,label:d.label};}),
+        backgroundColor:ZF[z],
+        borderColor:ZB[z],
+        borderWidth:2,
+        // FIX: larger points on mobile for easier tapping
+        pointRadius: isMobile ? 14 : 10,
+        pointHoverRadius: isMobile ? 20 : 16
+      };
+    })
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{enabled:false}},
+    scales:{
+      x:{min:0,max:10,title:{display:true,text:'Complexity Score (CS)',font:{size:isMobile?9:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:isMobile?9:11,family:'system-ui'}}},
+      y:{min:50,max:100,title:{display:true,text:'BCRI Score (50–100)',font:{size:isMobile?9:11,family:'system-ui'},color:'#6b7280'},grid:{color:'rgba(128,128,128,0.08)'},ticks:{font:{size:isMobile?9:11,family:'system-ui'}}}
+    }
+  }
+});
+
+/* Mobile tap for chart 3 */
+document.getElementById('c3').addEventListener('touchend', function(e){
+  e.preventDefault();
+  var touch = e.changedTouches[0];
+  var els = chart3.getElementsAtEventForMode(touch,'nearest',{intersect:false},false);
+  if(els.length){
+    var pt = chart3.data.datasets[els[0].datasetIndex].data[els[0].index];
+    if(tipVisible && tipName.textContent === pt.label){ hideTip(); }
+    else { showTip(touch.clientX, touch.clientY, pt.label,'BCRI '+pt.y+'  ·  CS '+pt.x, CONFIGS[pt.label]||''); }
+  } else { hideTip(); }
+}, {passive:false});
+document.getElementById('c3').addEventListener('mousemove', mvTip);
+document.getElementById('c3').addEventListener('mouseleave', hideTip);
+
+/* ─────────────────────────────────────────────
+   DYNAMIC HEADER OFFSET
+───────────────────────────────────────────── */
+(function(){
+  function setHeaderOffset(){
+    var header=document.querySelector('header');
+    if(!header) return;
+    var h=Math.ceil(header.getBoundingClientRect().height);
+    document.documentElement.style.setProperty('--headerOffset',(h+4)+'px');
+  }
+  window.addEventListener('load', setHeaderOffset);
+  window.addEventListener('resize', setHeaderOffset);
 })();
-</script>
-<script>
+
+/* ─────────────────────────────────────────────
+   DARK MODE
+───────────────────────────────────────────── */
 (function(){
   var btn=document.getElementById('tt');
-  function apply(d){document.body.classList.toggle('dark',d);if(btn)btn.textContent=d?'☀':'🌙';}
+  function apply(d){
+    document.body.classList.toggle('dark',d);
+    if(btn) btn.textContent=d?'☀':'🌙';
+  }
   var s=localStorage.getItem('bcs-theme');
   apply(s==='dark');
-  if(btn)btn.addEventListener('click',function(){
+  if(btn) btn.addEventListener('click',function(){
     var d=!document.body.classList.contains('dark');
     localStorage.setItem('bcs-theme',d?'dark':'light');
     apply(d);
   });
-  function sh(){va
+})();
+
+/* ─────────────────────────────────────────────
+   PREVENT PAGE SCROLL on chart canvas touch-drag
+   (allow horizontal scroll within the scroll-wrap instead)
+───────────────────────────────────────────── */
+['c1','c2','c3'].forEach(function(cid){
+  var el=document.getElementById(cid);
+  if(!el) return;
+  // Allow the scroll wrapper to scroll horizontally;
+  // prevent vertical page scroll only when touch starts on canvas
+  el.addEventListener('touchstart', function(e){
+    // do nothing — let the scroll wrap handle it
+  }, {passive:true});
+});
+</script>
+</body>
+</html>
