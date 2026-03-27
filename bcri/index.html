@@ -321,6 +321,47 @@ html{scroll-padding-top:var(--headerOffset);}
   background: transparent;
 }
 #tip-overlay.active { display: block; }
+
+/* ── Document Viewer ── */
+.viewerWrap{margin-top:14px;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.viewerHead{padding:12px 14px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:800;text-transform:uppercase;color:var(--text);}
+.viewerHead a{font-size:12px;font-weight:600;color:var(--btc);text-decoration:none;text-transform:none;}
+.viewerHead a:hover{text-decoration:underline;}
+.viewerFrame{width:100%;height:90vh;min-height:900px;border:0;display:block;}
+
+/* ── Mobile PDF fallback ── */
+.viewer-mobile-fallback{
+  display:none;
+  padding:24px 20px;
+  background:var(--panel);
+  text-align:center;
+}
+.viewer-mobile-fallback p{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.65;
+  margin:0 0 16px;
+}
+.viewer-mobile-open{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:var(--btc);
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.03em;
+  padding:11px 20px;
+  border-radius:6px;
+  text-decoration:none;
+  touch-action:manipulation;
+}
+.viewer-mobile-open:hover{opacity:.9;text-decoration:none;}
+
+@media(max-width:768px){
+  .viewerFrame{display:none;}
+  .viewer-mobile-fallback{display:block;}
+}
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "name": "BCRI Benchmark Report (BCS-BR-1.0)", "description": "Applies the Bitcoin Custody Standard framework across 14 benchmark custody architectures to evaluate structural resilience and operational complexity.", "version": "1.0", "datePublished": "2026-03-01", "url": "https://bitcoincustodystandard.org/bcri/", "publisher": {"@type": "Organization", "name": "Bitcoin Custody Standard Initiative"}}</script>
@@ -496,7 +537,13 @@ html{scroll-padding-top:var(--headerOffset);}
       <div>Document Viewer</div>
       <div><a href="/BCS-BR-1.0-2026-03.pdf" target="_blank" rel="noopener">Open in new tab</a></div>
     </div>
+    <!-- Desktop: embedded iframe -->
     <iframe class="viewerFrame" src="/BCS-BR-1.0-2026-03.pdf#pagemode=none&view=FitH" title="BCS BCRI Benchmark Report PDF" loading="lazy"></iframe>
+    <!-- Mobile: direct access fallback (iframe is not reliably navigable on iOS/Android) -->
+    <div class="viewer-mobile-fallback">
+      <p>Embedded PDF viewing is not reliable on mobile browsers.<br>Open the full report directly for the best reading experience.</p>
+      <a class="viewer-mobile-open" href="/BCS-BR-1.0-2026-03.pdf" target="_blank" rel="noopener">Open PDF Report ↗</a>
+    </div>
   </section>
 
   <!-- DOCUMENT RECORD -->
