@@ -245,6 +245,27 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
 @media(max-width:680px){
   .metaGrid{grid-template-columns:1fr;}
 }
+/* ── Dot and principle box ── */
+.dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--orange);
+  display:inline-block;
+  flex-shrink:0;
+}
+.principle-box{
+  padding:14px 16px;
+  border-left:3px solid var(--orange);
+  background:var(--bg2);
+  border-radius:0 4px 4px 0;
+}
+.principle-box p{
+  margin:0;
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+}
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","name":"Bitcoin Custody Standard — Normative Summary","url":"https://bitcoincustodystandard.org/normative-summary/","description":"BCS-NS-1.1 — The foundational normative document of the Bitcoin Custody Standard. Defines the framework, five structural pillars, and BCRI evaluation methodology.","publisher":{"@type":"Organization","name":"Bitcoin Custody Standard Initiative","url":"https://bitcoincustodystandard.org"}}</script>
@@ -284,7 +305,7 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   </div>
 
   <section style="margin-top:32px;" aria-label="Abstract and Purpose"><div class="section-title">Abstract and Purpose</div>
-  <section class="about-standard" style="margin:18px 0;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--bg);">
+  <div class="about-standard" style="margin:18px 0;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--bg);">
 
     <h3 style="font-size:18px;font-weight:900;color:var(--text);margin:0 0 12px;display:flex;align-items:center;gap:8px;"><span class="dot"></span>Abstract</h3>
     <p style="margin:0;">The Bitcoin Custody Standard (BCS) defines a normative framework for evaluating the structural resilience of Bitcoin custody architectures across time. The Bitcoin Custody Resilience Index (BCRI) is the quantitative assessment methodology aligned with BCS and used to measure custody resilience under the standard. The framework evaluates custody architectures across the five BCS structural pillars through the Architecture Resilience Score (ARS) while also assessing coordination health (CHS), entropy-related degradation (ERI), and adversarial exposure conditions (XRI). BCS is designed to operate alongside evolving institutional, regulatory, and technological custody frameworks while remaining structurally independent of jurisdiction-specific requirements and legal regimes.</p>
@@ -295,7 +316,6 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
     <p style="margin:0;">The Bitcoin Custody Standard (BCS) defines a normative framework for evaluating and strengthening the structural resilience of Bitcoin custody architectures across time. Custodial Entropy refers to the progressive structural degradation of custody systems as operational coherence erodes through knowledge loss, undocumented changes, technological evolution, coordination drift, and insufficient review.</p>
     <p style="margin:10px 0 0;">Because Bitcoin is a bearer asset with no recovery possible once keys are lost, BCS exists to reduce the probability that Bitcoin holdings — whether managed by individuals, families, fiduciaries, advisors, or institutions — become permanently inaccessible due to preventable Custodial Entropy. BCS operates within Bitcoin's foundational constraint that ownership is defined by control of private keys.</p>
     <p style="margin:10px 0 0;">The Bitcoin Custody Resilience Index (BCRI) operationalizes the BCS framework by providing structured measurement of architecture resilience, coordination reliability, entropy-related degradation, and adversarial exposure.</p>
-    <p style="margin:10px 0 0;">BCS defines the normative framework; BCRI operationalizes that framework through structured scoring and reporting across the five structural pillars.</p>
 
     <div style="height:1px;background:var(--border);margin:14px 0;"></div>
 
@@ -304,6 +324,7 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
       <p>Bitcoin custody must be evaluated for resilience over time, not security at a point in time.</p>
     </div>
 
+  </div>
   </section>
 
   <!-- KEY METRICS + BCRI STRUCTURAL RESILIENCE MODEL -->
@@ -376,16 +397,16 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
 
   <section class="meta" aria-label="Document Record" style="margin-top:32px;"><div class="section-title">Document Record</div>
     <div class="metaGrid">
-      <div class="kv"><div class="k">Document Type</div><div class="v">Normative Summary</div></div>
-      <div class="kv"><div class="k">Document ID</div><div class="v">BCS-NS-1.1</div></div>
-      <div class="kv"><div class="k">Version</div><div class="v">1.1</div></div>
-      <div class="kv"><div class="k">Publication Date</div><div class="v">Originally released: February 2026<br>Last updated: March 2026</div></div>
-      <div class="kv"><div class="k">Document Class</div><div class="v">Normative Framework</div></div>
-      <div class="kv"><div class="k">Status</div><div class="v">Public, Citable</div></div>
-      <div class="kv"><div class="k">Steward</div><div class="v">Bitcoin Custody Standard Initiative</div></div>
-      <div class="kv"><div class="k">Next Scheduled Review</div><div class="v">February 2027 (or earlier if major revision required)</div></div>
-      <div class="kv"><div class="k">Social</div><div class="v"><a href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener">@Bitcoin_custody</a></div></div>
-      <div class="kv"><div class="k">Contact</div><div class="v"><a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a></div></div>
+      <div class="kv"><div class="kv-key">Document Type</div><div class="kv-val">Normative Summary</div></div>
+      <div class="kv"><div class="kv-key">Document ID</div><div class="kv-val">BCS-NS-1.1</div></div>
+      <div class="kv"><div class="kv-key">Version</div><div class="kv-val">1.1</div></div>
+      <div class="kv"><div class="kv-key">Publication Date</div><div class="kv-val">Originally released: February 2026<br>Last updated: March 2026</div></div>
+      <div class="kv"><div class="kv-key">Document Class</div><div class="kv-val">Normative Framework</div></div>
+      <div class="kv"><div class="kv-key">Status</div><div class="kv-val">Public, Citable</div></div>
+      <div class="kv"><div class="kv-key">Steward</div><div class="kv-val">Bitcoin Custody Standard Initiative</div></div>
+      <div class="kv"><div class="kv-key">Next Scheduled Review</div><div class="kv-val">February 2027 (or earlier if major revision required)</div></div>
+      <div class="kv"><div class="kv-key">Social</div><div class="kv-val"><a href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener">@Bitcoin_custody</a></div></div>
+      <div class="kv"><div class="kv-key">Contact</div><div class="kv-val"><a href="mailto:contact@bitcoincustodystandard.org">contact@bitcoincustodystandard.org</a></div></div>
     </div>
   </section>
 
