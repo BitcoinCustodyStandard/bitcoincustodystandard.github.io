@@ -317,15 +317,14 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   <!-- ABOUT THE STANDARD -->
   <section style="margin-top:32px;" aria-label="About the Bitcoin Custody Standard">
     <div class="section-title">About the Standard</div>
-    <p>The Bitcoin Custody Standard evaluates custody as a system—not a product or device choice. It asks whether a custody architecture can preserve control across time, operational change, participant turnover, and adversarial conditions.</p>
+    <p>Custody is evaluated as a structural system—not a product or device choice. The framework asks whether an architecture can preserve control across time, operational change, participant turnover, and adversarial conditions.</p>
     <p>The framework introduces custodial entropy: the gradual degradation of a system through knowledge loss, coordination drift, undocumented change, and unmaintained processes.</p>
   </section>
 
   <!-- BCRI STRUCTURAL MODEL -->
   <section aria-label="BCRI Structural Model" style="margin-top:28px;">
     <div class="section-title">BCRI Structural Model</div>
-    <p class="section-intro" style="margin-bottom:4px;">All custody evaluation flows through this model.</p>
-    <p class="section-intro">The Bitcoin Custody Resilience Index is constructed from four linked components. Hover any node for its definition — click to pin.</p>
+    <p class="section-intro">All custody evaluation flows through this model. Hover any node for its definition — click to pin.</p>
     <div id="bcri-wrap" style="position:relative;width:100%;background:#0f1c2e;border-radius:6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;margin-top:12px;">
       <canvas id="bcri-cv" style="display:block;width:100%;"></canvas>
       <div id="bcri-tip" style="position:absolute;background:#111;border:1px solid #2a2a2a;border-radius:5px;padding:10px 13px;font-size:11px;max-width:200px;pointer-events:none;opacity:0;transition:opacity .12s;z-index:20;line-height:1.6;font-family:system-ui,sans-serif;">
@@ -726,7 +725,6 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   <!-- OUTPUTS -->
   <section style="margin-top:28px;" aria-label="Outputs">
     <div class="section-title">Outputs</div>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:10px;">The model produces standardized outputs:</p>
     <div class="out-grid">
       <div class="out-card"><div class="out-name">BCRI Score</div><div class="out-desc">Composite resilience score from 0 to 100.</div></div>
       <div class="out-card"><div class="out-name">BCRI Rating</div><div class="out-desc">Standardized resilience classification.</div></div>
@@ -772,44 +770,9 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   </section>
 
   <!-- APPLICATION AND EVALUATION -->
-  <section style="margin-top:28px;" aria-label="Why Existing Custody Evaluation Fails">
-    <div class="section-title">Why Existing Custody Evaluation Fails</div>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">Most custody analysis focuses on components: hardware wallets, multisignature setups, service providers, or isolated security features. This is necessary but incomplete.</p>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">It does not adequately evaluate:</p>
-    <div style="border-top:1px solid var(--border);">
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Structural failure</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.65;">How custody systems degrade over time without any adversarial event.</div>
-      </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Coordination breakdown</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.65;">Whether participants can reliably execute recovery across time and turnover.</div>
-      </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Entropy-driven degradation</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.65;">The accumulation of undocumented changes, knowledge loss, and procedural drift.</div>
-      </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Dependency concentration</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.65;">Reliance on single devices, providers, or individuals as unacknowledged failure points.</div>
-      </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Jurisdictional constraints</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.65;">Legal, regulatory, or geographic conditions that restrict access or compel disclosure.</div>
-      </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Long-horizon recoverability</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.65;">Whether the system remains recoverable years or decades after initial setup.</div>
-      </div>
-    </div>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-top:16px;">As a result, systems that appear secure at deployment may still fail under real-world conditions. The Bitcoin Custody Standard addresses this gap by evaluating custody as a structural system.</p>
-  </section>
-
-  <!-- APPLICATION AND EVALUATION -->
   <section style="margin-top:32px;padding-bottom:40px;" aria-label="Application and Evaluation">
     <div class="section-title">Application and Evaluation</div>
     <div class="app-eval-body">
-      <p>The Bitcoin Custody Standard defines a public framework for evaluating Bitcoin custody resilience.</p>
       <p>The scoring methodology is maintained as a controlled model to ensure consistency, comparability, and integrity across assessments.</p>
       <p>Evaluations are conducted under the Bitcoin Custody Standard framework and administered by the Bitcoin Custody Standard Initiative.</p>
       <p>The standard is version-controlled, with benchmark and research publications expanding over time.</p>
