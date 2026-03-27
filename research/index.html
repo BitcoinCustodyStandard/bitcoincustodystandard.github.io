@@ -13,13 +13,13 @@
 <meta name="llm-description" content="The Bitcoin Custody Standard (BCS) evaluates Bitcoin custody architectures for long-horizon resilience. Key concepts: BCRI (0-100 composite score), ARS (Architecture Resilience Score), ERI (Entropy Risk Index), XRI (Exposure Risk Index), CHS (Coordination Health Score), five structural pillars: Cryptographic Integrity, Physical Distribution, Temporal Resilience, Cognitive Reliability, Operational Dependency. Custodial entropy and custodial paradox are core framework concepts."/>
 <meta property="og:title" content="Bitcoin Custody Standard — Research"/>
 <meta property="og:description" content="Research publications from the Bitcoin Custody Standard Initiative on custody architecture, failure modes, and long-horizon resilience."/>
-<meta property="og:type" content="article"/>
-<meta property="og:image" content="https://bitcoincustodystandard.org/Normative.png"/>
+<meta property="og:type" content="website"/>
+<meta property="og:image" content="https://bitcoincustodystandard.org/home-og-1200x630.jpg"/>
 <meta property="og:url" content="https://bitcoincustodystandard.org/research/"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Bitcoin Custody Standard — Research"/>
 <meta name="twitter:description" content="Research publications from the Bitcoin Custody Standard Initiative on custody architecture, failure modes, and long-horizon resilience."/>
-<meta name="twitter:image" content="https://bitcoincustodystandard.org/Normative.png"/>
+<meta name="twitter:image" content="https://bitcoincustodystandard.org/home-og-1200x630.jpg"/>
 <meta name="twitter:site" content="@Bitcoin_Custody"/>
 <style>
 /* ── Header ── */
@@ -225,6 +225,33 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
 @media(max-width:400px){
   .path-grid{grid-template-columns:1fr!important;}
 }
+@media(max-width:480px){
+  .channel-grid{grid-template-columns:1fr!important;}
+}
+
+/* ── Channel cards ── */
+.channel-card{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:13px 14px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:var(--card);
+  text-decoration:none;
+  transition:border-color .12s,background .12s;
+}
+.channel-card:hover{border-color:var(--orange);background:var(--bg2);text-decoration:none;}
+
+/* ── Why-row: stacks on mobile ── */
+.why-row{
+  display:grid;
+  grid-template-columns:160px 1fr;
+  gap:0;
+  border-bottom:1px solid var(--border);
+  padding:10px 0;
+}
+@media(max-width:560px){
+  .why-row{grid-template-columns:1fr;gap:3px;}
+}
 @media(max-width:768px){
   .btn{min-height:44px;padding:10px 16px;}
   .theme-toggle{width:40px;height:40px;}
@@ -282,6 +309,32 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   <section class="hero">
     <h1>Bitcoin Custody Standard — Research</h1>
     <p class="hero-sub">Publications on custody architecture, failure modes, and long-horizon operational resilience.</p>
+  </section>
+
+  <section style="margin-top:24px;" aria-label="Research channels">
+    <div class="section-title">Research Channels</div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">Primary research is published on Substack. Short-form commentary, updates, and discussion are posted on X. All research publications are archived on this page.</p>
+    <div class="channel-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <a href="https://bitcoincustodystandard.substack.com" target="_blank" rel="noopener" class="channel-card">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-top:1px;opacity:0.5;">
+          <rect x="3" y="3" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M3 17l9 4 9-4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;">Substack</div>
+          <div style="font-size:11px;color:var(--muted);">Primary research and long-form publications</div>
+        </div>
+      </a>
+      <a href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener" class="channel-card">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;margin-top:1px;opacity:0.5;">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;">X</div>
+          <div style="font-size:11px;color:var(--muted);">Commentary, updates, and ongoing discussion</div>
+        </div>
+      </a>
+    </div>
   </section>
 
   <section style="margin-top:24px;" aria-label="Featured publications">
@@ -352,15 +405,6 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
     </div>
   </section>
 
-  <section style="margin-top:24px;" aria-label="Follow on X">
-    <div class="section-title">Follow Research Updates</div>
-    <p class="section-intro">Research commentary, framework updates, and analysis are posted on X.</p>
-    <a class="x-follow" href="https://x.com/Bitcoin_custody" target="_blank" rel="noopener" aria-label="Follow @Bitcoin_custody on X">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      @Bitcoin_custody
-    </a>
-  </section>
-
   <section style="margin-top:28px;" aria-label="Archive">
     <div class="section-title">Research Archive</div>
     <p class="section-intro">The full BCS Research Archive is published at the BCS Substack. Research notes, working papers, and analytical commentary are published on an ongoing basis.</p>
@@ -374,27 +418,27 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
     <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">Most custody analysis focuses on components: hardware wallets, multisignature setups, service providers, or isolated security features. This is necessary but incomplete.</p>
     <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">It does not adequately evaluate:</p>
     <div style="border-top:1px solid var(--border);">
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
+      <div class="why-row">
         <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Structural failure</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.65;">How custody systems degrade over time without any adversarial event.</div>
       </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
+      <div class="why-row">
         <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Coordination breakdown</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.65;">Whether participants can reliably execute recovery across time and turnover.</div>
       </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
+      <div class="why-row">
         <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Entropy-driven degradation</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.65;">The accumulation of undocumented changes, knowledge loss, and procedural drift.</div>
       </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
+      <div class="why-row">
         <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Dependency concentration</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.65;">Reliance on single devices, providers, or individuals as unacknowledged failure points.</div>
       </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
+      <div class="why-row">
         <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Jurisdictional constraints</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.65;">Legal, regulatory, or geographic conditions that restrict access or compel disclosure.</div>
       </div>
-      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
+      <div class="why-row">
         <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Long-horizon recoverability</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.65;">Whether the system remains recoverable years or decades after initial setup.</div>
       </div>
