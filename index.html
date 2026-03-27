@@ -274,12 +274,17 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   <!-- 1. HERO -->
   <section class="hero" style="padding-bottom:20px;">
     <h1>Bitcoin Custody Standard</h1>
-    <p class="hero-sub" style="margin-top:10px;">A framework for evaluating the long-horizon resilience of Bitcoin custody architectures.</p>
+    <p class="hero-sub" style="margin-top:10px;">The Bitcoin Custody Standard evaluates whether a custody system can preserve control across time, operational change, participant turnover, and adversarial conditions.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
+      <a class="btn primary" href="/normative-summary/">Read the Standard</a>
+      <a class="btn secondary" href="/bcri/">View Benchmark</a>
+    </div>
   </section>
 
   <!-- 2. START HERE -->
   <section style="margin-top:28px;" aria-label="Start Here">
     <div class="section-title">Start Here</div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:10px;">Choose your entry point into the framework:</p>
     <div class="path-grid">
       <a class="path-tile" href="/normative-summary/">
         <span class="path-tile-label">Standard</span>
@@ -312,15 +317,14 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   <!-- ABOUT THE STANDARD -->
   <section style="margin-top:32px;" aria-label="About the Bitcoin Custody Standard">
     <div class="section-title">About the Standard</div>
-    <p>The Bitcoin Custody Standard is a public framework for evaluating Bitcoin custody beyond point-in-time security. It treats custody as a system, focused on whether an architecture can preserve control across time, operational change, participant turnover, and adversarial conditions.</p>
-    <p>Custody must be evaluated structurally — not as a product choice or a static audit. The framework assesses five independent pillars, combined into a composite resilience score capturing entropy, exposure, and coordination risk.</p>
-    <p>It addresses risks typically ignored in custody design, including custodial entropy — the gradual degradation of a system over time — and the custodial paradox, where strengthening one part of a custody architecture can weaken another.</p>
-    <p>Designed for long-term holders, fiduciaries, institutions, and operators requiring a rigorous basis for custody evaluation.</p>
+    <p>The Bitcoin Custody Standard evaluates custody as a system—not a product or device choice. It asks whether a custody architecture can preserve control across time, operational change, participant turnover, and adversarial conditions.</p>
+    <p>The framework introduces custodial entropy: the gradual degradation of a system through knowledge loss, coordination drift, undocumented change, and unmaintained processes.</p>
   </section>
 
   <!-- BCRI STRUCTURAL MODEL -->
   <section aria-label="BCRI Structural Model" style="margin-top:28px;">
     <div class="section-title">BCRI Structural Model</div>
+    <p class="section-intro" style="margin-bottom:4px;">All custody evaluation flows through this model.</p>
     <p class="section-intro">The Bitcoin Custody Resilience Index is constructed from four linked components. Hover any node for its definition — click to pin.</p>
     <div id="bcri-wrap" style="position:relative;width:100%;background:#0f1c2e;border-radius:6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;margin-top:12px;">
       <canvas id="bcri-cv" style="display:block;width:100%;"></canvas>
@@ -673,6 +677,7 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   <!-- FIVE STRUCTURAL PILLARS -->
   <section style="margin-top:28px;" aria-label="Five structural pillars">
     <div class="section-title">Five Structural Pillars</div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:10px;">Custody resilience is evaluated across five independent structural domains:</p>
     <div class="pillar-grid">
       <div class="pillar-card"><div class="pillar-name">Cryptographic Integrity</div><div class="pillar-desc">Key generation, material handling, derivation path preservation, algorithmic resilience.</div></div>
       <div class="pillar-card"><div class="pillar-name">Physical Distribution</div><div class="pillar-desc">Geographic redundancy of recovery material across independent risk domains.</div></div>
@@ -685,6 +690,7 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   <!-- MEASUREMENT COMPONENTS -->
   <section style="margin-top:28px;" aria-label="Measurement components">
     <div class="section-title">Measurement Components</div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:10px;">These pillars feed into four measurable components:</p>
     <div class="comp-row">
       <div class="comp-card">
         <div class="comp-code">ARS</div>
@@ -720,6 +726,7 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   <!-- OUTPUTS -->
   <section style="margin-top:28px;" aria-label="Outputs">
     <div class="section-title">Outputs</div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:10px;">The model produces standardized outputs:</p>
     <div class="out-grid">
       <div class="out-card"><div class="out-name">BCRI Score</div><div class="out-desc">Composite resilience score from 0 to 100.</div></div>
       <div class="out-card"><div class="out-name">BCRI Rating</div><div class="out-desc">Standardized resilience classification.</div></div>
@@ -729,31 +736,10 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
     </div>
   </section>
 
-  <!-- FRAMEWORK STRUCTURE -->
-  <section style="margin-top:32px;" aria-label="Framework Structure">
-    <div class="section-title">Framework Structure</div>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">The Bitcoin Custody Standard consists of a public normative layer, a benchmark application layer, and a supporting research layer.</p>
-    <div class="card-grid">
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;display:inline-block;"></span><div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);">Normative Layer</div></div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.65;margin:0;">The BCS Normative Standard defines the public conceptual and evaluative basis of the framework.</p>
-      </div>
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;display:inline-block;"></span><div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);">Benchmark Layer</div></div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.65;margin:0;">The BCRI Benchmark Report applies the framework across benchmark custody architectures and produces comparative structural analysis.</p>
-      </div>
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;display:inline-block;"></span><div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);">Research Layer</div></div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.65;margin:0;">Supporting research publications extend the framework into specific custody questions, architecture studies, and applied resilience analysis.</p>
-      </div>
-    </div>
-    <p style="font-size:13px;color:var(--muted);margin-top:12px;line-height:1.65;">Together, these layers define the framework, demonstrate its application, and expand its interpretive depth.</p>
-  </section>
-
   <!-- CORE PUBLICATIONS -->
   <section style="margin-top:32px;" aria-label="Core Publications">
     <div class="section-title">Core Publications</div>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">The Bitcoin Custody Standard is published through a normative framework, benchmark reports, and supporting research.</p>
+    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">The framework is published through three core documents:</p>
     <div class="card-grid">
       <div class="card">
         <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">BCS-NS-1.1 · Normative Standard</div>
@@ -786,10 +772,10 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   </section>
 
   <!-- APPLICATION AND EVALUATION -->
-  <section style="margin-top:32px;" aria-label="Why Existing Custody Evaluation Fails">
+  <section style="margin-top:28px;" aria-label="Why Existing Custody Evaluation Fails">
     <div class="section-title">Why Existing Custody Evaluation Fails</div>
     <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">Most custody analysis focuses on components: hardware wallets, multisignature setups, service providers, or isolated security features. This is necessary but incomplete.</p>
-    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:16px;">It does not adequately evaluate:</p>
+    <p style="font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:14px;">It does not adequately evaluate:</p>
     <div style="border-top:1px solid var(--border);">
       <div style="display:grid;grid-template-columns:160px 1fr;gap:0;border-bottom:1px solid var(--border);padding:10px 0;">
         <div style="font-size:13px;font-weight:700;color:var(--text);padding-right:20px;padding-top:1px;">Structural failure</div>
