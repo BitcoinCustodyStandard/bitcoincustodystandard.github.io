@@ -13,13 +13,13 @@
 <meta name="llm-description" content="The Bitcoin Custody Standard (BCS) evaluates Bitcoin custody architectures for long-horizon resilience. Key concepts: BCRI (0-100 composite score), ARS (Architecture Resilience Score), ERI (Entropy Risk Index), XRI (Exposure Risk Index), CHS (Coordination Health Score), five structural pillars: Cryptographic Integrity, Physical Distribution, Temporal Resilience, Cognitive Reliability, Operational Dependency. Custodial entropy and custodial paradox are core framework concepts."/>
 <meta property="og:title" content="Bitcoin Custody Standard — Outputs"/>
 <meta property="og:description" content="Five structured evaluation outputs produced by the Bitcoin Custody Standard framework: BCRI Score, Rating, Frontier Positioning, Gap Analysis, Upgrade Path."/>
-<meta property="og:type" content="article"/>
-<meta property="og:image" content="https://bitcoincustodystandard.org/Normative.png"/>
+<meta property="og:type" content="website"/>
+<meta property="og:image" content="https://bitcoincustodystandard.org/home-og-1200x630.jpg"/>
 <meta property="og:url" content="https://bitcoincustodystandard.org/outputs/"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Bitcoin Custody Standard — Outputs"/>
 <meta name="twitter:description" content="Five structured evaluation outputs produced by the Bitcoin Custody Standard framework: BCRI Score, Rating, Frontier Positioning, Gap Analysis, Upgrade Path."/>
-<meta name="twitter:image" content="https://bitcoincustodystandard.org/Normative.png"/>
+<meta name="twitter:image" content="https://bitcoincustodystandard.org/home-og-1200x630.jpg"/>
 <meta name="twitter:site" content="@Bitcoin_Custody"/>
 <style>
 /* ── Header ── */
@@ -67,27 +67,12 @@ p+p{margin-top:10px;}
 h3{font-size:16px;font-weight:800;color:var(--text);margin:0 0 8px;}
 h4{font-size:13px;font-weight:700;color:var(--text);margin:0 0 6px;}
 
-.site-footer{
-  border-top:1px solid var(--border);
-  padding:28px 0 24px;
-  text-align:center;
-  font-size:11px;
-  color:var(--dim);
-  margin-top:48px;
-}
-.site-footer a{color:var(--dim);text-decoration:none;}
-.site-footer a:hover{color:var(--muted);text-decoration:underline;}
-.site-footer .f-nav{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;}
-.site-footer .f-maintained{margin-bottom:4px;font-size:11px;color:var(--dim);}
-.site-footer .f-copy{font-size:11px;color:var(--dim);}
-
 :root{
   --bg:#f5f5f3;--bg2:#eeeeec;--card:#ffffff;
   --text:#0f172a;--muted:#475569;--dim:#94a3b8;
   --border:#e2e2e0;--border2:#c8c8c5;
   --orange:#f7931a;--orange-dim:rgba(247,147,26,0.10);--orange-line:rgba(247,147,26,0.28);
   --link:#c97415;--btn:#1a1a1a;--btnText:#ffffff;
-  
 }
 *{box-sizing:border-box;margin:0;padding:0}
 img{max-width:100%;height:auto;}
@@ -97,8 +82,6 @@ a{color:var(--link);text-decoration:none;}
 a:hover{text-decoration:underline;}
 
 .wrap{max-width:960px;margin:0 auto;padding:0 20px;}
-/* Theme toggle */
-/* Buttons */
 .btn{padding:7px 14px;border-radius:4px;border:1px solid var(--border2);font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;transition:filter .12s,border-color .12s;}
 .btn.primary{background:var(--orange);color:#fff;border-color:var(--orange);}
 .btn.primary:hover{background:#e07c12;border-color:#e07c12;text-decoration:none;filter:none;}
@@ -106,102 +89,35 @@ a:hover{text-decoration:underline;}
 .btn.secondary:hover{border-color:var(--muted);color:var(--text);text-decoration:none;}
 .btn.ghost{background:transparent;color:var(--muted);border-color:transparent;}
 .btn.ghost:hover{color:var(--text);background:var(--bg2);text-decoration:none;}
-/* Hero */
 .hero{padding:40px 0 32px;border-bottom:1px solid var(--border);}
-
 .hero-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
 .badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);border:1px solid var(--border2);border-radius:3px;padding:3px 8px;background:var(--bg2);}
-/* Section */
 .section{margin-top:32px;}
-
 .section-intro{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;}
-/* Cards */
 .card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:16px;}
 .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .card-grid.cols2{grid-template-columns:1fr 1fr;}
 .card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;}
 .card-body{font-size:12px;color:var(--muted);line-height:1.65;}
-/* Orange accent card */
 .accent-card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:0 4px 4px 0;padding:14px 16px;}
-/* Statement */
 .statement{padding:16px 20px;border-left:3px solid var(--orange);background:var(--bg2);border-radius:0 4px 4px 0;margin:24px 0;}
 .statement p{font-size:14px;font-weight:600;color:var(--text);}
-/* kv metadata */
 .kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .kv{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;font-size:13px;}
 .kv-key{color:var(--muted);font-weight:600;flex-shrink:0;padding-right:10px;}
 .kv-val{text-align:right;color:var(--text);}
-/* Path tiles */
 .path-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;}
 .path-tile{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:14px;text-decoration:none;display:flex;flex-direction:column;gap:4px;transition:border-color .12s,box-shadow .12s;min-height:64px;}
 .path-tile:hover{border-color:var(--orange);text-decoration:none;}
 .path-tile-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);}
 .path-tile-title{font-size:13px;font-weight:700;color:var(--text);}
 .path-tile-arrow{font-size:11px;color:var(--orange);margin-top:auto;padding-top:8px;}
-/* ── BCRI Interactive Model ── */
-.m-flow{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;}
-.m-arrow{display:flex;flex-direction:column;align-items:center;pointer-events:none;padding:3px 0;}
-.m-arrow-line{width:1px;height:20px;background:#3a3a3a;}
-.m-arrow-head{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid #3a3a3a;}
-.m-layer{width:100%;background:#1c1c1c;border:1px solid #2a2a2a;border-radius:4px;overflow:hidden;}
-.m-layer-hdr{padding:11px 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #2a2a2a;}
-.m-layer-title{font-size:13px;font-weight:800;color:#e5e7eb;letter-spacing:-.01em;}
-.m-layer-sub{font-size:11px;color:#9ca3af;margin-top:1px;}
-.m-tag{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;background:#242424;border:1px solid #2a2a2a;border-radius:3px;padding:2px 7px;flex-shrink:0;}
-.m-body{padding:12px 15px;}
-.m-pillars{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
-.m-pillar,.m-eri,.m-xc-body,.m-out{background:#242424;border:1px solid #2a2a2a;border-left:2px solid #3a3a3a;border-radius:3px;padding:8px 11px;cursor:pointer;transition:border-left-color .15s,background .15s;}
-.m-pillar:hover,.m-pillar.open,.m-eri:hover,.m-eri.open,.m-xc-body:hover,.m-xc-body.open,.m-out:hover,.m-out.open{border-left-color:#f7931a;background:rgba(247,147,26,0.07);}
-.m-item-name{font-size:11px;font-weight:700;color:#e5e7eb;display:flex;align-items:center;gap:6px;user-select:none;}
-.m-dot{width:5px;height:5px;border-radius:50%;background:#f7931a;flex-shrink:0;}
-.m-caret{margin-left:auto;font-size:9px;color:#6b7280;transition:transform .15s;flex-shrink:0;}
-.m-pillar.open .m-caret,.m-eri.open .m-caret,.m-xc-body.open .m-caret,.m-out.open .m-caret{transform:rotate(180deg);}
-.m-detail{display:none;margin-top:7px;font-size:11px;color:#9ca3af;line-height:1.6;border-top:1px solid #2a2a2a;padding-top:6px;}
-.m-pillar.open .m-detail,.m-eri.open .m-detail,.m-xc-body.open .m-detail,.m-out.open .m-detail{display:block;}
-.m-fail{margin-top:4px;font-size:10px;color:rgba(247,147,26,0.6);font-style:italic;}
-.m-eri-row,.m-xc-row,.m-out-cols{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
-.m-eri{border-top:2px solid #3a3a3a;border-left:none;}
-.m-eri:hover,.m-eri.open{border-top-color:#f7931a;}
-.m-eri-code{font-size:11px;font-weight:800;color:#e5e7eb;display:flex;align-items:center;gap:6px;}
-.m-eri-label{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#6b7280;}
-.m-xc-row{gap:10px;}
-.m-xc{background:#1c1c1c;border:1px solid #2a2a2a;border-radius:4px;overflow:hidden;}
-.m-xc-hdr{padding:9px 12px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;}
-.m-xc-code{font-size:13px;font-weight:800;color:#e5e7eb;}
-.m-xc-tag{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;}
-.m-xc-body{border-left:none;border:none;border-radius:0;padding:9px 12px;}
-.m-xc-body:hover,.m-xc-body.open{background:rgba(247,147,26,0.07);border-left:none;}
-.m-xc-title{font-size:11px;font-weight:700;color:#9ca3af;display:flex;align-items:center;gap:6px;}
-.m-xc-body:hover .m-xc-title,.m-xc-body.open .m-xc-title{color:#e5e7eb;}
-.m-xc-ex{font-size:10px;color:#6b7280;display:flex;align-items:baseline;gap:4px;margin-top:2px;}
-.m-xc-ex::before{content:'·';color:#f7931a;}
-.m-bcri-layer{border-top:2px solid rgba(247,147,26,0.35);}
-.m-out-col{display:flex;flex-direction:column;gap:5px;}
-.m-out-name{font-size:11px;font-weight:700;color:#e5e7eb;display:flex;align-items:center;gap:6px;}
-.m-formula{width:100%;background:#1c1c1c;border:1px solid #2a2a2a;border-radius:4px;overflow:hidden;}
-.m-formula-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;cursor:pointer;}
-.m-formula-hdr:hover{background:#242424;}
-.m-ftag{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;}
-.m-fexpr{font-family:monospace;font-size:12px;color:#e5e7eb;}
-.m-formula-body{max-height:0;overflow:hidden;transition:max-height .3s;}
-.m-formula-body.open{max-height:200px;}
-.m-formula-inner{padding:10px 13px;border-top:1px solid #2a2a2a;font-size:11px;color:#9ca3af;line-height:1.7;}
-.m-formula-inner b{color:#f7931a;font-weight:600;}
-
-/* Footer */
-
-.site-footer a:hover{color:var(--muted);}
-/* Responsive */
-
 .pillar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px;}
 .pillar-card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--orange-line);border-radius:0 4px 4px 0;padding:12px 14px;}
 .pillar-card .pillar-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;}
 .pillar-card .pillar-desc{font-size:11px;color:var(--muted);line-height:1.55;}
-
 .bcri-formula-tile{margin-top:10px;display:flex;align-items:center;justify-content:center;width:100%;border:1px solid var(--orange-line);border-radius:4px;background:var(--bg2);padding:14px 24px;text-align:center;}
 .bft-formula{font-family:monospace;font-size:16px;font-weight:700;color:var(--orange);letter-spacing:.04em;}
-.app-eval-body p{margin-top:0!important;}
-.app-eval-body p+p{margin-top:0!important;}
 .out-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px;}
 .out-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:11px 13px;}
 .out-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;}
@@ -212,8 +128,6 @@ a:hover{text-decoration:underline;}
 .comp-name{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
 .comp-desc{font-size:10px;color:var(--dim);line-height:1.5;margin-top:2px;}
 .path-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px;}
-.path-tile{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:14px;text-decoration:none;display:flex;flex-direction:column;gap:4px;transition:border-color .12s;}
-.path-tile:hover{border-color:var(--orange);text-decoration:none;}
 .path-tile-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);}
 .path-tile-title{font-size:12px;font-weight:700;color:var(--text);}
 .path-tile-arrow{font-size:11px;color:var(--orange);margin-top:auto;padding-top:8px;}
@@ -226,38 +140,15 @@ body.dark{
   --orange:#f7931a;--orange-dim:rgba(247,147,26,0.10);--orange-line:rgba(247,147,26,0.35);
   --link:#f7931a;
 }
-body.dark body.dark .site-footer{background:var(--bg);border-color:var(--border);}
 body.dark .card{background:var(--card);border-color:var(--border);}
 body.dark .path-tile{background:var(--card);border-color:var(--border);}
 body.dark .pillar-card{background:var(--card);border-color:var(--border);}
-body.dark body.dark 
 body.dark .section-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-body.dark .km-grid > div{background:var(--card);border-color:var(--border);}
-body.dark 
-body.dark 
-body.dark 
 body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!important;}
-body.dark 
-
-/* ── Featured Research list ── */
-.research-list{border:1px solid var(--border);border-radius:4px;overflow:hidden;}
-.res-row{border-bottom:1px solid var(--border);}
-.res-row:last-child{border-bottom:none;}
-.res-link{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;text-decoration:none;transition:background .12s;background:transparent;}
-.res-link:hover{background:var(--bg2);}
-.res-title{font-size:13px;font-weight:600;color:var(--orange);}
-.res-arrow{color:var(--orange);font-size:12px;flex-shrink:0;margin-left:10px;}
-.res-tip{display:none;padding:10px 16px 13px;font-size:12px;color:var(--muted);line-height:1.65;background:var(--bg2);border-top:1px solid var(--border);}
-.res-row:hover .res-tip{display:block;}
-.res-footer{display:flex;align-items:center;gap:12px;padding:12px 16px;font-size:12px;border-top:1px solid var(--border);background:var(--card);}
-.res-footer a{color:var(--orange);font-weight:600;text-decoration:none;}
-.res-footer a:hover{text-decoration:underline;}
 
 /* ── Responsive / Mobile ── */
-@media(max-width:820px){
-  }
 @media(max-width:680px){
-            main.wrap{padding:0 14px;}
+  main.wrap{padding:0 14px;}
   .hero h1,.hero h2{font-size:20px!important;}
   .card-grid{grid-template-columns:1fr!important;}
   .card-grid.cols2{grid-template-columns:1fr!important;}
@@ -265,9 +156,7 @@ body.dark
   .comp-row{grid-template-columns:1fr 1fr!important;}
   .out-grid{grid-template-columns:1fr 1fr!important;}
   .pillar-grid{grid-template-columns:1fr 1fr!important;}
-  .fw-grid{grid-template-columns:1fr!important;}
   .kv-grid{grid-template-columns:1fr!important;}
-  .m-pillars,.m-eri-row,.m-xc-row,.m-out-cols{grid-template-columns:1fr!important;}
   .bcri-formula-tile{padding:12px 14px;}
   .bft-formula{font-size:14px;}
 }
@@ -275,43 +164,83 @@ body.dark
   .path-grid{grid-template-columns:1fr!important;}
   .comp-row{grid-template-columns:1fr!important;}
   .out-grid{grid-template-columns:1fr!important;}
-  }
+}
 @media(max-width:768px){
   .btn{min-height:44px;padding:10px 16px;}
   .theme-toggle{width:40px;height:40px;}
   .path-tile{padding:16px;}
 }
 
-
-/* Sample output display */
+/* ── Sample output display ── */
 .sample-output{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-top:16px;}
-.sample-output-hdr{padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.sample-output-hdr{padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
 .sample-output-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
 .sample-output-id{font-size:10px;color:var(--dim);font-family:monospace;}
-.sample-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--border);}
+/* Top summary row */
+.sample-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--border);}
 .sample-metric{padding:12px 16px;border-right:1px solid var(--border);}
 .sample-metric:last-child{border-right:none;}
 .sample-metric-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
 .sample-metric-value{font-size:20px;font-weight:900;color:var(--text);letter-spacing:-.02em;line-height:1;}
 .sample-metric-sub{font-size:10px;color:var(--muted);margin-top:3px;}
-.sample-bar-wrap{padding:12px 16px;border-bottom:1px solid var(--border);}
-.sample-bar-track{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;position:relative;}
-.sample-bar-fill{height:100%;background:var(--orange);border-radius:3px;width:78.4%;}
-.sample-bar-marker{position:absolute;top:-3px;left:75%;width:1px;height:12px;background:var(--border2);}
-.sample-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:4px;}
-.sample-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+/* Score bar */
+.sample-bar-wrap{padding:14px 16px;border-bottom:1px solid var(--border);}
+.sample-bar-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+.sample-bar-score-above{position:relative;height:18px;margin-bottom:2px;}
+.sample-bar-score-above span{position:absolute;font-size:11px;font-weight:800;color:var(--text);transform:translateX(-50%);}
+.sample-bar-track{height:8px;background:var(--bg2);border-radius:4px;position:relative;margin-bottom:0;}
+.sample-bar-fill{height:100%;background:var(--dim);border-radius:4px 0 0 4px;}
+.sample-bar-mk{position:absolute;top:-5px;width:2px;height:18px;border-radius:1px;}
+.sample-bar-mk-floor{background:var(--border2);left:65%;}
+.sample-bar-mk-thresh{background:var(--orange);left:75%;}
+.sample-bar-annot{position:relative;height:20px;margin-top:6px;}
+.sample-bar-annot span{position:absolute;font-size:8px;transform:translateX(-50%);}
+/* Rating scale 2-col */
+.rating-scale{display:grid;grid-template-columns:1fr 1fr;gap:1px 4px;}
+.rating-item{display:flex;align-items:center;gap:5px;padding:2px 4px;border-radius:2px;font-size:10px;font-weight:600;color:var(--muted);}
+.rating-item.current{background:var(--orange-dim);color:var(--text);font-weight:800;}
+.rating-item .ri-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0;}
+.rating-item.current .ri-dot{background:var(--orange);}
+.rating-item .ri-here{font-size:8px;color:var(--orange);font-weight:700;margin-left:auto;white-space:nowrap;}
+/* Radar chart */
+#pillar-radar{display:block;width:100%;max-width:180px;margin:0 auto;}
+/* Lower section 3-col grid */
+.sample-lower{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
+.sample-lower-col{padding:12px 14px;border-right:1px solid var(--border);}
+.sample-lower-col:last-child{border-right:none;}
+.sample-col-title{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+.sample-col-hint{font-size:9px;color:var(--dim);margin-bottom:8px;}
+/* Risk indicator tiles */
+.risk-tile{padding:8px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;margin-bottom:5px;}
+.risk-tile:last-child{margin-bottom:0;}
+.risk-tile-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;}
+.risk-tile-label{font-size:10px;font-weight:700;color:var(--muted);}
+.risk-tile-val{font-size:13px;font-weight:900;color:var(--text);}
+.risk-tile-track{height:3px;background:var(--border);border-radius:2px;}
+.risk-tile-fill{height:100%;border-radius:2px;}
+.risk-tile-sub{font-size:9px;color:var(--dim);margin-top:3px;}
+.risk-tile-interp{font-size:9px;color:var(--dim);font-style:italic;margin-top:2px;}
+/* Bottom cols gap+path */
+.sample-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
 .sample-col{padding:12px 16px;}
 .sample-col:first-child{border-right:1px solid var(--border);}
-.sample-col-title{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;}
 .sample-col ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
 .sample-col li{font-size:12px;color:var(--muted);display:flex;align-items:baseline;gap:6px;line-height:1.4;}
 .sample-col li::before{content:'·';color:var(--orange);flex-shrink:0;}
-.sample-note{padding:8px 16px;font-size:10px;color:var(--dim);font-style:italic;border-top:1px solid var(--border);}
+.sample-note{padding:8px 16px;font-size:10px;color:var(--dim);font-style:italic;}
+/* Mobile */
 @media(max-width:680px){
   .sample-metrics{grid-template-columns:1fr!important;}
   .sample-metric{border-right:none!important;border-bottom:1px solid var(--border);}
+  .sample-lower{grid-template-columns:1fr!important;}
+  .sample-lower-col{border-right:none!important;border-bottom:1px solid var(--border);}
+  .sample-lower-col:last-child{border-bottom:none;}
   .sample-cols{grid-template-columns:1fr!important;}
   .sample-col:first-child{border-right:none;border-bottom:1px solid var(--border);}
+  .rating-scale{grid-template-columns:1fr 1fr!important;}
+  .sample-bar-annot{height:26px;margin-top:8px;}
+  .sample-bar-annot span{font-size:7.5px;}
+  .sample-frontier-wrap{padding-bottom:6px;}
 }
 
 /* ── Viewer (canonical) ── */
@@ -320,10 +249,8 @@ body.dark
 .viewerHead a{font-size:12px;font-weight:600;color:var(--orange);text-decoration:none;}
 .viewerHead a:hover{text-decoration:underline;}
 .viewerFrame{width:100%;height:85vh;min-height:750px;border:0;display:block;}
-/* ── Why-list ── */
 .why-list{padding-left:18px;display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
 .why-list li{font-size:14px;color:var(--muted);line-height:1.65;}
-/* ── Mobile viewer ── */
 @media(max-width:680px){.viewerFrame{height:70vh;min-height:500px;}}
 </style>
 <script data-goatcounter="https://bcs.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
@@ -358,66 +285,333 @@ body.dark
     <p class="hero-sub">Five structured evaluation outputs produced by applying the Bitcoin Custody Standard framework.</p>
   </section>
 
-
-  <section style="margin-top:32px;" aria-label="Example output" style="margin-top:32px;">
+  <section style="margin-top:32px;" aria-label="Example output">
     <div class="section-title">Example Output</div>
-    <p class="section-intro">A representative BCS evaluation result for a self-managed multisig custody architecture.</p>
+    <p class="section-intro">A benchmark evaluation result for Single-Signature Cold Storage (Standard Implementation). Source: BCS-BR-1.0.</p>
 
     <div class="sample-output" role="region" aria-label="Sample BCS evaluation output">
+
+      <!-- Header -->
       <div class="sample-output-hdr">
         <span class="sample-output-label">BCS Evaluation Output</span>
-        <span class="sample-output-id">Sample · Self-Managed Multisig</span>
+        <span class="sample-output-id">Benchmark · Single-Sig Cold Storage — Regular</span>
       </div>
+
+      <!-- Top summary: BCRI / Rating / Frontier / Status -->
       <div class="sample-metrics">
         <div class="sample-metric">
           <div class="sample-metric-label">BCRI Score</div>
-          <div class="sample-metric-value">78.4</div>
-          <div class="sample-metric-sub">Above sufficiency threshold</div>
+          <div class="sample-metric-value">68.2</div>
+          <div class="sample-metric-sub">BBB− · Below sufficiency threshold</div>
         </div>
         <div class="sample-metric">
-          <div class="sample-metric-label">Resilience Rating</div>
-          <div class="sample-metric-value" style="color:var(--orange);">A</div>
-          <div class="sample-metric-sub">Structurally sufficient</div>
+          <div class="sample-metric-label">BCRI Rating</div>
+          <div class="sample-metric-value" style="color:var(--orange);">BBB−</div>
+          <div class="sample-metric-sub">Minimum structural sufficiency</div>
         </div>
         <div class="sample-metric">
           <div class="sample-metric-label">Frontier Position</div>
-          <div class="sample-metric-value" style="font-size:14px;padding-top:4px;">Above Average</div>
-          <div class="sample-metric-sub">ERE 28.1 · CS 3.8</div>
+          <div class="sample-metric-value" style="font-size:14px;padding-top:4px;">Below Average</div>
+          <div class="sample-metric-sub">ERE 26.8 · CS 2.6</div>
+        </div>
+        <div class="sample-metric">
+          <div class="sample-metric-label">Status</div>
+          <div class="sample-metric-value" style="font-size:14px;padding-top:4px;">Conformant</div>
+          <div class="sample-metric-sub">Above conformance floor</div>
         </div>
       </div>
+
+      <!-- Score bar with floor + threshold markers -->
       <div class="sample-bar-wrap">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">BCRI Score — 0 to 100</div>
-        <div class="sample-bar-track">
-          <div class="sample-bar-fill"></div>
-          <div class="sample-bar-marker" title="Sufficiency threshold at 75"></div>
+        <div class="sample-bar-lbl">BCRI Score — 0 to 100</div>
+        <div class="sample-bar-score-above">
+          <span style="left:68.2%;">68.2</span>
         </div>
-        <div class="sample-bar-labels"><span>0</span><span style="color:var(--dim);">▲ Threshold 75</span><span>100</span></div>
+        <div class="sample-bar-track">
+          <div class="sample-bar-fill" style="width:68.2%;"></div>
+          <div class="sample-bar-mk sample-bar-mk-floor" title="Conformance Floor at 65"></div>
+          <div class="sample-bar-mk sample-bar-mk-thresh" title="Sufficiency Threshold at 75"></div>
+        </div>
+        <div class="sample-bar-annot">
+          <span style="left:0%;color:var(--dim);">0</span>
+          <span style="left:65%;color:var(--dim);">Floor 65</span>
+          <span style="left:75%;color:var(--orange);">Threshold 75</span>
+          <span style="left:100%;color:var(--dim);">100</span>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap;">
+          <span style="font-size:10px;color:var(--muted);">Gap to Threshold: <strong style="color:var(--text);">6.8 points</strong></span>
+          <span style="font-size:10px;color:var(--muted);">Buffer to Conformance Floor: <strong style="color:var(--text);">+3.2 points</strong></span>
+        </div>
       </div>
+
+      <!-- Lower 3-column block -->
+      <div class="sample-lower">
+
+        <!-- Col 1: Core Pillar Profile -->
+        <div class="sample-lower-col">
+          <div class="sample-col-title">Core Pillar Profile</div>
+          <div class="sample-col-hint">Higher is better</div>
+          <!--
+            viewBox: 0 0 480 430
+            Pentagon center: cx=240, cy=215, outer radius r=126
+            Angles clockwise from top: CI=270°, PD=342°, OD=54°, CR=126°, TR=198°
+            Outer ring (r=126):
+              CI:  (240, 215-126) = (240, 89)
+              PD:  (240+126*cos(-18°), 215+126*sin(-18°)) = (240+119.8,215-38.9) = (359.8, 176.1)
+              OD:  (240+126*cos(54°), 215+126*sin(54°))   = (240+74.1,215+102.0) = (314.1, 317.0)
+              CR:  (240+126*cos(126°),215+126*sin(126°))   = (240-74.1,215+102.0) = (165.9, 317.0)
+              TR:  (240+126*cos(198°),215+126*sin(198°))   = (240-119.8,215-38.9) = (120.2, 176.1)
+            Data polygon (scaled):
+              CI=86:  (240, 215-126*0.86) = (240, 215-108.4) = (240, 106.6)
+              PD=83:  (240+126*0.83*cos(-18°), 215+126*0.83*sin(-18°)) = (240+99.4,215-32.3) = (339.4, 182.7)
+              OD=65:  (240+126*0.65*cos(54°),  215+126*0.65*sin(54°))  = (240+48.2,215+66.3)  = (288.2, 281.3)
+              CR=75:  (240+126*0.75*cos(126°), 215+126*0.75*sin(126°)) = (240-55.6,215+76.5)  = (184.4, 291.5)
+              TR=52:  (240+126*0.52*cos(198°), 215+126*0.52*sin(198°)) = (240-62.3,215-20.2)  = (177.7, 194.8)
+          -->
+          <svg viewBox="0 0 480 430" xmlns="http://www.w3.org/2000/svg" aria-label="Core Pillar Profile radar chart" style="display:block;width:100%;max-width:none;height:auto;margin:8px auto 0;">
+            <!-- Grid rings at 100%, 75%, 50%, 25% of r=126 -->
+            <g opacity="0.3">
+              <!-- 100% -->
+              <polygon points="240,89 359.8,176.1 314.1,317 165.9,317 120.2,176.1" fill="none" stroke="var(--border2)" stroke-width="1.4"/>
+              <!-- 75% r=94.5 -->
+              <polygon points="240,120.5 329.9,191.1 294.1,291.3 185.9,291.3 150.1,191.1" fill="none" stroke="var(--border2)" stroke-width="0.9"/>
+              <!-- 50% r=63 -->
+              <polygon points="240,152 299.9,206.1 277.1,265.5 202.9,265.5 180.1,206.1" fill="none" stroke="var(--border2)" stroke-width="0.9"/>
+              <!-- 25% r=31.5 -->
+              <polygon points="240,183.5 270,221.1 258.5,239.8 221.5,239.8 210,221.1" fill="none" stroke="var(--border2)" stroke-width="0.6"/>
+              <!-- Axis lines -->
+              <line x1="240" y1="215" x2="240" y2="89" stroke="var(--border2)" stroke-width="0.9"/>
+              <line x1="240" y1="215" x2="359.8" y2="176.1" stroke="var(--border2)" stroke-width="0.9"/>
+              <line x1="240" y1="215" x2="314.1" y2="317" stroke="var(--border2)" stroke-width="0.9"/>
+              <line x1="240" y1="215" x2="165.9" y2="317" stroke="var(--border2)" stroke-width="0.9"/>
+              <line x1="240" y1="215" x2="120.2" y2="176.1" stroke="var(--border2)" stroke-width="0.9"/>
+            </g>
+            <!-- Data polygon -->
+            <polygon
+              points="240,106.6 339.4,182.7 288.2,281.3 184.4,291.5 177.7,194.8"
+              fill="rgba(247,147,26,0.13)"
+              stroke="var(--orange)"
+              stroke-width="2.2"
+              stroke-linejoin="round"
+            />
+            <!-- Data points -->
+            <circle cx="240" cy="106.6" r="4" fill="var(--orange)"/>
+            <circle cx="339.4" cy="182.7" r="4" fill="var(--orange)"/>
+            <circle cx="288.2" cy="281.3" r="4" fill="var(--orange)"/>
+            <circle cx="184.4" cy="291.5" r="4" fill="var(--orange)"/>
+            <circle cx="177.7" cy="194.8" r="4" fill="var(--orange)"/>
+
+            <!-- CI — top, centred -->
+            <text x="240" y="64" text-anchor="middle" font-size="13" fill="var(--muted)" font-family="system-ui" font-weight="600">Cryptographic Integrity</text>
+            <text x="240" y="80" text-anchor="middle" font-size="14" fill="var(--text)" font-family="system-ui" font-weight="800">86</text>
+
+            <!-- PD — top-right -->
+            <text x="372" y="163" text-anchor="start" font-size="13" fill="var(--muted)" font-family="system-ui" font-weight="600">Physical</text>
+            <text x="372" y="178" text-anchor="start" font-size="13" fill="var(--muted)" font-family="system-ui" font-weight="600">Distribution</text>
+            <text x="372" y="194" text-anchor="start" font-size="14" fill="var(--text)" font-family="system-ui" font-weight="800">83</text>
+
+            <!-- OD — bottom-right -->
+            <text x="324" y="332" text-anchor="start" font-size="13" fill="var(--muted)" font-family="system-ui" font-weight="600">Operational</text>
+            <text x="324" y="347" text-anchor="start" font-size="13" fill="var(--muted)" font-family="system-ui" font-weight="600">Dependency</text>
+            <text x="324" y="363" text-anchor="start" font-size="14" fill="var(--text)" font-family="system-ui" font-weight="800">65</text>
+
+            <!-- CR — bottom-left -->
+            <text x="156" y="332" text-anchor="end" font-size="13" fill="var(--muted)" font-family="system-ui" font-weight="600">Cognitive</text>
+            <text x="156" y="347" text-anchor="end" font-size="13" fill="var(--muted)" font-family="system-ui" font-weight="600">Reliability</text>
+            <text x="156" y="363" text-anchor="end" font-size="14" fill="var(--text)" font-family="system-ui" font-weight="800">75</text>
+
+            <!-- TR — top-left -->
+            <text x="108" y="163" text-anchor="end" font-size="13" fill="var(--muted)" font-family="system-ui" font-weight="600">Temporal</text>
+            <text x="108" y="178" text-anchor="end" font-size="13" fill="var(--muted)" font-family="system-ui" font-weight="600">Resilience</text>
+            <text x="108" y="194" text-anchor="end" font-size="14" fill="var(--text)" font-family="system-ui" font-weight="800">52</text>
+          </svg>
+        </div>
+
+        <!-- Col 2: Structural Risk Indicators -->
+        <div class="sample-lower-col">
+          <div class="sample-col-title">Structural Risk Indicators</div>
+          <div class="sample-col-hint">&nbsp;</div>
+          <div class="risk-tile">
+            <div class="risk-tile-top">
+              <span class="risk-tile-label">Custodial Entropy (ERI)</span>
+              <span class="risk-tile-val">39</span>
+            </div>
+            <div class="risk-tile-track"><div class="risk-tile-fill" style="width:39.4%;background:var(--dim);"></div></div>
+            <div class="risk-tile-sub">LEI 26 · CEI 63</div>
+            <div class="risk-tile-interp">Lower is better</div>
+          </div>
+          <div class="risk-tile">
+            <div class="risk-tile-top">
+              <span class="risk-tile-label">Exposure Surface (XRI)</span>
+              <span class="risk-tile-val">21</span>
+            </div>
+            <div class="risk-tile-track"><div class="risk-tile-fill" style="width:21.4%;background:var(--dim);"></div></div>
+            <div class="risk-tile-interp">Lower is better</div>
+          </div>
+          <div class="risk-tile">
+            <div class="risk-tile-top">
+              <span class="risk-tile-label">Coordination Health (CHS)</span>
+              <span class="risk-tile-val">64</span>
+            </div>
+            <div class="risk-tile-track"><div class="risk-tile-fill" style="width:63.5%;background:var(--orange);opacity:.6;"></div></div>
+            <div class="risk-tile-interp">Higher is better</div>
+          </div>
+        </div>
+
+        <!-- Col 3: BCRI Rating -->
+        <div class="sample-lower-col">
+          <div class="sample-col-title">BCRI Rating</div>
+          <div class="sample-col-hint">&nbsp;</div>
+          <div class="rating-scale">
+            <div class="rating-item"><span class="ri-dot"></span>AAA</div>
+            <div class="rating-item"><span class="ri-dot"></span>AA+</div>
+            <div class="rating-item"><span class="ri-dot"></span>AA</div>
+            <div class="rating-item"><span class="ri-dot"></span>AA−</div>
+            <div class="rating-item"><span class="ri-dot"></span>A+</div>
+            <div class="rating-item"><span class="ri-dot"></span>A</div>
+            <div class="rating-item"><span class="ri-dot"></span>A−</div>
+            <div class="rating-item"><span class="ri-dot"></span>BBB+</div>
+            <div class="rating-item"><span class="ri-dot"></span>BBB</div>
+            <div class="rating-item current"><span class="ri-dot"></span>BBB−<span class="ri-here">You are here</span></div>
+            <div class="rating-item"><span class="ri-dot"></span>BB+</div>
+            <div class="rating-item"><span class="ri-dot"></span>BB</div>
+            <div class="rating-item"><span class="ri-dot"></span>BB−</div>
+            <div class="rating-item"><span class="ri-dot"></span>B+</div>
+            <div class="rating-item"><span class="ri-dot"></span>B</div>
+            <div class="rating-item"><span class="ri-dot"></span>B−</div>
+            <div class="rating-item"><span class="ri-dot"></span>CCC</div>
+            <div class="rating-item"><span class="ri-dot"></span>D</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Gap analysis + upgrade path -->
       <div class="sample-cols">
         <div class="sample-col">
           <div class="sample-col-title">Resilience Gap Analysis</div>
           <ul>
-            <li>Coordination dependency risk identified</li>
-            <li>Partial geographic concentration in seed storage</li>
-            <li>Recovery procedure not formally documented</li>
-            <li>No scheduled recovery validation cycle</li>
+            <li>The same device is used for both daily activity and Bitcoin signing operations</li>
+            <li>No personal node; full reliance on third-party servers for transaction verification</li>
+            <li>No verifiable records maintained after custody configuration changes</li>
+            <li>Informal and untested succession and inheritance procedures</li>
+            <li>No structured long-term review or entropy mitigation practices</li>
+            <li>Weak UTXO management, increasing transaction linkage and exposure risk</li>
           </ul>
         </div>
         <div class="sample-col">
           <div class="sample-col-title">Resilience Upgrade Path</div>
           <ul>
-            <li>Add independent signer in separate jurisdiction</li>
-            <li>Implement documented recovery procedure</li>
-            <li>Introduce annual recovery testing protocol</li>
-            <li>Establish succession documentation</li>
+            <li>Establish a documented inheritance and succession plan</li>
+            <li>Maintain and update custody records after any configuration change</li>
+            <li>Separate Bitcoin activity from daily usage (dedicated device or isolated user profile)</li>
+            <li>Operate a personal node for independent transaction verification</li>
+            <li>Improve UTXO management to reduce linkage and exposure</li>
           </ul>
         </div>
       </div>
-      <div class="sample-note">Illustrative output only. Actual evaluations are conducted under the Bitcoin Custody Standard Initiative.</div>
+
+      <!-- Frontier chart -->
+      <div class="sample-frontier-wrap" style="padding:16px 16px 14px;border-top:1px solid var(--border);">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:2px;">BCRI Resilience Efficiency Frontier</div>
+        <div style="font-size:11px;color:var(--dim);margin-bottom:14px;">Position on the benchmark resilience efficiency frontier</div>
+        <!-- Legend -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px 14px;margin-bottom:16px;font-size:11px;color:var(--muted);">
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#fca5a5;border:1.5px solid #f87171;flex-shrink:0;display:inline-block;"></span>No Sovereignty</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#fde68a;border:1.5px solid #d97706;flex-shrink:0;display:inline-block;"></span>Single-Key</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#bfdbfe;border:1.5px solid #2563eb;flex-shrink:0;display:inline-block;"></span>Collaborative</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#bbf7d0;border:1.5px solid #059669;flex-shrink:0;display:inline-block;"></span>Distributed</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#e9d5ff;border:1.5px solid #7c3aed;flex-shrink:0;display:inline-block;"></span>Institutional</span>
+        </div>
+        <!-- Static SVG frontier chart -->
+        <!-- viewBox 0 0 620 380 | plot area L=60 R=580 T=30 B=310 | CS 0-11 ERE -2-36 -->
+        <svg viewBox="0 0 620 355" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;" aria-label="BCRI Resilience Efficiency Frontier chart">
+          <!-- Zone backgrounds -->
+          <!-- No Sovereignty: cs 0-1.5 → x 60-131 -->
+          <rect x="60" y="30" width="71" height="280" fill="rgba(254,202,202,0.18)"/>
+          <!-- Single-Key: cs 1.5-3.5 → x 131-225 -->
+          <rect x="131" y="30" width="94" height="280" fill="rgba(253,230,138,0.15)"/>
+          <!-- Collaborative: cs 3.5-5.5 → x 225-319 -->
+          <rect x="225" y="30" width="94" height="280" fill="rgba(191,219,254,0.15)"/>
+          <!-- Distributed: cs 5.5-7.2 → x 319-399 -->
+          <rect x="319" y="30" width="80" height="280" fill="rgba(187,247,208,0.15)"/>
+          <!-- Institutional: cs 7.2-11 → x 399-580 -->
+          <rect x="399" y="30" width="181" height="280" fill="rgba(233,213,255,0.15)"/>
+          <!-- Zone labels at top -->
+          <text x="95" y="44" text-anchor="middle" font-size="9" fill="#b91c1c" font-family="system-ui" font-weight="700">No Sov.</text>
+          <text x="178" y="44" text-anchor="middle" font-size="9" fill="#92400e" font-family="system-ui" font-weight="700">Single-Key</text>
+          <text x="272" y="44" text-anchor="middle" font-size="9" fill="#1e40af" font-family="system-ui" font-weight="700">Collaborative</text>
+          <text x="359" y="44" text-anchor="middle" font-size="9" fill="#065f46" font-family="system-ui" font-weight="700">Distributed</text>
+          <text x="490" y="44" text-anchor="middle" font-size="9" fill="#4c1d95" font-family="system-ui" font-weight="700">Institutional</text>
+          <!-- Grid lines -->
+          <line x1="60" y1="30" x2="60" y2="310" stroke="var(--border)" stroke-width="1"/>
+          <line x1="60" y1="310" x2="580" y2="310" stroke="var(--border)" stroke-width="1"/>
+          <!-- Y axis tick lines and labels: ERE 0,10,20,30 -->
+          <line x1="56" y1="295" x2="580" y2="295" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <text x="54" y="298" text-anchor="end" font-size="9" fill="var(--dim)" font-family="system-ui">0</text>
+          <line x1="56" y1="221" x2="580" y2="221" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <text x="54" y="224" text-anchor="end" font-size="9" fill="var(--dim)" font-family="system-ui">10</text>
+          <line x1="56" y1="148" x2="580" y2="148" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <text x="54" y="151" text-anchor="end" font-size="9" fill="var(--dim)" font-family="system-ui">20</text>
+          <line x1="56" y1="74" x2="580" y2="74" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3,3"/>
+          <text x="54" y="77" text-anchor="end" font-size="9" fill="var(--dim)" font-family="system-ui">30</text>
+          <!-- X axis tick labels: CS 0,2,4,6,8,10 -->
+          <text x="60" y="323" text-anchor="middle" font-size="9" fill="var(--dim)" font-family="system-ui">0</text>
+          <text x="155" y="323" text-anchor="middle" font-size="9" fill="var(--dim)" font-family="system-ui">2</text>
+          <text x="249" y="323" text-anchor="middle" font-size="9" fill="var(--dim)" font-family="system-ui">4</text>
+          <text x="344" y="323" text-anchor="middle" font-size="9" fill="var(--dim)" font-family="system-ui">6</text>
+          <text x="438" y="323" text-anchor="middle" font-size="9" fill="var(--dim)" font-family="system-ui">8</text>
+          <text x="533" y="323" text-anchor="middle" font-size="9" fill="var(--dim)" font-family="system-ui">10</text>
+          <!-- Axis titles -->
+          <text x="320" y="342" text-anchor="middle" font-size="10" fill="var(--dim)" font-family="system-ui">Complexity Score (CS)</text>
+          <text x="14" y="170" text-anchor="middle" font-size="10" fill="var(--dim)" font-family="system-ui" transform="rotate(-90,14,170)">ERE = (BCRI−25)÷√CS</text>
+          <!-- Frontier curve -->
+          <polyline
+            points="62.4,294.2 68.7,287.8 77.3,275.5 86.0,261.1 94.7,245.8 103.3,230.2 112.0,214.9 120.7,200.0 129.3,185.8 138.0,172.4 146.7,160.0 155.3,148.5 164.0,138.0 172.7,128.5 181.3,120.0 190.0,112.4 198.7,105.8 207.3,100.2 216.0,95.4 224.7,91.4 233.3,88.2 242.0,85.8 250.7,84.0 259.3,82.9 268.0,82.4 276.7,82.4 285.3,83.0 294.0,84.0 302.7,85.4 311.3,87.3 320.0,89.4 328.7,91.9 337.3,94.7 346.0,97.8 354.7,101.0 363.3,104.5 372.0,108.1 380.7,111.9 389.3,115.7 398.0,119.7 406.7,123.8 415.3,127.9 424.0,132.1 432.7,136.3 441.3,140.5 450.0,144.8 458.7,149.0 467.3,153.2 476.0,157.4 484.7,161.5 493.3,165.6 502.0,169.6 510.7,173.6 519.3,177.6 528.0,181.4 536.7,185.2 545.3,188.9 554.0,192.6 562.7,196.2 571.3,199.6 580.0,203.0"
+            fill="none" stroke="var(--orange)" stroke-width="1.8" stroke-linejoin="round" opacity="0.7"
+          />
+          <!-- Frontier peak marker -->
+          <circle cx="271.7" cy="82.3" r="4" fill="var(--orange)" opacity="0.9"/>
+          <text x="278" y="73" font-size="8.5" fill="var(--orange)" font-family="system-ui" font-weight="700">Peak CS 4.5</text>
+          <!-- Data points — normal (r=5) -->
+          <!-- No Sovereignty -->
+          <circle cx="107.3" cy="295.3" r="5" fill="#fca5a5" stroke="#f87171" stroke-width="1.5"/>
+          <circle cx="126.2" cy="295.3" r="5" fill="#fca5a5" stroke="#f87171" stroke-width="1.5"/>
+          <!-- Single-Key (non-highlighted) -->
+          <circle cx="286.9" cy="96.7"  r="5" fill="#fde68a" stroke="#d97706" stroke-width="1.5"/>
+          <!-- Distributed -->
+          <circle cx="268.0" cy="114.0" r="5" fill="#bbf7d0" stroke="#059669" stroke-width="1.5"/>
+          <circle cx="324.7" cy="94.2"  r="5" fill="#bbf7d0" stroke="#059669" stroke-width="1.5"/>
+          <circle cx="353.1" cy="80.8"  r="5" fill="#bbf7d0" stroke="#059669" stroke-width="1.5"/>
+          <!-- Collaborative -->
+          <circle cx="220.7" cy="78.6"  r="5" fill="#bfdbfe" stroke="#2563eb" stroke-width="1.5"/>
+          <circle cx="277.5" cy="99.6"  r="5" fill="#bfdbfe" stroke="#2563eb" stroke-width="1.5"/>
+          <circle cx="305.8" cy="64.2"  r="5" fill="#bfdbfe" stroke="#2563eb" stroke-width="1.5"/>
+          <!-- Institutional -->
+          <circle cx="409.8" cy="120.3" r="5" fill="#e9d5ff" stroke="#7c3aed" stroke-width="1.5"/>
+          <circle cx="447.6" cy="174.4" r="5" fill="#e9d5ff" stroke="#7c3aed" stroke-width="1.5"/>
+          <circle cx="476.0" cy="169.9" r="5" fill="#e9d5ff" stroke="#7c3aed" stroke-width="1.5"/>
+          <circle cx="504.4" cy="130.1" r="5" fill="#e9d5ff" stroke="#7c3aed" stroke-width="1.5"/>
+          <!-- Highlighted point: Single-Sig Cold Storage — Regular (CS=2.6, ERE=26.8) -->
+          <!-- Annotation: tighter box, left-offset, short diagonal leader -->
+          <defs>
+            <marker id="arr" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto">
+              <path d="M0,0 L0,5 L5,2.5 z" fill="var(--dim)"/>
+            </marker>
+          </defs>
+          <rect x="86" y="74" width="88" height="16" rx="2" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>
+          <text x="130" y="85.5" text-anchor="middle" font-size="9" fill="var(--text)" font-family="system-ui" font-weight="700">You are here</text>
+          <line x1="174" y1="82" x2="179" y2="91" stroke="var(--dim)" stroke-width="1" marker-end="url(#arr)"/>
+          <!-- Highlighted dot last so it renders on top -->
+          <circle cx="182.9" cy="97.8" r="8" fill="#fde68a" stroke="#d97706" stroke-width="2.5"/>
+        </svg>
+      </div>
+
+      <div class="sample-note">Benchmark output. Single-Signature Cold Storage (Standard Implementation). Source: BCS-BR-1.0. &nbsp;·&nbsp; Conformance Floor: 65 &nbsp;·&nbsp; Sufficiency Threshold: 75</div>
     </div>
   </section>
 
-  <section style="margin-top:32px;" aria-label="Output definitions" style="margin-top:32px;">
+  <section style="margin-top:32px;" aria-label="Output definitions">
     <div style="display:flex;flex-direction:column;gap:12px;">
 
       <article class="accent-card" aria-label="BCRI Score">
@@ -428,9 +622,9 @@ body.dark
         <p class="card-body" style="margin-top:8px;">Numerical composite measure from 0 to 100 across architecture, entropy, exposure, and coordination. Subject to entropy degradation without active maintenance.</p>
       </article>
 
-      <article class="accent-card" aria-label="Resilience Rating">
+      <article class="accent-card" aria-label="BCRI Rating">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-          <div class="card-title" style="font-size:15px;">Resilience Rating</div>
+          <div class="card-title" style="font-size:15px;">BCRI Rating</div>
           <span class="badge">AAA → Floor</span>
         </div>
         <p class="card-body" style="margin-top:8px;">Standardized tiered classification from AAA to Floor. Based on score relative to the Resilience Sufficiency Threshold of BCRI 75.</p>
@@ -463,7 +657,7 @@ body.dark
     </div>
   </section>
 
-  <section style="margin-top:32px;" aria-label="Interpretation" style="margin-top:32px;">
+  <section style="margin-top:32px;" aria-label="Interpretation">
     <div class="section-title">Interpretation Reference</div>
     <div class="card-grid">
       <div class="card"><div class="card-title">Resilience Sufficiency Threshold</div><p class="card-body" style="margin-top:4px;">Minimum BCRI of 75 required for structural sufficiency. Architectures below this threshold are considered structurally insufficient regardless of other factors.</p></div>
