@@ -342,6 +342,19 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
     <div style="border:1px solid var(--border);border-radius:4px;overflow:hidden;">
 
       <div class="pub-entry"
+           data-key="insights-21"
+           data-label="Framework Insights"
+           data-title="21 Custody Insights"
+           data-summary="A scannable framework entry point: 21 structural insights on how Bitcoin custody systems fail, degrade, and remain recoverable across time."
+           data-url="https://bitcoincustodystandard.org/21-things/"
+           data-img="https://bitcoincustodystandard.org/21-things-bitcoin-holders-still-get-wrong-about-custody.png">
+        <a href="/21-things/">
+          <div><div style="font-size:13px;font-weight:700;color:var(--text);">21 Custody Insights</div><div style="font-size:11px;color:var(--dim);margin-top:2px;">A scannable entry point into the framework through 21 structural custody insights · April 2026</div></div>
+          <span style="font-size:12px;color:var(--orange);flex-shrink:0;">↗</span>
+        </a>
+      </div>
+
+      <div class="pub-entry"
            data-key="start-here"
            data-label="Introduction"
            data-title="Start Here — The Bitcoin Custody Standard"
@@ -528,6 +541,12 @@ window.addEventListener('load',sh);window.addEventListener('resize',sh);
      Images: use the Substack CDN URL pattern for each article's OG image.
      If an image 404s the img element is hidden gracefully. */
   var META = {
+    'insights-21': {
+      label:   'Framework Insights',
+      title:   '21 Custody Insights',
+      desc:    'A scannable framework entry point: 21 structural insights on how Bitcoin custody systems fail, degrade, and remain recoverable across time.',
+      img:     'https://bitcoincustodystandard.org/21-things-bitcoin-holders-still-get-wrong-about-custody.png'
+    },
     'start-here': {
       label:   'Introduction',
       title:   'Start Here — The Bitcoin Custody Standard',
