@@ -155,6 +155,25 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
   transition:background .12s;
 }
 .pub-entry > a:hover{background:var(--bg2);}
+.pub-entry-featured{
+  border:1px solid var(--orange-line);
+  background:linear-gradient(
+    to right,
+    rgba(247,147,26,0.06),
+    rgba(247,147,26,0.02)
+  );
+}
+.pub-entry-featured > a{
+  border-left:3px solid var(--orange);
+}
+.pub-entry-featured:hover{
+  border-color:var(--orange);
+  background:linear-gradient(
+    to right,
+    rgba(247,147,26,0.10),
+    rgba(247,147,26,0.03)
+  );
+}
 
 /* ── Hover preview card ── */
 #pub-preview{
@@ -341,17 +360,16 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
     <div class="section-title">Featured Publications</div>
     <div style="border:1px solid var(--border);border-radius:4px;overflow:hidden;">
 
-      <div class="pub-entry"
+      <div class="pub-entry pub-entry-featured"
            data-key="insights-21"
            data-label="Interactive Card Experience"
            data-title="21 Custody Insights"
            data-summary="A visual card-based guide to 21 structural custody insights, including complexity, entropy, recoverability, coordination, and long-horizon failure modes."
            data-url="https://bitcoincustodystandard.org/21-things/"
-           data-img="https://bitcoincustodystandard.org/21-things-bitcoin-holders-still-get-wrong-about-custody.png"
-           style="border-left:3px solid var(--orange);background:rgba(247,147,26,0.04);">
-        <a href="/21-things/" rel="noopener" style="background:transparent;">
-          <div><div style="font-size:13px;font-weight:700;color:var(--orange);">21 Custody Insights</div><div style="font-size:11px;color:var(--dim);margin-top:2px;">A visual entry point into the framework through 21 structural custody insights · April 2026</div></div>
-          <span style="font-size:12px;color:var(--orange);flex-shrink:0;">↗</span>
+           data-img="">
+        <a href="/21-things/">
+          <div><div style="font-size:13px;font-weight:700;color:var(--text);">21 Custody Insights</div><div style="font-size:11px;color:var(--dim);margin-top:2px;">Interactive visual guide to 21 structural custody insights · April 2026</div></div>
+          <span style="font-size:12px;color:var(--orange);flex-shrink:0;">→</span>
         </a>
       </div>
 
@@ -576,7 +594,7 @@ window.addEventListener('load',sh);window.addEventListener('resize',sh);
       label: 'Interactive Card Experience',
       title: '21 Custody Insights',
       desc: 'A visual card-based guide to 21 structural custody insights, including complexity, entropy, recoverability, coordination, and long-horizon failure modes.',
-      img: 'https://bitcoincustodystandard.org/21-things-bitcoin-holders-still-get-wrong-about-custody.png'
+      img: ''
     }
   };
 
@@ -608,30 +626,28 @@ window.addEventListener('load',sh);window.addEventListener('resize',sh);
 
   function show(entry, e) {
     clearTimeout(hideTimer);
-
-    var key = entry.dataset.key;
+    var key  = entry.dataset.key;
     var meta = META[key];
     if (!meta) return;
-
     prevLabel.textContent = meta.label;
     prevTitle.textContent = meta.title;
     prevDesc.textContent  = meta.desc;
-
-    prevImg.classList.remove('hidden');
-    prevImg.onerror = function() {
-      if (prevImg.src !== FALLBACK_IMG) {
-        prevImg.src = FALLBACK_IMG;
-      } else {
+    if (meta.img && meta.img.trim() !== '') {
+      prevImg.src = meta.img;
+      prevImg.alt = meta.title;
+      prevImg.classList.remove('hidden');
+      prevImg.onerror = function() {
         prevImg.classList.add('hidden');
-      }
-    };
-    prevImg.src = meta.img;
-    prevImg.alt = meta.title;
-
+        prevImg.removeAttribute('src');
+      };
+    } else {
+      prevImg.classList.add('hidden');
+      prevImg.removeAttribute('src');
+      prevImg.alt = '';
+    }
     preview.style.display = 'block';
     preview.offsetHeight;
     preview.classList.add('visible');
-
     currentEntry = entry;
     position(e);
   }
@@ -648,18 +664,12 @@ window.addEventListener('load',sh);window.addEventListener('resize',sh);
     }, 80);
   }
 
-  var entries = document.querySelectorAll('.pub-entry');
+  var entries = document.querySelectorAll('.pub-entry[data-key="insights-21"]');
   entries.forEach(function(entry) {
-    entry.addEventListener('mouseenter', function(e) {
-      show(entry, e);
-    });
-
-    entry.addEventListener('mouseleave', function() {
-      hide();
-    });
-
+    entry.addEventListener('mouseenter', function(e) { show(entry, e); });
+    entry.addEventListener('mouseleave', hide);
     entry.addEventListener('mousemove', function(e) {
-      if (currentEntry === entry) position(e);
+      if (currentEntry === entry) { position(e); }
     });
   });
 })();
