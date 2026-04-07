@@ -598,6 +598,23 @@
   .mini-dot.current-act-1 { background: #b03a2e; transform: scale(1.5); }
   .mini-dot.current-act-2 { background: #f7931a; transform: scale(1.5); }
   .mini-dot.current-act-3 { background: #2a7a6a; transform: scale(1.5); }
+
+  /* ── HOME LINK (TOP BAR) ── */
+  #home-link {
+    font-size: 11px;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    font-family: 'Source Serif 4', serif;
+    transition: opacity 0.2s ease;
+    flex-shrink: 0;
+  }
+  #home-link:hover { opacity: 1; color: var(--orange); }
+
+  /* ── REMOVE BOTTOM NAV ON MOBILE (SWIPE ONLY) ── */
+  @media (max-width: 600px) {
+    #nav { display: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -638,6 +655,7 @@
   <div id="topbar">
     <div class="brand"><span class="bcs">BCS</span><span class="sep">|</span><span class="full">Bitcoin Custody Standard</span></div>
     <div id="counter"><span class="cur" id="cur-num">1</span> <span style="opacity:.3">/</span> 21</div>
+    <a href="https://bitcoincustodystandard.org/" id="home-link">← Home</a>
   </div>
   <div id="progress-track"><div id="progress-fill" style="width:4.76%"></div></div>
   <div id="mini-dots"></div>
@@ -1230,6 +1248,28 @@ window.addEventListener('keydown', (e) => {
 
 buildCards();
 updateUI();
+
+/* ── ADD "GO HOME" BUTTON TO COMPLETION SCREEN ── */
+(function() {
+  const completion = document.getElementById('completion');
+  if (completion && !document.getElementById('home-btn')) {
+    const btn = document.createElement('a');
+    btn.id = 'home-btn';
+    btn.href = 'https://bitcoincustodystandard.org/';
+    btn.textContent = 'Go to Home →';
+    btn.style.marginTop = '12px';
+    btn.style.display = 'inline-block';
+    btn.style.padding = '13px 32px';
+    btn.style.border = '1.5px solid #f7931a';
+    btn.style.color = '#f7931a';
+    btn.style.textDecoration = 'none';
+    btn.style.fontFamily = "'Playfair Display', serif";
+    btn.style.fontSize = '13px';
+    btn.style.letterSpacing = '1px';
+    btn.style.borderRadius = '2px';
+    completion.querySelector('.completion-restart').after(btn);
+  }
+})();
 </script>
 </body>
 </html>
