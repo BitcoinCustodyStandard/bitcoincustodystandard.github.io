@@ -160,7 +160,7 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
 #pub-preview{
   position:fixed;
   z-index:9999;
-  width:340px;
+  width:300px;
   background:var(--card);
   border:1px solid var(--border);
   border-radius:6px;
@@ -349,7 +349,7 @@ body.dark [style*="border:1px solid var(--border)"]{border-color:var(--border)!i
            data-url="https://bitcoincustodystandard.org/21-things/"
            data-img="https://bitcoincustodystandard.org/21-things-bitcoin-holders-still-get-wrong-about-custody.png"
            style="border-left:3px solid var(--orange);background:rgba(247,147,26,0.04);">
-        <a href="/21-things/" style="background:transparent;">
+        <a href="/21-things/" rel="noopener" style="background:transparent;">
           <div><div style="font-size:13px;font-weight:700;color:var(--orange);">21 Custody Insights</div><div style="font-size:11px;color:var(--dim);margin-top:2px;">A visual entry point into the framework through 21 structural custody insights · April 2026</div></div>
           <span style="font-size:12px;color:var(--orange);flex-shrink:0;">↗</span>
         </a>
@@ -542,41 +542,41 @@ window.addEventListener('load',sh);window.addEventListener('resize',sh);
      Images: use the Substack CDN URL pattern for each article's OG image.
      If an image 404s the img element is hidden gracefully. */
   var META = {
-    'insights-21': {
-      label:   'Interactive Card Experience',
-      title:   '21 Custody Insights',
-      desc:    'A visual card-based guide to 21 structural custody insights, including complexity, entropy, recoverability, coordination, and long-horizon failure modes.',
-      img:     'https://bitcoincustodystandard.org/21-things-bitcoin-holders-still-get-wrong-about-custody.png'
-    },
     'start-here': {
-      label:   'Introduction',
-      title:   'Start Here — The Bitcoin Custody Standard',
-      desc:    'Entry point to the BCS research series. Covers the framework structure, key concepts, and how to navigate the standard.',
-      img:     'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F2dc587f3-774d-428f-a4de-ac9de1c24f14_1536x1024.png'
+      label: 'Introduction',
+      title: 'Start Here — The Bitcoin Custody Standard',
+      desc: 'Entry point to the BCS research series. Covers the framework structure, key concepts, and how to navigate the standard.',
+      img: 'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F2dc587f3-774d-428f-a4de-ac9de1c24f14_1536x1024.png'
     },
     'case-for': {
-      label:   'Research Series, Article 1',
-      title:   'The Case for a Bitcoin Custody Standard',
-      desc:    'Why custody must be evaluated as a structural system — not a device choice or a provider relationship.',
-      img:     'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fd40662c0-a753-4abc-a7b5-66de6385bf5b_1536x1024.png'
+      label: 'Research Series, Article 1',
+      title: 'The Case for a Bitcoin Custody Standard',
+      desc: 'Why custody must be evaluated as a structural system — not a device choice or a provider relationship.',
+      img: 'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fd40662c0-a753-4abc-a7b5-66de6385bf5b_1536x1024.png'
     },
     'entropy': {
-      label:   'Research Series, Article 2',
-      title:   'Custodial Entropy: The Silent Failure Mode',
-      desc:    'A custody system can be cryptographically sound and simultaneously unrecoverable. Entropy accumulates silently.',
-      img:     'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fb034fc71-11b0-433a-869c-20d022d8dded_1536x1024.png'
+      label: 'Research Series, Article 2',
+      title: 'Custodial Entropy: The Silent Failure Mode',
+      desc: 'A custody system can be cryptographically sound and simultaneously unrecoverable. Entropy accumulates silently.',
+      img: 'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fb034fc71-11b0-433a-869c-20d022d8dded_1536x1024.png'
     },
     'paradox': {
-      label:   'Research Series, Article 3',
-      title:   'The Custodial Paradox',
-      desc:    'Adding complexity can trade one failure mode for another without improving overall resilience.',
-      img:     'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F878d7659-2c85-490d-a1d8-7924e38d9ff3_1536x1024.png'
+      label: 'Research Series, Article 3',
+      title: 'The Custodial Paradox',
+      desc: 'Adding complexity can trade one failure mode for another without improving overall resilience.',
+      img: 'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F878d7659-2c85-490d-a1d8-7924e38d9ff3_1536x1024.png'
     },
     'institutional-limits': {
-      label:   'Analysis',
-      title:   'Structural Limits of Institutional Bitcoin Custody',
-      desc:    'Analytical commentary on institutional custody structure, dependency concentration, and long-horizon resilience limits.',
-      img:     'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F42413f1d-9870-46cb-ad52-90a218312647_2000x810.png'
+      label: 'Analysis',
+      title: 'Structural Limits of Institutional Bitcoin Custody',
+      desc: 'Analytical commentary on institutional custody structure, dependency concentration, and long-horizon resilience limits.',
+      img: 'https://substackcdn.com/image/fetch/w_560,h_292,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F42413f1d-9870-46cb-ad52-90a218312647_2000x810.png'
+    },
+    'insights-21': {
+      label: 'Interactive Card Experience',
+      title: '21 Custody Insights',
+      desc: 'A visual card-based guide to 21 structural custody insights, including complexity, entropy, recoverability, coordination, and long-horizon failure modes.',
+      img: 'https://bitcoincustodystandard.org/21-things-bitcoin-holders-still-get-wrong-about-custody.png'
     }
   };
 
@@ -608,37 +608,27 @@ window.addEventListener('load',sh);window.addEventListener('resize',sh);
 
   function show(entry, e) {
     clearTimeout(hideTimer);
-    var key  = entry.dataset.key;
-    var meta = {
-      label: entry.dataset.label || '',
-      title: entry.dataset.title || '',
-      desc: entry.dataset.summary || '',
-      img: entry.dataset.img || ''
-    };
-    if (!meta.label || !meta.title || !meta.desc || !meta.img) {
-      meta = META[key];
-    }
+
+    var key = entry.dataset.key;
+    var meta = META[key];
     if (!meta) return;
 
     prevLabel.textContent = meta.label;
     prevTitle.textContent = meta.title;
     prevDesc.textContent  = meta.desc;
 
-    prevImg.src = meta.img;
-    prevImg.alt = meta.title;
     prevImg.classList.remove('hidden');
-
     prevImg.onerror = function() {
-      /* Try BCS fallback image */
       if (prevImg.src !== FALLBACK_IMG) {
         prevImg.src = FALLBACK_IMG;
       } else {
         prevImg.classList.add('hidden');
       }
     };
+    prevImg.src = meta.img;
+    prevImg.alt = meta.title;
 
     preview.style.display = 'block';
-    /* Force reflow so transition fires */
     preview.offsetHeight;
     preview.classList.add('visible');
 
@@ -660,10 +650,16 @@ window.addEventListener('load',sh);window.addEventListener('resize',sh);
 
   var entries = document.querySelectorAll('.pub-entry');
   entries.forEach(function(entry) {
-    entry.addEventListener('mouseenter', function(e) { show(entry, e); });
-    entry.addEventListener('mouseleave', hide);
-    entry.addEventListener('mousemove',  function(e) {
-      if (currentEntry === entry) { position(e); }
+    entry.addEventListener('mouseenter', function(e) {
+      show(entry, e);
+    });
+
+    entry.addEventListener('mouseleave', function() {
+      hide();
+    });
+
+    entry.addEventListener('mousemove', function(e) {
+      if (currentEntry === entry) position(e);
     });
   });
 })();
