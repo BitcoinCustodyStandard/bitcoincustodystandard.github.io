@@ -1,0 +1,14 @@
+{
+ "reports": [
+  {
+   "id": "2026-10-01-1414",
+   "date": "2026-10-01",
+   "kind": "refresh",
+   "generatedAt": "2026-10-01T18:14:35.322Z",
+   "price": 84843,
+   "regime": "Macro-led"
+  }
+ ],
+ "updated": "2026-10-01T18:14:35.322Z",
+ "timezone": "America/New_York"
+}
