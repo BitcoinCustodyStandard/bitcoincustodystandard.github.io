@@ -377,7 +377,7 @@ async function hyperliquid() {
 }
 
 async function cgDerivatives() {
-  const j = await cg('https://api.coingecko.com/api/v3/derivatives', {}, 30000);
+  const j = await cg('https://api.coingecko.com/api/v3/derivatives', 90000);
   const rows = j.filter((t) => String(t.index_id).toUpperCase() === 'BTC' && /perpetual/i.test(t.contract_type || '') && num(t.open_interest));
   const byMarket = new Map();
   for (const t of rows) {
