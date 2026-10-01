@@ -42,6 +42,8 @@ If the repository secret `ANTHROPIC_API_KEY` is set, each run adds an analyst na
 | Cross-asset | Yahoo Finance: gold & silver futures, DXY, Nasdaq-100, S&P 500, VIX, 10y | daily | |
 | On-chain | Coin Metrics Community (MVRV, realised cap, hash rate, miner revenue), mempool.space, DefiLlama stablecoins | daily | |
 
+**ETF fallback:** if Farside blocks the runner, add rows to `intelligence/data/manual/etf_flows.csv` (`date,total_usd_m,IBIT,FBTC,...`, US$ millions). They fill missing dates only and are labelled as manual in the source table.
+
 **Not available from free sources (shown explicitly on the page):** exchange balances and entity-labelled flows, SOPR/LTH/STH/dormancy/whale cohorts, aggregated liquidation history and observed heatmaps, live CME OI/basis, ETF AUM, IBIT/CME options, executed (vs displayed) depth.
 
 ## Methodology

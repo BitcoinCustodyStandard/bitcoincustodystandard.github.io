@@ -46,6 +46,34 @@ async function gate() {
   return true;
 }
 
+// Optional manual ETF flows (if Farside blocks the runner): data/manual/etf_flows.csv
+// header: date,total_usd_m[,IBIT,FBTC,...]  — values in US$ millions, negative = outflow.
+// Rows only fill dates the scraper does not have; the source is labelled.
+function mergeManualEtf(snap) {
+  const f = path.join(DATA, 'manual', 'etf_flows.csv');
+  if (!fs.existsSync(f)) return;
+  const [hdr, ...lines] = fs.readFileSync(f, 'utf8').trim().split(/\r?\n/);
+  const cols = hdr.split(',').map((c) => c.trim());
+  const have = new Map((snap.etf?.daily || []).map((r) => [r.date, r]));
+  let added = 0;
+  for (const l of lines) {
+    const v = l.split(',').map((c) => c.trim());
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v[0]) || have.has(v[0])) continue;
+    const funds = {};
+    cols.slice(2).forEach((c, i) => { const n = parseFloat(v[i + 2]); if (Number.isFinite(n)) funds[c] = n; });
+    const total = parseFloat(v[1]);
+    if (!Number.isFinite(total)) continue;
+    have.set(v[0], { date: v[0], totalUsdM: total, funds, manual: true });
+    added++;
+  }
+  if (!added) return;
+  const daily = [...have.values()].sort((a, b) => (a.date < b.date ? -1 : 1));
+  snap.etf = { ...(snap.etf || {}), daily };
+  const s = snap.sources.farside || { name: 'Farside Investors — BTC ETF flows', frequency: 'daily' };
+  snap.sources.farside = { ...s, status: s.status === 'ok' ? 'ok' : 'stale', asOf: daily.at(-1).date, method: (s.method || '') + ` Includes ${added} manually entered day(s) from data/manual/etf_flows.csv.` };
+  log(`Merged ${added} manual ETF flow rows.`);
+}
+
 async function main() {
   if (scheduled && !(await gate())) { fs.writeFileSync(path.join(DATA, '.skipped'), '1'); return; }
   try { fs.unlinkSync(path.join(DATA, '.skipped')); } catch {}
@@ -56,6 +84,7 @@ async function main() {
   log(`Collecting (${fixture ? 'fixture ' + fixture : 'live'})…`);
   let snap = fixture ? readJSON(fixture) : await collectAll({ scope: 'server', log });
   snap = mergeWithPrevious(snap, prevSnap);
+  mergeManualEtf(snap);
 
   // First run (or gaps): reconstruct past rows from series that carry history.
   const bf = backfillRows(snap);
