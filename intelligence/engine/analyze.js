@@ -139,7 +139,9 @@ export function computeMetrics(snap, rows) {
       persistence10: pos10 / Math.min(10, etfDaily.length),
       btc5: btcImplied(lastN(5)), btc20: btcImplied(lastN(20)),
       funds5: Object.entries(funds).map(([k, v]) => ({ fund: k, usdM: v })).sort((a, b) => b.usdM - a.usdM),
-      cumulativeUsdM: usd / 1e6, cumulativeBtc: btc, flowBasis: btc > 0 && usd > 0 ? usd / btc : null,
+      // Only meaningful if the series starts at launch (Jan 2024); otherwise it is the basis of a partial window.
+      cumulativeUsdM: usd / 1e6, cumulativeBtc: btc, flowBasis: etfDaily[0].date <= '2024-01-31' && btc > 0 && usd > 0 ? usd / btc : null,
+      fullHistory: etfDaily[0].date <= '2024-01-31', firstDate: etfDaily[0].date,
       ytdUsdM: sum(ytd.map((r) => r.totalUsdM)),
       feb2026UsdM: feb.length ? sum(feb.map((r) => r.totalUsdM)) : null, feb2026Days: feb.length,
       historyDays: etfDaily.length,
@@ -1158,7 +1160,7 @@ export function analyze(snap, rows = []) {
   const feb = compareFeb2026(m);
   const changes = whatChanged(m, rows);
   const top = forces.filter((f) => !f.unavailable).slice(0, 3).map((f) => ({ id: f.id, name: f.name, direction: f.direction, watch: f.watch, state: f.state }));
-  const quality = Object.entries(snap.sources || {}).map(([id, s]) => ({ id, name: s.name, status: s.status, asOf: s.asOf || null, fetchedAt: s.fetchedAt, frequency: s.frequency, method: s.method, url: s.url, error: s.error || s.lastError || null, staleSince: s.staleSince || null }));
+  const quality = Object.entries(snap.sources || {}).map(([id, s]) => ({ id, name: s.name, status: s.status, asOf: s.asOf || null, fetchedAt: s.fetchedAt, frequency: s.frequency, method: s.method, url: s.url, error: s.error || s.lastError || null, note: s.note || null, staleSince: s.staleSince || null }));
   const forceSummary = Object.fromEntries(forces.map((f) => [f.id, { direction: f.direction, importance: f.importance, key: f.key ?? null }]));
   const row = makeRow(snap, m, { regime: regime.primary, move1d: attribution.d1.label, move7d: attribution.d7.label, forces: forceSummary });
   return {

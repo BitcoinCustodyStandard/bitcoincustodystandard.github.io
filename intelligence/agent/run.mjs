@@ -144,6 +144,7 @@ async function main() {
   const ok = a.quality.filter((q) => q.status === 'ok').length;
   log(`Done. ${ok}/${a.quality.length} sources fresh. Regime: ${a.regime.primary}. BTC ${Math.round(a.metrics.price.spot || 0)}.`);
   for (const q of a.quality.filter((q) => q.status !== 'ok')) log(`  ${q.status.toUpperCase()} ${q.id}: ${q.error || ''}`);
+  for (const q of a.quality.filter((q) => q.note)) log(`  NOTE ${q.id}: ${q.note}`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

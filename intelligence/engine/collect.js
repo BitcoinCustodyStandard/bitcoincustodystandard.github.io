@@ -50,7 +50,7 @@ async function attempt(sources, id, fn) {
       src(sources, id, 'error', { error: 'empty response' });
       return null;
     }
-    src(sources, id, 'ok', { asOf: out.__asOf || new Date().toISOString() });
+    src(sources, id, 'ok', { asOf: out.__asOf || new Date().toISOString(), ...(out.note ? { note: out.note } : {}) });
     delete out.__asOf;
     return out;
   } catch (e) {
@@ -60,9 +60,26 @@ async function attempt(sources, id, fn) {
 }
 
 // ---------------------------------------------------------------------------
+// CoinGecko's free tier rate-limits bursts: serialize calls, space them, retry a 429 once.
+let cgChain = Promise.resolve();
+function cg(url, timeout) {
+  const run = async () => {
+    try { return await fetchJSON(url, {}, timeout); }
+    catch (e) {
+      if (e.status !== 429) throw e;
+      await new Promise((r) => setTimeout(r, 15000));
+      return fetchJSON(url, {}, timeout);
+    }
+  };
+  const p = cgChain.then(run);
+  cgChain = p.catch(() => {}).then(() => new Promise((r) => setTimeout(r, 2500)));
+  return p;
+}
+
+// ---------------------------------------------------------------------------
 // PRICE
 async function cgSpot() {
-  const j = await fetchJSON('https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false');
+  const j = await cg('https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false');
   const m = j.market_data;
   return {
     spot: num(m.current_price.usd),
@@ -79,7 +96,7 @@ async function cgSpot() {
 }
 
 async function cgHistory() {
-  const j = await fetchJSON('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365&interval=daily');
+  const j = await cg('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=365&interval=daily');
   const byDate = new Map();
   j.prices.forEach(([t, p], i) => {
     byDate.set(isoDate(t), [isoDate(t), p, num(j.total_volumes[i]?.[1]), num(j.market_caps[i]?.[1])]);
@@ -102,7 +119,7 @@ async function coinbaseHistory() {
 }
 
 async function cgGlobal() {
-  const j = await fetchJSON('https://api.coingecko.com/api/v3/global');
+  const j = await cg('https://api.coingecko.com/api/v3/global');
   const d = j.data;
   return {
     btcDominance: num(d.market_cap_percentage?.btc),
@@ -116,7 +133,7 @@ async function cgGlobal() {
 
 const STABLES = new Set(['usdt', 'usdc', 'dai', 'usde', 'fdusd', 'tusd', 'usdd', 'pyusd', 'usds', 'busd', 'usd1', 'usdtb', 'rlusd', 'susde', 'gusd', 'usdp', 'frax', 'usdg', 'bfusd']);
 async function cgMarkets() {
-  const j = await fetchJSON('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=60&page=1&price_change_percentage=7d,30d');
+  const j = await cg('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=60&page=1&price_change_percentage=7d,30d');
   const coins = j
     .filter((c) => !STABLES.has(String(c.symbol).toLowerCase()) && !/usd|wrapped|staked|bridged/i.test(c.name) && !/^(w|st|cb|j)?(btc|eth)$/i.test(c.symbol) || c.id === 'bitcoin' || c.id === 'ethereum')
     .slice(0, 50)
@@ -360,7 +377,7 @@ async function hyperliquid() {
 }
 
 async function cgDerivatives() {
-  const j = await fetchJSON('https://api.coingecko.com/api/v3/derivatives', {}, 30000);
+  const j = await cg('https://api.coingecko.com/api/v3/derivatives', {}, 30000);
   const rows = j.filter((t) => String(t.index_id).toUpperCase() === 'BTC' && /perpetual/i.test(t.contract_type || '') && num(t.open_interest));
   const byMarket = new Map();
   for (const t of rows) {
@@ -503,6 +520,8 @@ export function parseFarside(html) {
       if (!totalCell || /^[-–]$/.test(totalCell)) continue;
       const total = parseFlowValue(totalCell);
       if (total === null) continue;
+      // Farside pre-fills the current day with zeros before issuers report: an all-zero row is pending, not a $0 day.
+      if (total === 0 && vals.slice(0, -1).every((c) => !c || /^[-–]$/.test(c) || parseFlowValue(c) === 0)) continue;
       const funds = {};
       const fv = vals.slice(0, -1);
       const off = Math.max(0, fv.length - tickers.length);
@@ -515,14 +534,16 @@ export function parseFarside(html) {
   throw new Error(`ETF flow table not found — page "${cellText(title).slice(0, 60)}", ${html.length} bytes, ${tables.length} table(s), IBIT ${/IBIT/.test(html) ? 'present' : 'absent'}`);
 }
 async function farside() {
-  let html;
+  const H = { headers: { ...UA, Accept: 'text/html,application/xhtml+xml', 'Accept-Language': 'en-GB,en;q=0.9' } };
+  let daily, page = 'all-data', note = null;
   try {
-    html = await fetchText('https://farside.co.uk/bitcoin-etf-flow-all-data/', { headers: UA }, 30000);
-  } catch {
-    html = await fetchText('https://farside.co.uk/btc/', { headers: UA }, 30000);
+    daily = parseFarside(await fetchText('https://farside.co.uk/bitcoin-etf-flow-all-data/', H, 45000));
+  } catch (e) {
+    note = `full-history page failed (${String(e.message).slice(0, 120)}); used recent-days page`;
+    page = 'recent';
+    daily = parseFarside(await fetchText('https://farside.co.uk/btc/', H, 30000));
   }
-  const daily = parseFarside(html);
-  return { daily, __asOf: daily.at(-1).date };
+  return { daily, page, note, __asOf: daily.at(-1).date };
 }
 
 // ---------------------------------------------------------------------------
@@ -759,12 +780,12 @@ export function mergeWithPrevious(snap, prev) {
     if (!snap.derivs.cot && prev.derivs.cot) markStale(['cftc_cot']);
     // venues that dropped out: keep last values but flag them
     const have = new Set(snap.derivs.venues.map((v) => v.venue));
-    for (const v of prev.derivs.venues || []) if (!have.has(v.venue)) snap.derivs.venues.push({ ...v, stale: true });
+    for (const v of prev.derivs.venues || []) if (!have.has(v.venue) && v.oiUsd) snap.derivs.venues.push({ ...v, stale: true });
   }
   if (snap.options && !snap.options.dvolHistory && prev.options?.dvolHistory) snap.options.dvolHistory = prev.options.dvolHistory;
   // ETF history is cumulative: merge old rows with new (new wins on same date)
   if (prev.etf?.daily) {
-    const m = new Map(prev.etf.daily.map((r) => [r.date, r]));
+    const m = new Map(prev.etf.daily.filter((r) => !(r.totalUsdM === 0 && Object.values(r.funds || {}).every((v) => !v))).map((r) => [r.date, r]));
     for (const r of snap.etf?.daily || []) m.set(r.date, r);
     snap.etf = { ...(snap.etf || prev.etf), daily: [...m.values()].sort((a, b) => (a.date < b.date ? -1 : 1)) };
   }
