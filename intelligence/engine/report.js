@@ -52,7 +52,7 @@ export function morningReport(a, opts = {}) {
   };
   forceSection(3, 'Liquidity', 'depth', () => {
     const imp = m.depth?.impact;
-    if (imp) bullet(`Estimated impact of aggressive selling (idealised cross-venue routing, displayed book): ${imp.sell.map((s) => `${fmtUsd(s.sizeUsd)} → ${s.exhausted ? 'exceeds captured book' : fmtPct(-s.slippagePct, 2)}`).join(' · ')}`);
+    if (imp) bullet(`Estimated impact of aggressive selling (idealised cross-venue routing, displayed book): ${imp.sell.map((s) => `${fmtUsd(s.sizeUsd)} → ${s.exhausted ? 'beyond captured depth' : fmtPct(-s.slippagePct, 2)}`).join(' · ')}`);
   });
   forceSection(4, 'ETF flows', 'etf');
   forceSection(5, 'Futures / leverage', 'leverage', () => {

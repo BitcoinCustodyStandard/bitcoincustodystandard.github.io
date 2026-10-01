@@ -597,7 +597,7 @@ export function buildForces(snap, m) {
         { label: '±0.5% / ±1% / ±2%', value: `${fmtUsd(D.d05)} / ${fmtUsd(D.d1)} / ${fmtUsd(D.d2)}`, source: 'Exchange order books (aggregated)', asOf: snap.collectedAt, frequency: 'snapshot' },
         { label: 'Change vs 1d / 7d / 30d', value: `${fmtPct(D.ch1d)} / ${fmtPct(D.ch7d)} / ${fmtPct(D.ch30d)}`, derived: true },
         { label: 'Concentration', value: D.shares.slice(0, 3).map((s) => `${s.venue} ${Math.round(s.share * 100)}%`).join(', ') + ` (HHI ${Math.round(D.hhi)})`, derived: true },
-        { label: 'Est. impact of $25M / $100M market sell', value: `${sell25 ? (sell25.exhausted ? 'exceeds captured book' : fmtPct(-sell25.slippagePct, 2)) : 'n/a'} / ${sell100 ? (sell100.exhausted ? 'exceeds captured book (±3%)' : fmtPct(-sell100.slippagePct, 2)) : 'n/a'}`, derived: true },
+        { label: 'Est. impact of $25M / $100M market sell', value: `${sell25 ? (sell25.exhausted ? 'beyond captured depth' : fmtPct(-sell25.slippagePct, 2)) : 'n/a'} / ${sell100 ? (sell100.exhausted ? 'beyond captured depth (lower bound)' : fmtPct(-sell100.slippagePct, 2)) : 'n/a'}`, derived: true },
         { label: 'Coinbase premium vs USDT venues', value: D.coinbasePremiumPct !== null ? fmtPct(D.coinbasePremiumPct, 3) : 'n/a', derived: true },
       ],
       mechanism: 'Depth is the market’s shock absorber. Price impact of a flow ≈ flow ÷ available liquidity, so the same ETF redemption or liquidation moves price far more in a thin book. Displayed depth also withdraws during volatility (market makers widen or pull quotes), so realised liquidity in a sell-off is lower than the snapshot suggests — the reflexive part of February 2026.',
