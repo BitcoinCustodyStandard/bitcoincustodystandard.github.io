@@ -1,6 +1,14 @@
 {
  "reports": [
   {
+   "id": "2026-10-01-1420",
+   "date": "2026-10-01",
+   "kind": "refresh",
+   "generatedAt": "2026-10-01T18:20:54.642Z",
+   "price": 84811,
+   "regime": "Balanced / no dominant driver"
+  },
+  {
    "id": "2026-10-01-1418",
    "date": "2026-10-01",
    "kind": "refresh",
@@ -17,6 +25,6 @@
    "regime": "Macro-led"
   }
  ],
- "updated": "2026-10-01T18:18:31.934Z",
+ "updated": "2026-10-01T18:20:54.642Z",
  "timezone": "America/New_York"
 }
