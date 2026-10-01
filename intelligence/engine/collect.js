@@ -25,6 +25,7 @@ export const SOURCE_META = {
   binance_deriv: { name: 'Binance USDⓈ-M futures API', url: 'https://www.binance.com/en/futures/BTCUSDT', frequency: 'snapshot / 8h funding', method: 'BTCUSDT perpetual OI, funding. Often geo-blocked from US servers.' },
   bybit_deriv: { name: 'Bybit V5 API', url: 'https://www.bybit.com', frequency: 'snapshot / 8h funding', method: 'BTCUSDT linear + BTCUSD inverse perpetual OI and funding. Often geo-blocked from US servers.' },
   deribit_fut: { name: 'Deribit futures', url: 'https://www.deribit.com', frequency: 'snapshot', method: 'Perpetual + dated futures; OI in USD; basis vs Deribit BTC index.' },
+  coingecko_deriv: { name: 'CoinGecko derivatives (aggregator)', url: 'https://www.coingecko.com/en/derivatives', frequency: 'intraday', method: 'Per-market BTC perpetual OI (USD) and funding as reported to CoinGecko. Used for venues that geo-block direct access (Binance, Bybit) and for a market-wide total; methodology differs from direct venue APIs and is labelled "via CoinGecko".' },
   bitmex: { name: 'BitMEX XBTUSD', url: 'https://www.bitmex.com', frequency: 'snapshot / 8h funding', method: 'Inverse perpetual; OI in USD contracts.' },
   hyperliquid: { name: 'Hyperliquid', url: 'https://app.hyperliquid.xyz', frequency: 'snapshot / 1h funding', method: 'On-chain perp DEX; OI in BTC × mark; hourly funding scaled to 8h.' },
   cftc_cot: { name: 'CFTC Traders in Financial Futures (CME Bitcoin)', url: 'https://publicreporting.cftc.gov', frequency: 'weekly (Tue positions, Fri release)', method: 'CME Bitcoin futures (5 BTC contract) positioning by trader class.' },
@@ -344,6 +345,7 @@ async function deribitFutures() {
 async function bitmex() {
   const j = await fetchJSON('https://www.bitmex.com/api/v1/instrument?symbol=XBTUSD');
   const r = j[0];
+  if (!num(r.openInterest) && !num(r.volume24h)) throw new Error('XBTUSD reports zero open interest and volume (inactive) — excluded');
   return { venue: 'BitMEX', oiUsd: num(r.openInterest), funding8h: num(r.fundingRate), mark: num(r.markPrice), volume24hUsd: num(r.volume24h) };
 }
 
@@ -355,6 +357,23 @@ async function hyperliquid() {
   const c = ctxs[i];
   const mark = num(c.markPx);
   return { venue: 'Hyperliquid', oiBtc: num(c.openInterest), oiUsd: num(c.openInterest) * mark, funding8h: num(c.funding) * 8, mark, volume24hUsd: num(c.dayNtlVlm) };
+}
+
+async function cgDerivatives() {
+  const j = await fetchJSON('https://api.coingecko.com/api/v3/derivatives', {}, 30000);
+  const rows = j.filter((t) => String(t.index_id).toUpperCase() === 'BTC' && /perpetual/i.test(t.contract_type || '') && num(t.open_interest));
+  const byMarket = new Map();
+  for (const t of rows) {
+    const m = byMarket.get(t.market) || { market: t.market, oiUsd: 0, w: 0, fw: 0, volume24hUsd: 0 };
+    const oi = num(t.open_interest);
+    m.oiUsd += oi;
+    m.volume24hUsd += num(t.volume_24h) || 0;
+    if (num(t.funding_rate) !== null) { m.fw += (num(t.funding_rate) / 100) * oi; m.w += oi; } // CoinGecko funding is in percent per interval (≈8h)
+    byMarket.set(t.market, m);
+  }
+  const markets = [...byMarket.values()].map((m) => ({ market: m.market, oiUsd: m.oiUsd, funding8h: m.w ? m.fw / m.w : null, volume24hUsd: m.volume24hUsd })).sort((a, b) => b.oiUsd - a.oiUsd);
+  if (!markets.length) return null;
+  return { markets, totalOiUsd: markets.reduce((s, m) => s + m.oiUsd, 0), marketCount: markets.length };
 }
 
 async function cftcCot() {
@@ -464,31 +483,36 @@ function parseFlowValue(s) {
   return Number.isFinite(v) ? (neg ? -v : v) : null;
 }
 export function parseFarside(html) {
+  // Farside's table may split fund names and tickers over two header rows, and
+  // put "Total" in a different header row than the tickers. Align from cells:
+  // data row = [date, fund1..fundN, total].
   const tables = html.match(/<table[\s\S]*?<\/table>/gi) || [];
   for (const t of tables) {
     const rows = (t.match(/<tr[\s\S]*?<\/tr>/gi) || []).map((r) => (r.match(/<t[hd][^>]*>[\s\S]*?<\/t[hd]>/gi) || []).map(cellText));
-    const hdrIdx = rows.findIndex((r) => r.some((c) => /^IBIT$/i.test(c)) && r.some((c) => /^Total$/i.test(c)));
+    const hdrIdx = rows.findIndex((r) => r.some((c) => /^IBIT$/i.test(c)));
     if (hdrIdx < 0) continue;
-    const hdr = rows[hdrIdx];
+    const tickers = rows[hdrIdx].filter((c) => /^[A-Z]{2,5}$/.test(c) && !/^TOTAL$/i.test(c));
     const out = [];
     for (const r of rows.slice(hdrIdx + 1)) {
       const d = parseFarsideDate(r[0] || '');
       if (!d) continue;
+      const vals = r.slice(1);
+      if (vals.length < 2) continue;
+      const totalCell = vals[vals.length - 1];
+      // A blank or dash total = day not yet reported.
+      if (!totalCell || /^[-–]$/.test(totalCell)) continue;
+      const total = parseFlowValue(totalCell);
+      if (total === null) continue;
       const funds = {};
-      let total = null;
-      hdr.forEach((h, i) => {
-        if (i === 0 || !h) return;
-        const v = parseFlowValue(r[i]);
-        if (/^Total$/i.test(h)) total = v;
-        else funds[h] = v;
-      });
-      // A row whose total is blank is a day not yet reported (Farside shows '-' pending): skip.
-      if (total === null || r[hdr.findIndex((h) => /^Total$/i.test(h))] === '') continue;
+      const fv = vals.slice(0, -1);
+      const off = Math.max(0, fv.length - tickers.length);
+      tickers.forEach((tk, i) => { const v = parseFlowValue(fv[i + off]); if (v !== null) funds[tk] = v; });
       out.push({ date: d, totalUsdM: total, funds });
     }
     if (out.length) return out.sort((a, b) => (a.date < b.date ? -1 : 1));
   }
-  throw new Error('ETF flow table not found (page layout changed or blocked)');
+  const title = (/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html) || [])[1] || 'no title';
+  throw new Error(`ETF flow table not found — page "${cellText(title).slice(0, 60)}", ${html.length} bytes, ${tables.length} table(s), IBIT ${/IBIT/.test(html) ? 'present' : 'absent'}`);
 }
 async function farside() {
   let html;
@@ -629,6 +653,7 @@ export async function collectAll({ scope = 'server', log = () => {} } = {}) {
     bybit: attempt(sources, 'bybit_deriv', bybitDeriv),
     deribitF: attempt(sources, 'deribit_fut', deribitFutures),
     bitmex: attempt(sources, 'bitmex', bitmex),
+    cgd: attempt(sources, 'coingecko_deriv', cgDerivatives),
     hl: attempt(sources, 'hyperliquid', hyperliquid),
     opts: attempt(sources, 'deribit_opt', deribitOptions),
     dvol: attempt(sources, 'deribit_dvol', deribitDvol),
@@ -657,6 +682,14 @@ export async function collectAll({ scope = 'server', log = () => {} } = {}) {
 
   const dv = [r.okx?.venue, r.binance, r.bybit, r.deribitF?.venue, r.bitmex, r.hl].filter(Boolean)
     .map(({ longShort, mark, ...v }) => v);
+  // Venues that block direct access: fill from the CoinGecko aggregator, labelled.
+  if (r.cgd) {
+    for (const [name, rx] of [['Binance', /^Binance \(Futures\)$/i], ['Bybit', /^Bybit \(Futures\)$/i]]) {
+      if (dv.some((v) => v.venue === name)) continue;
+      const m = r.cgd.markets.find((x) => rx.test(x.market));
+      if (m) dv.push({ venue: name, oiUsd: m.oiUsd, funding8h: m.funding8h, volume24hUsd: m.volume24hUsd, via: 'CoinGecko' });
+    }
+  }
   snap.derivs = dv.length || r.rubik ? {
     venues: dv,
     okxFundingHistory: r.okx?.fundingHistory || null,
@@ -668,6 +701,7 @@ export async function collectAll({ scope = 'server', log = () => {} } = {}) {
     curve: r.deribitF?.curve || null,
     deribitIndex: r.deribitF?.index || null,
     cot: r.cot || null,
+    marketWide: r.cgd ? { totalOiUsd: r.cgd.totalOiUsd, marketCount: r.cgd.marketCount, top: r.cgd.markets.slice(0, 12) } : null,
   } : null;
   snap.liquidations = r.okx?.liquidations || null;
   snap.options = r.opts ? { ...r.opts, dvolHistory: r.dvol?.history || null } : null;
@@ -687,7 +721,7 @@ export async function collectAll({ scope = 'server', log = () => {} } = {}) {
 // presents old data as fresh.
 const SECTION_SOURCES = {
   price: ['coingecko'], priceHistory: ['coingecko_hist', 'coinbase_hist'], global: ['coingecko_global'], breadth: ['coingecko_markets'],
-  books: Object.keys(BOOKS), derivs: ['okx_deriv', 'okx_rubik', 'binance_deriv', 'bybit_deriv', 'deribit_fut', 'bitmex', 'hyperliquid', 'cftc_cot'],
+  books: Object.keys(BOOKS), derivs: ['okx_deriv', 'okx_rubik', 'binance_deriv', 'bybit_deriv', 'deribit_fut', 'bitmex', 'hyperliquid', 'cftc_cot', 'coingecko_deriv'],
   liquidations: ['okx_deriv'], options: ['deribit_opt', 'deribit_dvol'], etf: ['farside'], macro: ['fred', 'yahoo'], onchain: ['coinmetrics', 'mempool', 'defillama_stables'],
 };
 export function mergeWithPrevious(snap, prev) {
@@ -719,7 +753,7 @@ export function mergeWithPrevious(snap, prev) {
     }
   }
   if (snap.derivs && prev.derivs) {
-    for (const k of ['okxOiHistory', 'okxFundingHistory', 'cot', 'curve', 'takerContracts', 'takerSpot', 'okxLongShort']) {
+    for (const k of ['okxOiHistory', 'okxFundingHistory', 'cot', 'curve', 'takerContracts', 'takerSpot', 'okxLongShort', 'marketWide']) {
       if (!snap.derivs[k] && prev.derivs[k]) snap.derivs[k] = prev.derivs[k];
     }
     if (!snap.derivs.cot && prev.derivs.cot) markStale(['cftc_cot']);

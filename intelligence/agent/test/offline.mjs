@@ -98,6 +98,11 @@ const farsideHtml = `<table><tr><th></th><th>IBIT</th><th>FBTC</th><th>Total</th
 <tr><td>06 Feb 2026</td><td>-</td><td>12.1</td><td>12.1</td></tr><tr><td>Total</td><td>1</td><td>2</td><td>3</td></tr></table>`;
 const fs1 = parseFarside(farsideHtml);
 if (fs1.length !== 2 || fs1[0].totalUsdM !== -90.5 || fs1[0].funds.IBIT !== -120.5 || fs1[1].funds.IBIT !== 0) throw new Error('parseFarside failed: ' + JSON.stringify(fs1));
+// Two-row header (names row, then tickers row without "Total"), blank pending day
+const farside2 = `<table><tr><th></th><th>Blackrock</th><th>Fidelity</th><th>Total</th></tr><tr><th></th><th>IBIT</th><th>FBTC</th><th></th></tr>
+<tr><td>29 Sep 2026</td><td>500.1</td><td>(20.0)</td><td>480.1</td></tr><tr><td>30 Sep 2026</td><td>-</td><td>-</td><td></td></tr></table>`;
+const fs2 = parseFarside(farside2);
+if (fs2.length !== 1 || fs2[0].totalUsdM !== 480.1 || fs2[0].funds.FBTC !== -20) throw new Error('parseFarside two-row failed: ' + JSON.stringify(fs2));
 const fr = parseFredCsv('observation_date,DGS10\n2026-09-01,4.10\n2026-09-02,.\n2026-09-03,4.2\n');
 if (fr.length !== 2 || fr[1][1] !== 4.2) throw new Error('parseFredCsv failed');
 console.log('parser checks ok');

@@ -172,6 +172,8 @@ export function computeMetrics(snap, rows) {
       fundingAnn: fw !== null ? fw * 3 * 365 * 100 : null,
       fundingDispersionBps: rates.length > 1 ? (Math.max(...rates) - Math.min(...rates)) * 1e4 : null,
       volume24h: sum(dv.filter((v) => !v.stale).map((v) => v.volume24hUsd || 0)),
+      marketWide: snap.derivs.marketWide || null,
+      viaCg: dv.filter((v) => v.via === 'CoinGecko').map((v) => v.venue),
     };
     const D = m.derivs;
     const cmp = (r) => (r && r.oiTotal && r.oiCoverage === D.coverage ? pct(D.totalOi, r.oiTotal) : null);
@@ -328,7 +330,13 @@ export function computeMetrics(snap, rows) {
   // ---- on-chain
   const cm = snap.onchain?.coinmetrics?.series || {};
   const ochg = (s, n) => (s && s.length > n ? pct(s.at(-1)[1], s.at(-1 - n)[1]) : null);
-  const realized = cm.CapRealUSD && cm.SplyCur ? cm.CapRealUSD.at(-1)[1] / cm.SplyCur.at(-1)[1] : null;
+  // Realised price = realised cap / supply; if realised cap is not served, price ÷ MVRV on the same date (identical by definition).
+  let realized = cm.CapRealUSD && cm.SplyCur ? cm.CapRealUSD.at(-1)[1] / cm.SplyCur.at(-1)[1] : null;
+  if (realized === null && cm.CapMVRVCur?.length) {
+    const [d, mv] = cm.CapMVRVCur.at(-1);
+    const px = valueAt(ph.map((r) => [r[0], r[1]]), d);
+    if (px && mv) realized = px / mv;
+  }
   const hashTh = cm.HashRate;
   const hashprice = cm.RevUSD && hashTh ? cm.RevUSD.map(([d, v]) => { const h = valueAt(hashTh, d); return h ? [d, v / (h / 1000)] : null; }).filter(Boolean) : null; // USD / PH/s / day
   const st = snap.onchain?.stablecoins || [];
@@ -472,8 +480,18 @@ export function attributeMove(m, horizon) {
 
 // ---------------------------------------------------------------------------
 // REGIME
+function macroTransmission(m) {
+  // How strongly macro moves currently reach BTC: max |90d corr| with Nasdaq / dollar / yields.
+  const c = m.corr || {};
+  const vals = [c.NDX?.c90, c.DXY?.c90, c.US10Y?.c90, c.REAL10Y?.c90].filter((x) => x !== null && x !== undefined).map(Math.abs);
+  if (!vals.length) return { factor: 0.6, link: null };
+  const link = Math.max(...vals);
+  return { factor: clamp(0.25 + link * 1.5, 0.25, 1), link };
+}
+
 export function classifyRegime(m) {
   const s = {};
+  const tm = macroTransmission(m);
   const reasons = {};
   const add = (k, w, why) => { s[k] = (s[k] || 0) + w; (reasons[k] ||= []).push(why); };
   const D = m.derivs, E = m.etf, P = m.price;
@@ -491,9 +509,11 @@ export function classifyRegime(m) {
   if (m.options?.nextBigExpiry && m.options.nextBigExpiry.notionalUsd > 3e9 && m.options.nextBigExpiry.days < 4) add('derivatives-led', 1, `${fmtUsd(m.options.nextBigExpiry.notionalUsd)} Deribit expiry in ${m.options.nextBigExpiry.days}d`);
   if (m.corr?.NDX?.c30 !== null && m.corr?.NDX?.c30 !== undefined && m.corr.NDX.c30 > T.corrHigh) add('macro-led', 1.5, `30d correlation with Nasdaq ${fmtNum(m.corr.NDX.c30)}`);
   if (m.macro) {
-    if (m.macro.dollar20d !== null && Math.abs(m.macro.dollar20d) > 2) add('macro-led', 1, `${m.macro.dollarLabel} ${fmtPct(m.macro.dollar20d)} in 4w`);
-    if (m.macro.real10y20d !== null && Math.abs(m.macro.real10y20d) > 0.25) add('macro-led', 1, `10y real yield ${m.macro.real10y20d > 0 ? '+' : ''}${fmtNum(m.macro.real10y20d * 100, 0)}bp in 4w`);
-    if (m.macro.vix !== null && m.macro.vix[1] > 25) add('macro-led', 1, `VIX ${fmtNum(m.macro.vix[1], 1)}`);
+    const w = tm.factor;
+    if (tm.link !== null && tm.link < 0.2) (reasons['macro-led'] ||= []).push(`weak transmission: max 90d correlation with macro assets ${fmtNum(tm.link)}`);
+    if (m.macro.dollar20d !== null && Math.abs(m.macro.dollar20d) > 2) add('macro-led', w, `${m.macro.dollarLabel} ${fmtPct(m.macro.dollar20d)} in 4w`);
+    if (m.macro.real10y20d !== null && Math.abs(m.macro.real10y20d) > 0.25) add('macro-led', w, `10y real yield ${m.macro.real10y20d > 0 ? '+' : ''}${fmtNum(m.macro.real10y20d * 100, 0)}bp in 4w`);
+    if (m.macro.vix !== null && m.macro.vix[1] > 25) add('macro-led', w, `VIX ${fmtNum(m.macro.vix[1], 1)}`);
   }
   if (m.depth) {
     if (m.depth.ch7d !== null && m.depth.ch7d < T.depthDeteriorate7d) add('liquidity-led', 2, `±1% depth ${fmtPct(m.depth.ch7d)} vs 7d ago`);
@@ -601,7 +621,8 @@ export function buildForces(snap, m) {
       confidence: D.oiChBasis.startsWith('aggregate') ? 'moderate' : D.okx ? 'weak' : 'insufficient data', key: D.totalOi,
       state: `${fmtUsd(D.totalOi)} OI across ${D.coverage.split(',').length} venues (${fmtNum(D.oiPctMcap)}% of market cap). OI ${fmtPct(D.oiCh1d)} 1d, ${fmtPct(D.oiCh7d)} 7d, ${fmtPct(D.oiCh30d)} 30d (${D.oiChBasis}).`,
       evidence: [
-        { label: 'Venue OI', value: D.venues.filter((v) => v.oiUsd).map((v) => `${v.venue} ${fmtUsd(v.oiUsd)}${v.stale ? ' (stale)' : ''}`).join(' · '), source: 'Venue APIs (OKX, Binance, Bybit, Deribit, BitMEX, Hyperliquid)', asOf: snap.collectedAt, frequency: 'snapshot' },
+        { label: 'Venue OI', value: D.venues.filter((v) => v.oiUsd).map((v) => `${v.venue} ${fmtUsd(v.oiUsd)}${v.via ? ' (via ' + v.via + ')' : ''}${v.stale ? ' (stale)' : ''}`).join(' · '), source: 'Venue APIs (OKX, Deribit, Hyperliquid, BitMEX direct; Binance/Bybit direct or via CoinGecko when geo-blocked)', asOf: snap.collectedAt, frequency: 'snapshot' },
+        D.marketWide ? { label: 'Market-wide BTC perpetual OI (aggregator)', value: `${fmtUsd(D.marketWide.totalOiUsd)} across ${D.marketWide.marketCount} venues — includes smaller exchanges whose reporting is not independently verified; shown for scale, not used in change calculations`, ...SRC(snap, 'coingecko_deriv') } : null,
         D.okx ? { label: 'OKX daily OI (consistent series)', value: `${fmtUsd(D.okx.oi)}; ${fmtPct(D.okx.ch1d)} 1d / ${fmtPct(D.okx.ch7d)} 7d / ${fmtPct(D.okx.ch30d)} 30d`, ...SRC(snap, 'okx_rubik') } : null,
         D.cot ? { label: `CME (CFTC, ${D.cot.date})`, value: `OI ≈${fmtNum(D.cot.oiBtc / 1000, 1)}K BTC (${fmtPct(D.cot.oiCh1w)} w/w). Leveraged funds net ${D.cot.levNet} contracts; asset managers net ${D.cot.amNet}`, ...SRC(snap, 'cftc_cot') } : null,
         D.longShort ? { label: 'Long/short account ratio', value: `OKX ${fmtNum(D.longShort.okx)}${D.longShort.binance ? ` · Binance ${fmtNum(D.longShort.binance)}` : ''} (accounts, not notional)`, ...SRC(snap, 'okx_rubik') } : null,
@@ -674,9 +695,9 @@ export function buildForces(snap, m) {
     if (M.real10y20d !== null) sc -= clamp(M.real10y20d / 0.15, -2, 2);
     if (M.hy20d !== null) sc -= clamp(M.hy20d / 0.3, -1.5, 1.5);
     if (M.dollar20d !== null) sc -= clamp(M.dollar20d / 1.5, -1.5, 1.5);
-    const corrW = m.corr?.NDX?.c90 !== null && m.corr?.NDX?.c90 !== undefined ? Math.abs(m.corr.NDX.c90) : 0.3;
+    const tm = macroTransmission(m);
     const f = {
-      id: 'macro', name: 'Macro liquidity & financial conditions', importance: clamp(20 + Math.abs(sc) * 10 + corrW * 30, 10, 88),
+      id: 'macro', name: 'Macro liquidity & financial conditions', importance: clamp((15 + Math.abs(sc) * 12) * tm.factor + (tm.link ?? 0.3) * 25, 8, 88),
       direction: sc > 1 ? 'bullish' : sc < -1 ? 'bearish' : 'neutral', confidence: M.netLiq && M.real10y !== null ? 'moderate' : 'weak', key: M.netLiq?.[1] ?? null,
       state: `Net liquidity (Fed assets − TGA − RRP) ${M.netLiq ? fmtUsd(M.netLiq[1] * 1e9) : 'n/a'} (${M.netLiq4w !== null ? fmtUsdSigned(M.netLiq4w * 1e9) : 'n/a'} in 4w). 10y real yield ${M.real10y ? fmtNum(M.real10y[1], 2) + '%' : 'n/a'} (${M.real10y20d !== null ? (M.real10y20d >= 0 ? '+' : '') + fmtNum(M.real10y20d * 100, 0) + 'bp' : 'n/a'} 4w). HY spread ${M.hy ? fmtNum(M.hy[1], 2) + '%' : 'n/a'}. ${M.dollarLabel} ${fmtPct(M.dollar20d)} 4w.`,
       evidence: [
@@ -687,7 +708,7 @@ export function buildForces(snap, m) {
         M.g3 ? { label: 'G3 central-bank assets (USD)', value: `${fmtUsd(M.g3.usdBn * 1e9)} (${fmtPct(M.g3.ch13wPct)} 13w) — ${M.g3.note}`, ...SRC(snap, 'fred') } : null,
       ].filter(Boolean),
       mechanism: 'Fed balance sheet, Treasury cash (TGA) and reverse-repo usage determine bank reserves and dollar liquidity → that sets financial conditions (credit spreads, real yields, dollar) → which sets risk appetite and the cost of leverage → which sets the supply of speculative capital for BTC. Real yields are the opportunity cost of holding a non-yielding asset; a stronger dollar tightens global dollar funding.',
-      interpretation: `${sc > 1 ? 'Financial conditions are easing at the margin — a tailwind for speculative capital.' : sc < -1 ? 'Financial conditions are tightening at the margin — speculative capital is more expensive.' : 'Macro liquidity is not changing enough to be a primary driver.'} BTC’s 90-day correlation with Nasdaq is ${fmtNum(m.corr?.NDX?.c90)}, which scales how much these conditions transmit.`,
+      interpretation: `${sc > 1 ? 'Financial conditions are easing at the margin — a tailwind for speculative capital.' : sc < -1 ? 'Financial conditions are tightening at the margin — speculative capital is more expensive.' : 'Macro liquidity is not changing enough to be a primary driver.'} BTC’s 90-day correlation with Nasdaq is ${fmtNum(m.corr?.NDX?.c90)} and with the dollar ${fmtNum(m.corr?.DXY?.c90)}${tm.link !== null && tm.link < 0.2 ? ' — the transmission channel is currently weak, so these conditions are a background headwind/tailwind rather than the day-to-day driver' : ', which scales how much these conditions transmit'}.`,
       invalidation: sc >= 0 ? 'A rise in real yields >25bp or HY spreads >50bp within a month.' : 'Net liquidity rising and real yields falling for several weeks.',
       watch: 'Thursday H.4.1 release; Treasury refunding / TGA rebuild; FOMC communications; month-end and quarter-end funding pressure.',
     };
@@ -699,7 +720,7 @@ export function buildForces(snap, m) {
       const sc2 = -(clamp((M.dollar20d ?? 0) / 1.5, -2, 2) + clamp((M.us10y20d ?? 0) / 0.2, -2, 2));
       const cD = m.corr?.DXY?.c90, cR = m.corr?.US10Y?.c90;
       const f2 = {
-        id: 'dollar', name: 'Dollar & Treasury yields', importance: clamp(15 + Math.abs(sc2) * 10 + (Math.abs(cD ?? 0) + Math.abs(cR ?? 0)) * 25, 8, 80),
+        id: 'dollar', name: 'Dollar & Treasury yields', importance: clamp((12 + Math.abs(sc2) * 10) * macroTransmission(m).factor + (Math.abs(cD ?? 0) + Math.abs(cR ?? 0)) * 25, 6, 80),
         direction: sc2 > 1 ? 'bullish' : sc2 < -1 ? 'bearish' : 'neutral', confidence: cD !== null && cD !== undefined ? 'moderate' : 'weak', key: M.dollar?.[1] ?? null,
         state: `${M.dollarLabel} ${M.dollar ? fmtNum(M.dollar[1], 2) : 'n/a'} (${fmtPct(M.dollar20d)} 4w); 10y ${M.us10y ? fmtNum(M.us10y[1], 2) + '%' : 'n/a'} (${M.us10y20d !== null ? (M.us10y20d >= 0 ? '+' : '') + fmtNum(M.us10y20d * 100, 0) + 'bp' : 'n/a'}); 2y ${M.us2y ? fmtNum(M.us2y[1], 2) + '%' : 'n/a'}.`,
         evidence: [
@@ -757,7 +778,7 @@ export function buildForces(snap, m) {
           { label: 'MVRV / realised price', value: `${fmtNum(O.mvrv, 2)} (${ordinal(O.mvrvPctile)} pct, ~1y) / ${fmtPrice(O.realizedPrice)}`, ...SRC(snap, 'coinmetrics') },
           { label: 'Stablecoin supply', value: `${fmtUsd(O.stables)}; 7d ${fmtUsd(O.stables7d)}, 30d ${fmtUsd(O.stables30d)}`, ...SRC(snap, 'defillama_stables') },
           { label: 'Mining', value: `${fmtNum(O.hashrateEhs, 0)} EH/s; next difficulty adj. ${fmtPct(O.nextAdjPct)}; hashprice ${O.hashprice ? '$' + fmtNum(O.hashprice, 0) + '/PH/day' : 'n/a'}`, ...SRC(snap, 'mempool') },
-          O.exFlowNet7d !== null ? { label: 'Exchange net flow (7d)', value: `${fmtNum(O.exFlowNet7d, 0)} BTC`, ...SRC(snap, 'coinmetrics') } : { label: 'Exchange balances / LTH-STH / SOPR', value: 'Not available from free sources — see Data Coverage.', derived: true },
+          O.exFlowNet7d !== null ? { label: 'Exchange net flow (7d) / exchange supply', value: `${O.exFlowNet7d > 0 ? '+' : ''}${fmtNum(O.exFlowNet7d, 0)} BTC net ${O.exFlowNet7d > 0 ? 'into' : 'out of'} exchanges; balance ${O.exSupply ? fmtNum(O.exSupply / 1e6, 2) + 'M BTC' : 'n/a'} (${fmtPct(O.exSupply30d)} 30d) — Coin Metrics entity heuristics`, ...SRC(snap, 'coinmetrics') } : { label: 'Exchange balances / LTH-STH / SOPR', value: 'Not available from free sources — see Data Coverage.', derived: true },
         ],
         mechanism: 'Stablecoin growth is dry powder on exchanges (and a crypto-native liquidity measure); MVRV shows how far price sits above the aggregate on-chain cost basis — high values mean more holders in profit and more potential distribution; near 1 means the market trades near cost. Miner economics matter when hashprice is squeezed and miners must sell inventory.',
         interpretation: `${stab !== null && stab > 3 ? 'Stablecoin liquidity is expanding — capital is entering the crypto system.' : stab !== null && stab < -2 ? 'Stablecoin supply is contracting — capital is leaving.' : 'Stablecoin liquidity is roughly flat.'} ${O.mvrv !== null && O.mvrv < 1.2 ? 'Price is near the on-chain cost basis — historically an area where long-term holders absorb supply.' : ''} On-chain supply is rarely the daily driver; it matters at extremes.`,
@@ -978,8 +999,8 @@ export function compareFeb2026(m) {
     !E ? 'unknown' : E.consecOutWeeks >= 2 && E.s20 < 0 ? 'similar' : E.s20 < 0 ? 'partly similar' : 'different');
   add('Market depth', 'Binance ±1% depth <$400M vs >$600M at the Oct 2025 peak; aggregate ±2% ≈30% below 2025 high (Kaiko).',
     dep ? `±1% ${fmtUsd(dep.d1)} across ${dep.venueCount} venues${dep.venues.find((v) => v.venue === 'Binance') ? ` (Binance ${fmtUsd(dep.venues.find((v) => v.venue === 'Binance').d1)})` : ''}; ${dep.ch30d !== null ? fmtPct(dep.ch30d) + ' vs 30d' : 'no 30d history yet'}${dep.pctile !== null ? `; ${ordinal(dep.pctile)} pct of system history` : ''}.` : 'n/a',
-    !dep ? 'unknown' : (() => { const b = dep.venues.find((v) => v.venue === 'Binance'); if (b) return b.d1 < R.binanceDepth1PctUsd ? 'similar' : b.d1 < 550e6 ? 'partly similar' : 'different'; return dep.pctile !== null ? (dep.pctile < 20 ? 'similar' : 'different') : 'unknown'; })(),
-    'Methodology differs from Kaiko (venue set, snapshot vs average); Binance comparison is the most like-for-like.');
+    !dep || dep.pctile === null ? 'unknown' : dep.pctile < 20 || (dep.ch30d !== null && dep.ch30d < -25) ? 'similar' : dep.pctile < 40 ? 'partly similar' : 'different',
+    dep && dep.pctile === null ? `Needs ≥10 days of this system’s own depth history (${dep.historyDays} so far). Kaiko’s published figures use a different method (time-averaged, all pairs) and are not compared directly.` : 'Judged against this system’s own depth history only; Kaiko’s published Feb-2026 figures use a different method and are not compared directly.');
   add('Leverage (OI)', 'Long leverage rebuilt during January’s attempted recovery; ≈$2.5B and ≈$2.7B long-dominated liquidation waves.',
     D ? `OI ${fmtUsd(D.totalOi)} (${fmtNum(D.oiPctMcap)}% of mcap); ${fmtPct(D.oiCh30d)} 30d.` : 'n/a',
     !D || D.oiCh30d === null ? 'unknown' : D.oiCh30d > 10 && (D.fundingAnn ?? 0) > 5 ? 'similar' : D.oiCh30d > 0 ? 'partly similar' : 'different',
@@ -989,8 +1010,13 @@ export function compareFeb2026(m) {
     D?.fundingAnn === null || D?.fundingAnn === undefined ? 'unknown' : D.fundingAnn > 8 ? 'similar' : D.fundingAnn > 0 ? 'partly similar' : 'different');
   add('Macro / Fed liquidity shock', 'Hawkish Fed-chair nomination: expected tighter policy, higher real rates, smaller balance sheet.',
     M ? `Real 10y ${M.real10y20d !== null ? (M.real10y20d >= 0 ? '+' : '') + fmtNum(M.real10y20d * 100, 0) + 'bp' : 'n/a'} 4w; ${M.dollarLabel} ${fmtPct(M.dollar20d)} 4w; net liquidity ${M.netLiq4w !== null ? fmtUsdSigned(M.netLiq4w * 1e9) : 'n/a'} 4w; VIX ${M.vix ? fmtNum(M.vix[1], 1) : 'n/a'}.` : 'n/a',
-    !M ? 'unknown' : (M.real10y20d ?? 0) > 0.2 || (M.dollar20d ?? 0) > 2 || (M.netLiq4w ?? 0) < -150 ? 'similar' : (M.real10y20d ?? 0) > 0.08 || (M.netLiq4w ?? 0) < -50 ? 'partly similar' : 'different',
-    'A discrete policy shock is an event; this system measures its footprint (yields, dollar, liquidity), not the headline.');
+    (() => {
+      if (!M) return 'unknown';
+      const v = (M.real10y20d ?? 0) > 0.2 || (M.dollar20d ?? 0) > 2 || (M.netLiq4w ?? 0) < -150 ? 'similar' : (M.real10y20d ?? 0) > 0.08 || (M.netLiq4w ?? 0) < -50 ? 'partly similar' : 'different';
+      const tm = macroTransmission(m);
+      return v === 'similar' && tm.link !== null && tm.link < 0.2 ? 'partly similar' : v;
+    })(),
+    `A discrete policy shock is an event; this system measures its footprint (yields, dollar, liquidity), not the headline.${macroTransmission(m).link !== null && macroTransmission(m).link < 0.2 ? ` Tightening is present, but BTC’s link to macro assets is weak (max 90d correlation ${fmtNum(macroTransmission(m).link)}), unlike the risk-asset behaviour of early 2026 — downgraded to partly similar.` : ''}`);
   add('Options / volatility', 'Volatility expanded sharply into the cascade; downside protection bid.',
     O ? `IV ${fmtNum(O.atmIv30 ?? O.dvol, 1)}% vs RV ${fmtNum(P.rv30, 1)}%; skew ${fmtNum(O.skew25, 1)}.` : 'n/a',
     !O ? 'unknown' : (O.skew25 ?? 0) < -5 ? 'similar' : (O.skew25 ?? 0) < -2 ? 'partly similar' : 'different');
