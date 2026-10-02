@@ -7,6 +7,7 @@ import { collectAll, mergeWithPrevious } from '../engine/collect.js';
 import { morningReport, briefReport } from '../engine/report.js';
 import { brief } from '../engine/brief.js';
 import { ZONES } from '../engine/cycle.js';
+import { explain, REMINDER } from '../engine/explain.js';
 import { fmtUsd, fmtUsdSigned, fmtPrice, fmtPct, fmtNum, fmtK, ordinal } from '../engine/util.js';
 
 const REPO = 'bitcoincustodystandard/bitcoincustodystandard.github.io';
@@ -35,6 +36,8 @@ function dirClass(d = '') {
   return 'neu';
 }
 const chip = (txt, c) => h`<span class="chip ${c}">${txt}</span>`;
+// "i" icon that opens a plain-English explanation (hover, keyboard focus, or tap)
+const info = (key, ctx) => h`<button type="button" class="info" data-explain="${key}"${ctx !== undefined ? raw(` data-ctx="${esc(ctx)}"`) : ''} aria-label="What does this mean?">i</button>`;
 // evidence strength as a quiet 3-step meter next to its word (weak ●○○ · moderate ●●○ · strong ●●●)
 const EV_N = { weak: 1, moderate: 2, strong: 3 };
 const evMeter = (conf) => h`<span class="evm" title="evidence strength: ${conf}">${[1, 2, 3].map((i) => h`<i class="${i <= (EV_N[conf] || 0) ? 'on' : ''}"></i>`)}<span>${conf}</span></span>`;
@@ -269,7 +272,7 @@ function execStrip(b) {
 // 2. Today's three most important variables.
 function top3(b) {
   return sec('top3', 'Today’s three most important variables', null, h`<div class="vars">${b.top.map((t, i) => h`<article class="var ${dirClass(t.direction)}">
-    <div class="var-h"><span class="n">${i + 1}</span><b>${t.name}</b></div>
+    <div class="var-h"><span class="n">${i + 1}</span><b>${t.name}</b>${hasExplain('force:' + t.id) ? info('force:' + t.id) : ''}</div>
     <div>${chip(t.dirNote, dirClass(t.direction))}</div>
     <p>${t.summary}</p>
     <p class="watch"><span class="k">Watch</span>${t.watch}</p>
@@ -287,7 +290,7 @@ function forcesBlock(b) {
     return h`<details class="force${i >= TOP_N ? ' extra' : ''}" id="force-${f.id}">
       <summary>
         <span class="rank">${f.unavailable ? '–' : f.rank}</span>
-        <span class="fname">${f.name}${x.moved ? h` <span class="moved" title="${x.moved.label}: ${x.moved.from} → ${x.moved.to}">${fmtNum(x.moved.z, 1)}σ move</span>` : ''}</span>
+        <span class="fname">${f.name}${hasExplain('force:' + f.id) ? info('force:' + f.id) : ''}${x.moved ? h` <span class="moved" title="${x.moved.label}: ${x.moved.from} → ${x.moved.to}">${fmtNum(x.moved.z, 1)}σ move</span>` : ''}</span>
         <span>${chip(x.dirNote || f.direction, dirClass(f.direction))}</span>
         <span class="ev-col">${evMeter(f.confidence)}</span>
         <span class="fstate">${f.unavailable ? f.state : x.line}</span>
@@ -339,7 +342,7 @@ function ladderBlock(b) {
   const spot = state.a.map.spot;
   return sec('liqmap', 'Liquidity map', 'Key levels where forced or hedging flows sit. A map, not a prediction.', h`
     <ol class="ladder">${b.ladder.map((l) => h`<li class="lad ${l.kind}">
-      <div class="lv"><b class="num">${l.label}</b><span class="num">${l.isSpot ? 'spot ' + fmtPrice(spot) : fmtPct(l.distPct, 1)}</span></div>
+      <div class="lv"><b class="num">${l.label}${info('level', l.level)}</b><span class="num">${l.isSpot ? 'spot ' + fmtPrice(spot) : fmtPct(l.distPct, 1)}</span></div>
       <div class="lw">${l.what}${l.detail.length ? h`<div class="small muted">${cap1(l.detail.join(' · '))}</div>` : ''}</div>
       <div class="le">${l.effect}</div>
     </li>`)}</ol>
@@ -421,7 +424,7 @@ function cycleCard(x) {
   if (x.status === 'unavailable') return h`<article class="mcard off"><header><b>${x.name}</b>${chip('unavailable', 'neu')}</header><p class="small muted">${x.unavailableWhy || 'Not available from the free sources this run.'}</p><footer>${x.source}</footer></article>`;
   const note = DATA_STATE[x.status]?.(x);
   return h`<article class="mcard${x.status !== 'live' ? ' delayed' : ''}">
-    <header><b>${x.name}</b>${x.scored ? h`<span class="sc" title="score in the composite">${scoreTxt(x.zone?.score)}</span>` : h`<span class="sc dim" title="shown for context, not scored">ctx</span>`}</header>
+    <header><b>${x.name}${hasExplain(x.id) ? info(x.id) : ''}</b>${x.scored ? h`<span class="sc" title="score in the composite">${scoreTxt(x.zone?.score)}</span>` : h`<span class="sc dim" title="shown for context, not scored">ctx</span>`}</header>
     <div class="mv"><span class="num">${x.display}</span>${zchip(x.zone)}</div>
     ${note ? h`<div class="dstate">${note}</div>` : ''}
     <p>${x.meaning}</p>
@@ -460,7 +463,7 @@ function cycleTab() {
       <p class="xs dim">Historical regimes only — these zones describe where past cycles sat, not what happens next. No price targets, no probabilities.</p>
     </div>
 
-    <h3 class="cy-h">Composite valuation index</h3>
+    <h3 class="cy-h">Composite valuation index ${info('composite')}</h3>
     <div class="twocol cy-comp">
       <div class="panel">${gauge(V.score)}
         <table class="cy-tbl"><thead><tr><th>Input</th><th>Zone</th><th class="n">Score</th></tr></thead><tbody>
@@ -603,10 +606,67 @@ function coverageSection() {
   </section>`;
 }
 
+// ---------- explanations (single floating tooltip) ----------
+const hasExplain = (key) => !!state.a && !!explain(key, state.a, null);
+function explainFor(btn) {
+  const key = btn.dataset.explain;
+  const ctx = key === 'level' ? state.b?.ladder.find((l) => String(l.level) === btn.dataset.ctx) : undefined;
+  return explain(key, state.a, ctx);
+}
+let tipBtn = null;
+function showExplain(btn) {
+  const e = explainFor(btn);
+  if (!e) return;
+  let t = $('#xtip');
+  if (!t) { t = document.createElement('div'); t.id = 'xtip'; t.setAttribute('role', 'tooltip'); document.body.appendChild(t); }
+  t.innerHTML = h`<b>${e.title}</b>${e.parts.map((p, i) => h`<p class="${p[0] === REMINDER ? 'rem' : i === 1 ? 'now' : ''}">${p.join(' ')}</p>`)}`.s;
+  t.hidden = false;
+  tipBtn?.setAttribute('aria-expanded', 'false');
+  tipBtn = btn; btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-describedby', 'xtip');
+  const r = btn.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+  const w = Math.min(340, W - 24); t.style.width = w + 'px';
+  const left = Math.max(12, Math.min(r.left + r.width / 2 - w / 2, W - w - 12));
+  const below = r.bottom + 8, th = t.offsetHeight;
+  t.style.left = left + 'px';
+  t.style.top = (below + th > H - 8 && r.top - th - 8 > 8 ? r.top - th - 8 : below) + 'px';
+}
+function hideExplain() { const t = $('#xtip'); if (t) t.hidden = true; tipBtn?.setAttribute('aria-expanded', 'false'); tipBtn = null; }
+document.addEventListener('pointerover', (e) => { const b = e.target.closest?.('[data-explain]'); if (b && e.pointerType === 'mouse') showExplain(b); });
+document.addEventListener('pointerout', (e) => { const b = e.target.closest?.('[data-explain]'); if (b && e.pointerType === 'mouse' && !b.contains(e.relatedTarget)) hideExplain(); });
+// keyboard focus opens it; focus that comes from a click/tap is handled by the click handler
+let pointerDown = null;
+document.addEventListener('pointerdown', (e) => { pointerDown = e.pointerType; }, true);
+document.addEventListener('focusin', (e) => { const b = e.target.closest?.('[data-explain]'); if (b && !pointerDown) showExplain(b); });
+document.addEventListener('focusout', (e) => { if (e.target.closest?.('[data-explain]')) hideExplain(); });
+// tap / click: toggle; never toggles the <details> row the icon sits in
+document.addEventListener('click', (e) => {
+  const b = e.target.closest?.('[data-explain]');
+  const via = pointerDown; pointerDown = null;
+  if (b) {
+    e.preventDefault(); e.stopPropagation();
+    if (via !== 'mouse' && tipBtn === b && !$('#xtip')?.hidden) hideExplain(); else showExplain(b);
+    return;
+  }
+  if (!e.target.closest?.('#xtip')) hideExplain();
+}, true);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideExplain(); });
+// keep an open explanation attached to its icon while scrolling; close once the icon leaves the screen
+let tipRaf = 0;
+window.addEventListener('scroll', () => {
+  if (!tipBtn || tipRaf) return;
+  tipRaf = requestAnimationFrame(() => {
+    tipRaf = 0;
+    if (!tipBtn) return;
+    const r = tipBtn.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > innerHeight) hideExplain(); else showExplain(tipBtn);
+  });
+}, { passive: true });
+
 // ---------- render ----------
 function render() {
   const a = state.a;
   const b = brief(a);
+  state.b = b;
   const old = ageH(a.dataThrough);
   const banners = [];
   if (old !== null && old > 30) banners.push(h`<div class="banner warn">The latest analysis is ${Math.round(old)} hours old. Press <b>Refresh market</b> to update crypto market data in your browser, or start a server run.</div>`);
