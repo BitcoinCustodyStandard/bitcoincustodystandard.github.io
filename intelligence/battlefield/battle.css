@@ -60,7 +60,8 @@ a:hover { text-decoration: underline; }
 .vd i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 5px; background: var(--dim); }
 .vd.live i, .vd.recorded i { background: var(--bull); }
 .vd.error i, .vd.closed i, .vd.unavailable i { background: var(--bear); }
-.vd.connecting i { background: var(--gold); }
+.vd.connecting i, .vd.connected i { background: var(--gold); }
+.vd.silent i { background: var(--dim); box-shadow: 0 0 0 1px var(--bear); }
 .note { position: absolute; left: 50%; bottom: 52px; transform: translateX(-50%); z-index: 3; max-width: min(640px, 92%); background: rgba(6, 12, 22, 0.88); border: 1px solid rgba(245, 194, 122, 0.4); color: var(--text2); font-size: 12.5px; padding: 8px 12px; border-radius: 4px; text-align: center; }
 .badge { font: 600 9.5px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 6px; border-radius: 3px; display: inline-block; }
 .badge.obs { color: #9fd6ff; background: rgba(110, 180, 255, 0.12); border: 1px solid rgba(110, 180, 255, 0.35); }

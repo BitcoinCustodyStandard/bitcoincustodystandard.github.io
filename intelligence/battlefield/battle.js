@@ -602,7 +602,7 @@ function renderData() {
   tile('t-bwall', m.buyWall ? fmtUsd(m.buyWall[1]) : '—', m.buyWall ? `Largest $50 bid band within 1% · @ ${m.buyWall[0].toLocaleString('en-US')}` : '—', srcBook);
   tile('t-swall', m.sellWall ? fmtUsd(m.sellWall[1]) : '—', m.sellWall ? `Largest $50 ask band within 1% · @ ${m.sellWall[0].toLocaleString('en-US')}` : '—', srcBook);
   tile('t-imb', m.imb05 !== undefined ? fmtPct(m.imb05 * 100, 1) : '—', m.imb05 !== undefined ? `±0.5%: bids ${fmtUsd(m.bid05)} / asks ${fmtUsd(m.ask05)} · ±1%: ${fmtPct(m.imb1 * 100, 1)}` : '—', srcBook + ' · + = more bids');
-  const liqVenues = [...new Set(S.liqs.map((x) => x.venue))].join(', ') || (S.venues['Binance futures']?.state === 'live' ? 'OKX, Binance' : 'OKX');
+  const liqVenues = ['OKX', 'Deribit', 'Binance futures'].filter((v) => ['live', 'recorded'].includes(S.venues[v]?.state)).map((v) => v.replace(' futures', '')).join(', ') || 'none connected';
   const sess = S.sessionStart ? `since ${new Date(S.sessionStart).toISOString().slice(11, 16)} UTC` : '';
   tile('t-lliq', fmtUsd(m.longLiq1h), `Last hour · ${fmtUsd(m.longLiqS)} ${sess} · longs forced to sell`, `Liquidation feeds: ${liqVenues} (not market-wide)`);
   tile('t-sliq', fmtUsd(m.shortLiq1h), `Last hour · ${fmtUsd(m.shortLiqS)} ${sess} · shorts forced to buy`, `Liquidation feeds: ${liqVenues} (not market-wide)`);

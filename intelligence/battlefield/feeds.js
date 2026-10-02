@@ -78,19 +78,26 @@ export class BookSet {
 let debugHook = null;
 export function setDebug(fn) { debugHook = fn; }
 
-function socket(url, { onOpen, onMessage, venue, emit, pingMs, ping }) {
-  let ws, timer, closed = false, retry = 0;
+function socket(url, { onOpen, onMessage, venue, emit, pingMs, ping, silentMs }) {
+  let ws, timer, watch, closed = false, retry = 0, gotData = false;
   const open = () => {
     emit({ type: 'status', venue, state: 'connecting' });
     try { ws = new WebSocket(url); } catch (e) { emit({ type: 'status', venue, state: 'error', note: String(e.message || e) }); return schedule(); }
-    ws.onopen = () => { retry = 0; emit({ type: 'status', venue, state: 'live' }); onOpen(ws); if (pingMs) timer = setInterval(() => { try { ws.send(ping); } catch {} }, pingMs); };
-    ws.onmessage = (m) => { if (m.data === 'pong') return; let j; try { j = JSON.parse(m.data); } catch { return; } if (debugHook) debugHook(venue, j); try { onMessage(j, ws); } catch (e) { if (debugHook) debugHook(venue, { parseError: String(e) }); } };
+    ws.onopen = () => {
+      retry = 0; gotData = false;
+      emit({ type: 'status', venue, state: 'connected', note: 'connected, waiting for data' });
+      onOpen(ws);
+      if (pingMs) timer = setInterval(() => { try { ws.send(ping); } catch {} }, pingMs);
+      clearTimeout(watch);
+      watch = setTimeout(() => { if (!gotData) emit({ type: 'status', venue, state: 'silent', note: 'connected but no data received — likely a regional restriction' }); }, silentMs || 60000);
+    };
+    ws.onmessage = (m) => { if (m.data === 'pong') return; let j; try { j = JSON.parse(m.data); } catch { return; } if (debugHook) debugHook(venue, j); if (!gotData) { gotData = true; emit({ type: 'status', venue, state: 'live' }); } try { onMessage(j, ws); } catch (e) { if (debugHook) debugHook(venue, { parseError: String(e) }); } };
     ws.onerror = () => emit({ type: 'status', venue, state: 'error', note: 'connection error (blocked, or venue unavailable in this region)' });
-    ws.onclose = () => { clearInterval(timer); if (!closed) { emit({ type: 'status', venue, state: 'closed' }); schedule(); } };
+    ws.onclose = () => { clearInterval(timer); clearTimeout(watch); if (!closed) { emit({ type: 'status', venue, state: 'closed' }); schedule(); } };
   };
   const schedule = () => { if (closed) return; retry++; setTimeout(open, Math.min(30000, 1500 * 2 ** retry)); };
   open();
-  return () => { closed = true; clearInterval(timer); try { ws.close(); } catch {} };
+  return () => { closed = true; clearInterval(timer); clearTimeout(watch); try { ws.close(); } catch {} };
 }
 
 // ---- Coinbase Advanced Trade (spot BTC-USD): level2 book, trades, 24h ticker
@@ -214,21 +221,48 @@ function binanceSpot(books, emit) {
   });
 }
 function binanceLiqs(books, emit) {
-  return socket('wss://fstream.binance.com/ws/btcusdt@forceOrder', {
-    venue: 'Binance futures', emit,
+  // All-market stream (every symbol, several per second in normal conditions) so
+  // silence can be told apart from "no BTC liquidations"; filtered to BTC perps.
+  return socket('wss://fstream.binance.com/ws/!forceOrder@arr', {
+    venue: 'Binance futures', emit, silentMs: 45000,
     onOpen: () => {},
     onMessage: (j) => {
-      const o = j.o; if (!o) return;
+      const o = j.o; if (!o || !/^BTCUSD/.test(o.s)) return;
       const px = num(o.ap) || num(o.p);
       emit({ type: 'liq', t: o.T || now(), venue: 'Binance', px, usd: px * num(o.z || o.q), side: o.S === 'SELL' ? 'long' : 'short' });
     },
   });
 }
 
-export const VENUES = ['Coinbase', 'Kraken', 'OKX', 'Binance', 'Binance futures'];
+// ---- Deribit BTC-PERPETUAL: trades carry a `liquidation` flag (T = taker side
+//      liquidated, M = maker side, MT = both). Amount is USD (inverse contract).
+function deribit(books, emit) {
+  return socket('wss://www.deribit.com/ws/api/v2', {
+    venue: 'Deribit', emit, pingMs: 25000, ping: JSON.stringify({ jsonrpc: '2.0', id: 9, method: 'public/test', params: {} }),
+    onOpen: (ws) => ws.send(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'public/subscribe', params: { channels: ['trades.BTC-PERPETUAL.100ms'] } })),
+    onMessage: (j) => {
+      const data = j.params?.data;
+      if (j.method !== 'subscription' || !Array.isArray(data)) return;
+      for (const d of data) {
+        const px = num(d.price), usd = num(d.amount);
+        if (!px || !usd) continue;
+        const side = d.direction === 'buy' ? 'buy' : 'sell';
+        if (d.liquidation) {
+          // taker liquidated: a forced sell (direction sell) closes a long; maker liquidated: the resting side was the forced one
+          const takerLiq = d.liquidation.includes('T');
+          const long = takerLiq ? side === 'sell' : side === 'buy';
+          emit({ type: 'liq', t: d.timestamp || now(), venue: 'Deribit', px, usd, side: long ? 'long' : 'short' });
+        }
+        emit({ type: 'trade', t: d.timestamp || now(), venue: 'Deribit perp', px, usd, side, perp: true });
+      }
+    },
+  });
+}
+
+export const VENUES = ['Coinbase', 'Kraken', 'OKX', 'Binance', 'Binance futures', 'Deribit'];
 
 export function connectLive(emit, opts = {}) {
   const books = new BookSet();
-  const stops = [coinbase, kraken, okx, binanceSpot, binanceLiqs].filter((f) => !opts.skip?.includes(f.name)).map((f) => f(books, emit));
+  const stops = [coinbase, kraken, okx, binanceSpot, binanceLiqs, deribit].filter((f) => !opts.skip?.includes(f.name)).map((f) => f(books, emit));
   return { books, stop: () => stops.forEach((s) => s()) };
 }
