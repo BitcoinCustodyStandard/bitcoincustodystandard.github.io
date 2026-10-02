@@ -18,7 +18,23 @@ collect (engine/collect.js)  →  merge with last snapshot (stale-labelling)
 
 ### Page layout
 
-The default **Overview** is a 60–90 second read: price and regime with a quiet data-status bar; today's three most important variables; the top 5 ranked forces (each row expands to full evidence, mechanism, invalidation and charts; the rest behind "Show all"); a liquidity ladder of key levels (full band table on expand); three acceleration cards (upside / base case / downside) with condition status; and what to watch in the next 24 hours. The KPI tiles and charts sit in a collapsed **Market dashboard**. Changes are called out on the overview only when they are at least 1.5σ versus the typical daily change. Other tabs: **Morning report** (condensed, full report on expand), **Liquidity detail** (band table, depth by venue, order impact, options expiries), **Data & method**, **Archive**. The short copy is derived mechanically from the analysis (`engine/brief.js`) and adds no figures.
+The default **Overview** is a 60–90 second read: price and regime with a quiet data-status bar; today's three most important variables; the top 5 ranked forces (each row expands to full evidence, mechanism, invalidation and charts; the rest behind "Show all"); a liquidity ladder of key levels (full band table on expand); three acceleration cards (upside / base case / downside) with condition status; and what to watch in the next 24 hours. The KPI tiles and charts sit in a collapsed **Market dashboard**. Changes are called out on the overview only when they are at least 1.5σ versus the typical daily change. Other tabs: **On-chain cycle** (see below), **Morning report** (condensed, full report on expand), **Liquidity detail** (band table, depth by venue, order impact, options expiries), **Data & method**, **Archive**. The short copy is derived mechanically from the analysis (`engine/brief.js`) and adds no figures.
+
+### On-chain Cycle & Momentum (`engine/cycle.js`)
+
+Where BTC sits in the historical on-chain valuation cycle — positioning research, not a signal. Rule-based and fully shown on the page:
+
+| Input | Source | Zones (score) |
+|---|---|---|
+| MVRV | Coin Metrics `CapMVRVCur` (history since 2011) | <1.0 Deep value (+2) · 1.0–1.5 Value (+1) · 1.5–2.4 Neutral (0) · 2.4–3.2 Elevated (−1) · ≥3.2 Euphoria (−2) |
+| Mayer Multiple | spot ÷ 200-day average (CoinGecko) | <0.8 (+2) · 0.8–1.0 (+1) · 1.0–1.5 (0) · 1.5–2.4 (−1) · ≥2.4 (−2) |
+| Puell Multiple | derived: Coin Metrics `IssTotNtv` × `PriceUSD` ÷ 365-day average | <0.5 (+2) · 0.5–0.8 (+1) · 0.8–1.5 (0) · 1.5–2.5 (−1) · ≥2.5 (−2) |
+| SOPR (7d avg) | BGeometrics free API | <0.98 (+1) · 0.98–1.03 (0) · ≥1.03 (−1) |
+| % supply in profit | BGeometrics BTC in profit ÷ Coin Metrics supply | <55% (+2) · 55–70 (+1) · 70–90 (0) · 90–97 (−1) · ≥97 (−2) |
+| NUPL, distance to realised price | derived from MVRV (NUPL = 1 − 1/MVRV) | context only — not double-scored |
+| Hash Ribbons | derived: 30d vs 60d average hash rate | +1 only on a recovery cross after ≥10 days of capitulation |
+
+Composite valuation = mean of the scored valuation inputs available (minimum 3): ≥+1.25 Deep value · +0.5…+1.25 Value · −0.5…+0.5 Neutral / mid-cycle · −1.25…−0.5 Elevated · ≤−1.25 Euphoria / stretched. Momentum = sum of four −1/0/+1 components (price vs 200-day average, 200-day slope, MVRV vs its 365-day average, stablecoin supply 30d); ≥+2 constructive, ≤−2 weakening. **BGeometrics free tier** (15 requests/day) is called at most once every 20 hours (2 requests) and carried forward between runs; values the provider flags as delayed (latest ~7 days withheld) are shown as “Data delayed — last good value as of …”.
 
 The **same engine** runs in the agent (Node 22) and in the browser. The page's **Refresh market** button re-collects exchange, derivatives, options and on-chain data directly from source APIs in your browser and regenerates the full analysis in place. Sources that block browser requests (Farside ETF flows, FRED, Yahoo, CFTC) keep their last server values, labelled with their own timestamps. **Server run** triggers the full agent (all sources, archived) via `workflow_dispatch`.
 

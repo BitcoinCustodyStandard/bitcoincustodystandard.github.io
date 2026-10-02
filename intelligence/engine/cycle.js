@@ -220,12 +220,12 @@ export function computeCycle(snap, m) {
 
   // ---------- executive summary ----------
   const g = (id) => metrics.find((x) => x.id === id);
-  const asOfTxt = (x) => (x.status === 'delayed' ? ` (as of ${x.asOf}, delayed)` : '');
+  const asOfTxt = (x) => (x.status === 'delayed' ? `; as of ${x.asOf}, delayed` : '');
   const bullets = [];
   if (mvrv !== null) bullets.push(`MVRV ${fmtNum(mvrv, 2)} — ${mvZ.label.toLowerCase()}; NUPL ${fmtNum(nupl, 2)} puts the market in the “${phase}” phase.`);
   if (dist !== null && mayer !== null) bullets.push(`Price is ${fmtPct(Math.abs(dist), 0, false)} ${dist >= 0 ? 'above' : 'below'} the realised price (${fmtK(realized)}) and ${fmtPct(Math.abs(mayer - 1) * 100, 0, false)} ${mayer >= 1 ? 'above' : 'below'} its 200-day average (Mayer ${fmtNum(mayer, 2)}).`);
   const calm = ['puell', 'sopr', 'profit'].map(g).filter((x) => x && x.status !== 'unavailable');
-  if (calm.length) bullets.push(calm.map((x) => `${x.name.replace(/ \(.*\)/, '')} ${x.display} (${x.zone.label.toLowerCase()})${asOfTxt(x)}`).join('; ') + '.');
+  if (calm.length) bullets.push(calm.map((x) => `${x.name.replace(/ \(.*\)/, '')} ${x.display} (${x.zone.label.toLowerCase()}${asOfTxt(x)})`).join('; ') + '.');
   const MOM_TXT = { aboveMa: ['price above its 200-day average', 'price below its 200-day average'], maSlope: ['200-day average rising', '200-day average falling'], mvrvTrend: ['MVRV above its one-year average', 'MVRV below its one-year average'], stables: ['stablecoin supply expanding', 'stablecoin supply contracting'] };
   if (momLabel) bullets.push(`Momentum ${momLabel.toLowerCase()} (${momScore > 0 ? '+' : ''}${momScore} on a −${momIn.length}…+${momIn.length} scale): ${momIn.filter((x) => x.score !== 0).map((x) => MOM_TXT[x.id][x.score > 0 ? 0 : 1]).join(', ') || 'mixed inputs'}.`);
 
@@ -254,18 +254,25 @@ export function computeCycle(snap, m) {
   };
 }
 
-// Cycle watch items: a zone change since the previous observation, or a metric within 3%
-// of a zone boundary. Used by the overview's "things to watch".
+// Cycle watch items: a zone change since the previous observation, or a scored metric
+// within a metric-specific distance of a zone boundary (absolute units of that metric).
+// Used by the overview's "things to watch".
+const NEAR = { mvrv: 0.05, mayer: 0.03, puell: 0.05, sopr: 0.005, profit: 1.5 };
 export function cycleWatch(cy, prevRow) {
   if (!cy) return [];
   const out = [];
   const z = cy.valuation.zone?.label;
   if (z && prevRow?.cycleZone && prevRow.cycleZone !== z) out.push({ what: `On-chain zone change: ${prevRow.cycleZone} → ${z}`, why: 'First change in the composite valuation zone since the previous observation.', kind: 'zone' });
   for (const x of cy.metrics.filter((y) => y.scored && y.value !== null && y.status !== 'unavailable')) {
-    const tbl = ZONES[x.id];
-    if (!tbl) continue;
+    const tbl = ZONES[x.id], tol = NEAR[x.id];
+    if (!tbl || !tol) continue;
     for (const b of tbl.slice(1).map((t) => t.min)) {
-      if (b && Math.abs(x.value - b) / Math.abs(b) <= 0.03) { out.push({ what: `${x.name.replace(/ \(.*\)/, '')} near a zone boundary`, why: `${x.display} vs ${b} — a move across it would shift the on-chain reading.`, kind: 'near' }); break; }
+      if (Math.abs(x.value - b) <= tol) {
+        const i = tbl.findIndex((t) => t.min === b);
+        const other = x.value >= b ? tbl[i - 1] : tbl[i];
+        out.push({ what: `${x.name.replace(/ \(.*\)/, '')} near a zone boundary`, why: `${x.display} vs the ${b}${x.id === 'profit' ? '%' : ''} line — crossing it moves the reading from ${x.zone.label} to ${other.label}.`, kind: 'near' });
+        break;
+      }
     }
   }
   return out;
