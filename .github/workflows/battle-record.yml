@@ -5,9 +5,6 @@ name: battle-record
 on:
   schedule:
     - cron: '20 14 * * *'   # US session: more liquidations and large trades
-  push:
-    branches: ['claude/bitcoin-market-intelligence-qz1k50']
-    paths: ['.github/workflows/battle-record.yml']
   workflow_dispatch:
     inputs:
       minutes:
