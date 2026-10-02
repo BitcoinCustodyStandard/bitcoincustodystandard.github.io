@@ -460,7 +460,7 @@ details.more[open] > summary { border-bottom: 1px solid var(--line); }
 .acard dt:first-child { margin-top: 0; }
 .acard dd { margin: 3px 0 0; color: var(--text2); }
 
-.watch24 { margin: 0; padding: 0; list-style: none; counter-reset: w; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 12px; }
+.watch24 { margin: 0; padding: 0; list-style: none; counter-reset: w; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 12px; }
 .watch24 li { counter-increment: w; display: grid; grid-template-columns: 26px 1fr; grid-template-rows: auto auto; column-gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; font-size: 13px; }
 .watch24 li::before { content: counter(w); grid-row: span 2; font: 500 15px/1.3 var(--mono); color: var(--orange-ink); }
 .watch24 li span { color: var(--text2); }
@@ -549,8 +549,8 @@ details.more[open] > summary { border-bottom: 1px solid var(--line); }
 .mcard.delayed { border-color: rgba(217, 164, 65, 0.45); }
 .mcard .dstate { font-size: 11.5px; color: var(--warn); background: rgba(217, 164, 65, 0.08); border-radius: 3px; padding: 4px 8px; }
 .mcard.off { opacity: 0.75; border-style: dashed; }
-.chart .band { opacity: 0.09; }
-.chart .band.b-bull { fill: var(--up); } .chart .band.b-neu { fill: var(--neutral); opacity: 0.05; } .chart .band.b-warn { fill: var(--warn); } .chart .band.b-bear { fill: var(--down); }
+.chart .band { opacity: 0.16; }
+.chart .band.b-bull { fill: var(--up); } .chart .band.b-neu { fill: var(--neutral); opacity: 0.07; } .chart .band.b-warn { fill: var(--warn); } .chart .band.b-bear { fill: var(--down); }
 .cy-method h4 { margin: 14px 0 6px; font: 600 11px/1.3 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 .cy-method h4:first-child { margin-top: 0; }
 #cycle-sec { padding-top: 22px; }
