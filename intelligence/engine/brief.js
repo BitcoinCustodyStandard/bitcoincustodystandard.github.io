@@ -201,26 +201,37 @@ function scenarioShort(s, a) {
 }
 
 // ---------- watch next 24h ----------
+// Three things to watch: dated events first (options expiry, tonight's ETF print), then any
+// on-chain zone change or zone-boundary proximity, then stablecoin flow and the rest by force rank.
+const WATCH_N = 3;
 function watch24(a) {
   const m = a.metrics, out = [];
   const x = m.options?.nextBigExpiry;
   const g = byGamma(m.options)[0];
-  if (x && x.days <= 1.5) out.push({ what: `${dayLabel(x.expiry)} 08:00 UTC Deribit expiry`, why: `${fmtUsd(x.notionalUsd)} notional, max pain ${fmtK(x.maxPain)}.${g ? ` Watch for pin or break around ${fmtK(g.strike)}.` : ''}` });
-  if (m.etf) out.push({ what: "Tonight's Farside ETF print", why: `Does the 5-day net stay ${m.etf.s5 >= 0 ? 'constructive or roll over' : 'negative or turn'}?` });
+  if (x && x.days <= 1.5) out.push({ what: `${dayLabel(x.expiry)} 08:00 UTC Deribit expiry`, why: `${fmtUsd(x.notionalUsd)} notional, max pain ${fmtK(x.maxPain)}.${g ? ` Watch for pin or break around ${fmtK(g.strike)}.` : ''}`, link: '#liquidity' });
+  if (m.etf) out.push({ what: "Tonight's Farside ETF print", why: `Does the 5-day net stay ${m.etf.s5 >= 0 ? 'constructive or roll over' : 'negative or turn'}?`, link: '#force-etf' });
+  for (const w of a.cycle?.watch || []) out.push({ what: w.what, why: w.why, link: '#cycle' });
   const rank = (id) => a.forces.find((f) => f.id === id)?.rank ?? 99;
   const rest = [];
-  if (m.onchain?.stables30d !== null && m.onchain?.stables30d !== undefined) rest.push({ id: 'onchain', what: 'Stablecoin supply', why: m.onchain.stables30d > 0 ? 'Continued expansion or pause.' : 'Continued contraction or stabilisation.' });
-  if (m.depth) rest.push({ id: 'depth', what: 'Depth during US hours', why: 'Does bid-side hold or withdraw on any dip?' });
-  if (m.derivs) rest.push({ id: 'leverage', what: 'Open interest and funding', why: 'Is leverage being rebuilt into the move?' });
-  rest.sort((p, q) => rank(p.id) - rank(q.id));
-  for (const r of rest) if (out.length < 4) out.push({ what: r.what, why: r.why });
-  return out;
+  if (m.onchain?.stables30d !== null && m.onchain?.stables30d !== undefined) rest.push({ id: 'onchain', what: 'Stablecoin flow', why: m.onchain.stables30d > 0 ? `Supply ${fmtUsdSigned(m.onchain.stables7d, 1)} this week — continued expansion or pause?` : 'Continued contraction or stabilisation?', link: '#cycle' });
+  if (m.depth) rest.push({ id: 'depth', what: 'Depth during US hours', why: 'Does bid-side hold or withdraw on any dip?', link: '#liquidity' });
+  if (m.derivs) rest.push({ id: 'leverage', what: 'Open interest and funding', why: 'Is leverage being rebuilt into the move?', link: '#force-leverage' });
+  rest.sort((p, q) => (p.id === 'onchain' ? -1 : q.id === 'onchain' ? 1 : rank(p.id) - rank(q.id)));
+  for (const r of rest) out.push({ what: r.what, why: r.why, link: r.link });
+  return out.slice(0, WATCH_N);
 }
 
 // ---------- notable moves ----------
-const CHANGE_FORCE = { depth1: 'depth', etf5d: 'etf', oiTotal: 'leverage', fundingAnn: 'funding', iv30: 'options', skew: 'options', dxy: 'dollar', real10y: 'macro', vix: 'riskappetite', corrNdx30: 'riskappetite', stables: 'onchain' };
+const CHANGE_FORCE = { mvrv: 'onchain', depth1: 'depth', etf5d: 'etf', oiTotal: 'leverage', fundingAnn: 'funding', iv30: 'options', skew: 'options', dxy: 'dollar', real10y: 'macro', vix: 'riskappetite', corrNdx30: 'riskappetite', stables: 'onchain' };
 function notable(a) {
-  return (a.changes || []).filter((c) => c.z !== null && c.z !== undefined && Math.abs(c.z) >= NOTABLE_Z).map((c) => ({ key: c.key, label: c.label, from: c.from, to: c.to, z: c.z }));
+  const pick = (list, horizon) => (list || []).filter((c) => c.z !== null && c.z !== undefined && Math.abs(c.z) >= NOTABLE_Z).map((c) => ({ key: c.key, label: c.label, from: c.from, to: c.to, z: c.z, horizon }));
+  return [...pick(a.changes, '24h'), ...pick(a.changes7, '7d')].sort((x, y) => Math.abs(y.z) - Math.abs(x.z));
+}
+// Small cycle badge for the overview header.
+function cycleBadge(a) {
+  const c = a.cycle;
+  if (!c || c.error || (!c.valuation?.zone && !c.phase)) return null;
+  return { phase: c.phase?.label ?? null, zone: c.valuation.zone?.label ?? 'inputs incomplete', tone: c.valuation.zone?.tone ?? 'neu', momentum: c.momentum?.label ?? null, stretched: !!c.stretched };
 }
 
 export function brief(a) {
@@ -236,6 +247,7 @@ export function brief(a) {
     sources: sourceStatus(a.quality),
     dataThrough: a.dataThrough,
     notable: moves,
+    cycle: cycleBadge(a),
     top: a.top.map((t) => { const id = t.id || a.forces.find((f) => f.name === t.name)?.id; return { id, name: t.name, direction: t.direction, dirNote: byId[id]?.dirNote || cap(t.direction), summary: byId[id]?.summary || t.state, watch: byId[id]?.watch || t.watch }; }),
     forces,
     ladder: ladder(a),

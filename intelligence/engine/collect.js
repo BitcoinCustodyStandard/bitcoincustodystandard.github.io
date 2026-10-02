@@ -36,6 +36,7 @@ export const SOURCE_META = {
   yahoo: { name: 'Yahoo Finance chart API', url: 'https://finance.yahoo.com', frequency: 'daily close', method: 'Front-month futures (gold, silver), DXY, Nasdaq-100, S&P 500 closes.' },
   coinmetrics: { name: 'Coin Metrics Community API', url: 'https://docs.coinmetrics.io', frequency: 'daily', method: 'On-chain network data (MVRV, realized cap, hash rate, miner revenue, issuance).' },
   mempool: { name: 'mempool.space', url: 'https://mempool.space/mining', frequency: 'per block', method: 'Hash rate, difficulty, next adjustment estimate.' },
+  bgeometrics: { name: 'BGeometrics (bitcoin-data.com) free API', url: 'https://bitcoin-data.com', frequency: 'daily; free tier withholds the latest ~7 days on some metrics', method: 'SOPR and BTC supply in profit. Free tier: 15 requests/day — fetched at most once every 20 hours and carried forward between runs.' },
   defillama_stables: { name: 'DefiLlama stablecoins', url: 'https://defillama.com/stablecoins', frequency: 'daily', method: 'Total USD-pegged stablecoin circulation.' },
 };
 
@@ -621,11 +622,25 @@ async function yahoo() {
 
 // ---------------------------------------------------------------------------
 // ON-CHAIN
-const CM_METRICS = ['CapMVRVCur', 'CapRealUSD', 'SplyCur', 'HashRate', 'RevUSD', 'IssTotNtv', 'AdrActCnt', 'TxTfrValAdjUSD', 'FlowInExNtv', 'FlowOutExNtv', 'SplyExNtv'];
+const CM_METRICS = ['CapMVRVCur', 'CapRealUSD', 'SplyCur', 'HashRate', 'RevUSD', 'IssTotNtv', 'AdrActCnt', 'TxTfrValAdjUSD', 'FlowInExNtv', 'FlowOutExNtv', 'SplyExNtv', 'PriceUSD'];
+// Fetched with full history in one request: MVRV for cycle context since 2011; issuance,
+// price and hash rate for the Puell Multiple (needs a 365-day average) and Hash Ribbons.
+const CM_LONG = ['CapMVRVCur', 'PriceUSD', 'IssTotNtv', 'HashRate'];
+const CM_KEEP_DAYS = 800;
 async function coinmetrics() {
   const start = isoDate(Date.now() - 400 * DAY);
   const series = {}, unavailable = [];
-  await Promise.all(CM_METRICS.map(async (m) => {
+  let mvrvWeekly = null;
+  try {
+    const j = await fetchJSON(`https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=${CM_LONG.join(',')}&frequency=1d&start_time=2011-01-01&page_size=10000`, {}, 60000);
+    const rows = j.data || [];
+    for (const m of CM_LONG) {
+      const pts = rows.map((r) => [String(r.time).slice(0, 10), num(r[m])]).filter(([, v]) => v !== null);
+      if (pts.length) series[m] = pts.slice(-CM_KEEP_DAYS);
+      if (m === 'CapMVRVCur' && pts.length) mvrvWeekly = pts.filter((_, i) => i % 7 === (pts.length - 1) % 7);
+    }
+  } catch { /* fall back to the 400-day requests below */ }
+  await Promise.all(CM_METRICS.filter((m) => !series[m]).map(async (m) => {
     try {
       const j = await fetchJSON(`https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=${m}&frequency=1d&start_time=${start}&page_size=1000`);
       const pts = (j.data || []).map((r) => [String(r.time).slice(0, 10), num(r[m])]).filter(([, v]) => v !== null);
@@ -633,7 +648,36 @@ async function coinmetrics() {
     } catch { unavailable.push(m); }
   }));
   if (!Object.keys(series).length) throw new Error('no metrics returned');
-  return { series, unavailable };
+  return { series, unavailable, mvrvWeekly };
+}
+// BGeometrics free tier: 15 requests/day, 10/hour. Two requests per refresh, at most once
+// every 20 hours; between refreshes the previous values are carried forward unchanged
+// (status stays 'ok' with a note, because the data itself is daily and not yet due).
+const BG_MIN_HOURS = 20;
+async function bgeometrics(prev) {
+  const p = prev?.onchain?.bgeo;
+  if (p?.fetchedAt && (Date.now() - new Date(p.fetchedAt)) / 3600e3 < BG_MIN_HOURS) {
+    const { note, ...rest } = p;
+    return { ...rest, __asOf: p.asOf, note: `cached from ${p.fetchedAt.slice(0, 16).replace('T', ' ')} UTC (free tier: refreshed at most every ${BG_MIN_HOURS}h)` };
+  }
+  const startday = isoDate(Date.now() - 120 * DAY);
+  const get = async (path, key) => {
+    const j = await fetchJSON(`https://bitcoin-data.com/v1/${path}?startday=${startday}`, {}, 40000);
+    const arr = Array.isArray(j) ? j : j && j[key] !== undefined ? [j] : [];
+    const pts = arr.map((r) => [String(r.d).slice(0, 10), num(r[key])]).filter(([d, v]) => d && v !== null).sort((a, b) => (a[0] < b[0] ? -1 : 1));
+    if (!pts.length) throw new Error(`${path}: ${String(j?.message || j?.error || 'no data').slice(0, 120)}`);
+    return { pts, delayedFlag: arr.some((r) => r.delayed) };
+  };
+  const out = { fetchedAt: new Date().toISOString() };
+  const errs = [];
+  for (const [k, path, key] of [['sopr', 'sopr', 'sopr'], ['supplyProfit', 'supply-profit', 'supplyProfitBtc']]) {
+    try { const r = await get(path, key); out[k] = r.pts; out[k + 'Delayed'] = r.delayedFlag; } catch (e) { errs.push(e.message); }
+  }
+  if (!out.sopr && !out.supplyProfit) throw new Error(errs.join('; ') || 'no data');
+  // carry forward any metric that failed this time
+  for (const k of ['sopr', 'supplyProfit']) if (!out[k] && p?.[k]) { out[k] = p[k]; out[k + 'Carried'] = true; }
+  out.asOf = [out.sopr?.at(-1)?.[0], out.supplyProfit?.at(-1)?.[0]].filter(Boolean).sort().at(-1);
+  return { ...out, __asOf: out.asOf, ...(errs.length ? { note: errs.join('; ') } : {}) };
 }
 async function mempool() {
   const [adj, hr] = await Promise.all([
@@ -657,7 +701,7 @@ async function stables() {
 // `scope` = 'server' collects everything; 'browser' skips sources that never
 // allow cross-origin requests (FRED, Yahoo, Farside, CFTC) — those keep their
 // last server values and are labelled with their own timestamps.
-export async function collectAll({ scope = 'server', log = () => {} } = {}) {
+export async function collectAll({ scope = 'server', log = () => {}, prev = null } = {}) {
   const sources = {};
   const snap = { collectedAt: new Date().toISOString(), scope, sources };
   const browser = scope === 'browser';
@@ -687,6 +731,7 @@ export async function collectAll({ scope = 'server', log = () => {} } = {}) {
     tasks.etf = attempt(sources, 'farside', farside);
     tasks.fred = attempt(sources, 'fred', fred);
     tasks.yahoo = attempt(sources, 'yahoo', yahoo);
+    tasks.bgeo = attempt(sources, 'bgeometrics', () => bgeometrics(prev));
   }
   const r = {};
   for (const [k, p] of Object.entries(tasks)) r[k] = await p;
@@ -728,7 +773,7 @@ export async function collectAll({ scope = 'server', log = () => {} } = {}) {
   snap.options = r.opts ? { ...r.opts, dvolHistory: r.dvol?.history || null } : null;
   snap.etf = r.etf || null;
   snap.macro = r.fred || r.yahoo ? { fred: r.fred?.series || null, markets: r.yahoo?.series || null } : null;
-  snap.onchain = { coinmetrics: r.cm || null, mempool: r.mempool || null, stablecoins: r.stables?.history || null };
+  snap.onchain = { coinmetrics: r.cm || null, mempool: r.mempool || null, stablecoins: r.stables?.history || null, bgeo: r.bgeo || null };
   // fill spot fallback from books if CoinGecko spot failed
   if (!snap.price && snap.books) {
     snap.price = { spot: snap.books.impact.refMid, change24h: null, change7d: null, change30d: null, marketCap: null, volume24h: null, derivedFrom: 'order-book mid (CoinGecko unavailable)' };
@@ -743,7 +788,7 @@ export async function collectAll({ scope = 'server', log = () => {} } = {}) {
 const SECTION_SOURCES = {
   price: ['coingecko'], priceHistory: ['coingecko_hist', 'coinbase_hist'], global: ['coingecko_global'], breadth: ['coingecko_markets'],
   books: Object.keys(BOOKS), derivs: ['okx_deriv', 'okx_rubik', 'binance_deriv', 'bybit_deriv', 'deribit_fut', 'bitmex', 'hyperliquid', 'cftc_cot', 'coingecko_deriv'],
-  liquidations: ['okx_deriv'], options: ['deribit_opt', 'deribit_dvol'], etf: ['farside'], macro: ['fred', 'yahoo'], onchain: ['coinmetrics', 'mempool', 'defillama_stables'],
+  liquidations: ['okx_deriv'], options: ['deribit_opt', 'deribit_dvol'], etf: ['farside'], macro: ['fred', 'yahoo'], onchain: ['coinmetrics', 'mempool', 'defillama_stables', 'bgeometrics'],
 };
 export function mergeWithPrevious(snap, prev) {
   if (!prev) return snap;
@@ -769,7 +814,7 @@ export function mergeWithPrevious(snap, prev) {
     if (!snap.macro.markets && prev.macro.markets) { snap.macro.markets = prev.macro.markets; markStale(['yahoo']); }
   }
   if (snap.onchain && prev.onchain) {
-    for (const [k, id] of [['coinmetrics', 'coinmetrics'], ['mempool', 'mempool'], ['stablecoins', 'defillama_stables']]) {
+    for (const [k, id] of [['coinmetrics', 'coinmetrics'], ['mempool', 'mempool'], ['stablecoins', 'defillama_stables'], ['bgeo', 'bgeometrics']]) {
       if (!snap.onchain[k] && prev.onchain[k]) { snap.onchain[k] = prev.onchain[k]; markStale([id]); }
     }
   }

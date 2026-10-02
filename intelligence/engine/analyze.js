@@ -12,6 +12,7 @@ import {
   valueAt, lastPoint, shiftDate, isoDate, fmtUsd, fmtUsdSigned, ordinal, fmtPrice, fmtPct, fmtNum, fmtK, clamp, DAY,
 } from './util.js';
 import { UNAVAILABLE } from './reference.js';
+import { computeCycle, cycleWatch } from './cycle.js';
 
 export const ENGINE_VERSION = '1.0.0';
 
@@ -985,18 +986,21 @@ export function buildScenarios(m, map) {
 
 // ---------------------------------------------------------------------------
 // WHAT CHANGED
-export function whatChanged(m, rows) {
-  const p = m.prev1;
-  if (!p) return [{ text: 'No prior daily observation stored yet — change tracking begins with the next run.', weight: 0 }];
+// horizon 1 = since the previous daily observation; 7 = since the observation a week ago,
+// each scored against the typical change over the same horizon in the stored history.
+export function whatChanged(m, rows, horizon = 1) {
+  const p = horizon === 7 ? m.prev7 : m.prev1;
+  if (!p) return [{ text: horizon === 7 ? 'No observation from a week ago stored yet.' : 'No prior daily observation stored yet — change tracking begins with the next run.', weight: 0 }];
+  const span = horizon === 7 ? 'typical 7-day change' : 'typical daily change';
   const out = [];
   const series = (k) => rows.map((r) => r[k]).filter((v) => v !== null && v !== undefined);
-  const diffs = (k) => { const s = series(k); const d = []; for (let i = 1; i < s.length; i++) d.push(s[i] - s[i - 1]); return d; };
+  const diffs = (k) => { const s = series(k); const d = []; for (let i = horizon; i < s.length; i++) d.push(s[i] - s[i - horizon]); return d; };
   const add = (k, now, label, fmt, why) => {
     if (now === null || now === undefined || p[k] === null || p[k] === undefined) return;
     const d = now - p[k];
     const sd = std(diffs(k));
     const z = sd ? d / sd : null;
-    out.push({ key: k, label, from: fmt(p[k]), to: fmt(now), delta: d, z, weight: z !== null ? Math.abs(z) : Math.abs(d) > 0 ? 0.5 : 0, why, text: `${label}: ${fmt(p[k])} → ${fmt(now)}${z !== null ? ` (${fmtNum(z, 1)}σ vs typical daily change)` : ''}` });
+    out.push({ key: k, label, from: fmt(p[k]), to: fmt(now), delta: d, z, horizon, weight: z !== null ? Math.abs(z) : Math.abs(d) > 0 ? 0.5 : 0, why, text: `${label}: ${fmt(p[k])} → ${fmt(now)}${z !== null ? ` (${fmtNum(z, 1)}σ vs ${span})` : ''}` });
   };
   add('price', m.price.spot, 'BTC price', fmtPrice, 'Price');
   add('depth1', m.depth?.venueSet === p.depthVenues ? m.depth?.d1 : null, '±1% depth', fmtUsd, 'Liquidity cushion');
@@ -1010,6 +1014,7 @@ export function whatChanged(m, rows) {
   add('vix', m.macro?.vix?.[1], 'VIX', (v) => fmtNum(v, 1), 'Equity volatility');
   add('corrNdx30', m.corr?.NDX?.c30, 'BTC–Nasdaq 30d corr', (v) => fmtNum(v, 2), 'Macro linkage');
   add('stables', m.onchain?.stables, 'Stablecoin supply', fmtUsd, 'Crypto liquidity');
+  add('mvrv', m.onchain?.mvrv, 'MVRV', (v) => fmtNum(v, 2), 'On-chain valuation');
   return out.sort((a, b) => b.weight - a.weight);
 }
 
@@ -1093,17 +1098,27 @@ export function analyze(snap, rows = []) {
   const map = buildLevelMap(snap, m);
   const scenarios = buildScenarios(m, map);
   const changes = whatChanged(m, rows);
+  const changes7 = whatChanged(m, rows, 7);
   const top = forces.filter((f) => !f.unavailable).slice(0, 3).map((f) => ({ id: f.id, name: f.name, direction: f.direction, watch: f.watch, state: f.state }));
   const quality = Object.entries(snap.sources || {}).map(([id, s]) => ({ id, name: s.name, status: s.status, asOf: s.asOf || null, fetchedAt: s.fetchedAt, frequency: s.frequency, method: s.method, url: s.url, error: s.error || s.lastError || null, note: s.note || null, staleSince: s.staleSince || null }));
   const forceSummary = Object.fromEntries(forces.map((f) => [f.id, { direction: f.direction, importance: f.importance, key: f.key ?? null }]));
-  const row = makeRow(snap, m, { regime: regime.primary, move1d: attribution.d1.label, move7d: attribution.d7.label, forces: forceSummary });
+  let cycle = null;
+  try { cycle = computeCycle(snap, m); } catch (e) { cycle = { error: String(e.message || e) }; }
+  const cyOk = cycle && !cycle.error;
+  const cyVal = (id) => (cyOk ? cycle.metrics.find((x) => x.id === id)?.value ?? null : null);
+  const row = makeRow(snap, m, {
+    regime: regime.primary, move1d: attribution.d1.label, move7d: attribution.d7.label, forces: forceSummary,
+    cycleScore: cyOk ? cycle.valuation.score : null, cycleZone: cyOk ? cycle.valuation.zone?.label ?? null : null, momentumScore: cyOk ? cycle.momentum.score : null,
+    nupl: cyVal('nupl'), mayer: cyVal('mayer'), puell: cyVal('puell'), sopr7: cyVal('sopr'), supplyProfitPct: cyVal('profit'),
+  });
+  if (cyOk) cycle.watch = cycleWatch(cycle, m.prev1);
   return {
     engine: ENGINE_VERSION,
     generatedAt: new Date().toISOString(),
     dataThrough: snap.collectedAt,
     scope: snap.scope,
     metrics: stripHeavy(m),
-    regime, attribution, forces, map, scenarios, changes, top,
+    regime, attribution, forces, map, scenarios, changes, changes7, top, cycle,
     quality, unavailable: UNAVAILABLE,
     row,
   };

@@ -56,7 +56,7 @@ export function syntheticSnapshot(dayOffset = 0) {
   const ok = (name, freq) => ({ name, status: 'ok', fetchedAt: new Date(now).toISOString(), asOf: new Date(now).toISOString(), frequency: freq || 'snapshot' });
   const snap = {
     collectedAt: new Date(now).toISOString(), scope: 'server',
-    sources: { coingecko: ok('CoinGecko'), coingecko_hist: ok('CoinGecko (daily history)'), farside: ok('Farside'), fred: ok('FRED'), yahoo: ok('Yahoo'), deribit_opt: ok('Deribit options'), okx_deriv: ok('OKX'), okx_rubik: ok('OKX Rubik'), book_binance: ok('Binance book'), coinmetrics: ok('Coin Metrics'), defillama_stables: ok('DefiLlama'), mempool: ok('mempool.space'), binance_deriv: { name: 'Binance futures', status: 'error', error: 'HTTP 451 (geo-blocked)' } },
+    sources: { coingecko: ok('CoinGecko'), coingecko_hist: ok('CoinGecko (daily history)'), farside: ok('Farside'), fred: ok('FRED'), yahoo: ok('Yahoo'), deribit_opt: ok('Deribit options'), okx_deriv: ok('OKX'), okx_rubik: ok('OKX Rubik'), book_binance: ok('Binance book'), coinmetrics: ok('Coin Metrics'), defillama_stables: ok('DefiLlama'), mempool: ok('mempool.space'), bgeometrics: ok('BGeometrics'), binance_deriv: { name: 'Binance futures', status: 'error', error: 'HTTP 451 (geo-blocked)' } },
     price: { spot, change24h: (spot / ph.at(-2)[1] - 1) * 100, change7d: (spot / ph.at(-8)[1] - 1) * 100, change30d: (spot / ph.at(-31)[1] - 1) * 100, marketCap: spot * 19.93e6, volume24h: 3.2e10, circulatingSupply: 19.93e6, ath: 126000, athDate: '2025-10-06' },
     priceHistory: ph.slice(-366),
     global: { btcDominance: 58.2, totalMcap: 3.1e12 },
@@ -87,7 +87,7 @@ export function syntheticSnapshot(dayOffset = 0) {
       },
       markets: { NDX: series(22000, 180), SPX: series(6400, 40), GOLD: series(3600, 25), SILVER: series(42, 0.5), DXY: series(98, 0.3), VIX: series(17, 0.8), TNX: series(4.1, 0.03) },
     },
-    onchain: { coinmetrics: { series: { CapMVRVCur: series(1.9, 0.02), CapRealUSD: series(1.0e12, 1e9), SplyCur: series(19.9e6, 50), HashRate: series(9.5e8, 1e7), RevUSD: series(4.5e7, 1e6) }, unavailable: ['FlowInExNtv', 'FlowOutExNtv', 'SplyExNtv'] }, mempool: { hashrateEhs: 950, nextAdjPct: 1.8 }, stablecoins: series(2.9e11, 4e8) },
+    onchain: { coinmetrics: { series: { CapMVRVCur: series(1.9, 0.02), CapRealUSD: series(1.0e12, 1e9), SplyCur: series(19.9e6, 50), HashRate: series(9.5e8, 1e7), RevUSD: series(4.5e7, 1e6), IssTotNtv: series(450, 2), PriceUSD: series(60000, 400) }, unavailable: ['FlowInExNtv', 'FlowOutExNtv', 'SplyExNtv'] }, mempool: { hashrateEhs: 950, nextAdjPct: 1.8 }, stablecoins: series(2.9e11, 4e8), bgeo: { fetchedAt: new Date().toISOString(), sopr: series(1.0, 0.01).slice(-60, -7), soprDelayed: true, supplyProfit: series(1.5e7, 1e5).slice(-60, -2) } },
   };
   return snap;
 }
@@ -117,8 +117,14 @@ const run = (offset) => {
 run(-1);
 run(0);
 const latest = JSON.parse(fs.readFileSync(path.join(tmp, 'data', 'latest.json'), 'utf8'));
-const must = ['forces', 'map', 'scenarios', 'regime', 'attribution', 'reportMd', 'briefMd'];
+const must = ['forces', 'map', 'scenarios', 'regime', 'attribution', 'reportMd', 'briefMd', 'cycle'];
 for (const k of must) if (!latest[k]) throw new Error('missing ' + k);
+if (latest.cycle.error) throw new Error('cycle: ' + latest.cycle.error);
+const cyS = Object.fromEntries(latest.cycle.metrics.map((x) => [x.id, x.status]));
+if (cyS.sopr !== 'delayed') throw new Error('expected SOPR flagged delayed, got ' + cyS.sopr);
+if (cyS.profit === 'unavailable' || cyS.mvrv === 'unavailable') throw new Error('cycle inputs missing: ' + JSON.stringify(cyS));
+if (latest.cycle.valuation.score === null) throw new Error('composite not computed');
+if (/NaN|undefined|Infinity/.test(JSON.stringify(latest.cycle.metrics.map((x) => [x.display, x.meaning, x.move])))) throw new Error('bad cycle copy');
 if (latest.forces.length < 6) throw new Error('too few forces');
 if (!latest.map.levels.length) throw new Error('empty level map');
 const runsLog = JSON.parse(fs.readFileSync(path.join(tmp, 'data', 'runs.json'), 'utf8')).runs;

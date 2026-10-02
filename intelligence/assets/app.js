@@ -6,11 +6,12 @@ import { analyze } from '../engine/analyze.js';
 import { collectAll, mergeWithPrevious } from '../engine/collect.js';
 import { morningReport, briefReport } from '../engine/report.js';
 import { brief } from '../engine/brief.js';
+import { ZONES } from '../engine/cycle.js';
 import { fmtUsd, fmtUsdSigned, fmtPrice, fmtPct, fmtNum, fmtK, ordinal } from '../engine/util.js';
 
 const REPO = 'bitcoincustodystandard/bitcoincustodystandard.github.io';
 const WORKFLOW = 'market-intel.yml';
-const SERVER_ONLY = ['farside', 'fred', 'yahoo', 'cftc_cot'];
+const SERVER_ONLY = ['farside', 'fred', 'yahoo', 'cftc_cot', 'bgeometrics'];
 const state = { a: null, rows: [], runs: [], index: null, snapshot: null, range: 90 };
 const $ = (s, r = document) => r.querySelector(s);
 
@@ -34,6 +35,9 @@ function dirClass(d = '') {
   return 'neu';
 }
 const chip = (txt, c) => h`<span class="chip ${c}">${txt}</span>`;
+// evidence strength as a quiet 3-step meter next to its word (weak ●○○ · moderate ●●○ · strong ●●●)
+const EV_N = { weak: 1, moderate: 2, strong: 3 };
+const evMeter = (conf) => h`<span class="evm" title="evidence strength: ${conf}">${[1, 2, 3].map((i) => h`<i class="${i <= (EV_N[conf] || 0) ? 'on' : ''}"></i>`)}<span>${conf}</span></span>`;
 const dirChip = (d) => chip(d, dirClass(d));
 
 function srcLine(ids) {
@@ -110,10 +114,12 @@ function lineSvg(pts, fmt, o = BIG, emptyMsg = 'Not enough history yet', fmtTip 
   const path = pts.map((p, i) => `${i ? 'L' : 'M'}${X(xs[i]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
   const area = `${path}L${X(xs.at(-1)).toFixed(1)},${H - PAD.b}L${X(xs[0]).toFixed(1)},${H - PAD.b}Z`;
   const grid = o.axes ? ticks.map((t) => `<line class="gridl" x1="${PAD.l}" x2="${W - PAD.r}" y1="${Y(t)}" y2="${Y(t)}"/><text class="axis" x="${PAD.l - 6}" y="${Y(t) + 3}" text-anchor="end">${esc(fmt(t))}</text>`).join('') : '';
+  // optional zone bands (e.g. MVRV zones) behind the series
+  const bands = (o.bands || []).map((b) => { const lo = Math.max(y0, b.lo), hi = Math.min(y1, b.hi); return hi > lo ? `<rect class="band b-${b.tone}" x="${PAD.l}" width="${W - PAD.l - PAD.r}" y="${Y(hi).toFixed(1)}" height="${(Y(lo) - Y(hi)).toFixed(1)}"><title>${esc(b.label)}</title></rect>` : ''; }).join('');
   const xl = o.axes ? [0, Math.floor(pts.length / 2), pts.length - 1].map((i) => `<text class="axis" x="${X(xs[i])}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === pts.length - 1 ? 'end' : 'middle'}">${esc(xLabel(pts[i][0]))}</text>`).join('') : '';
   const data = esc(JSON.stringify(pts.map((p, i) => [+X(xs[i]).toFixed(1), +Y(p[1]).toFixed(1), tipLabel(p[0]), fmtTip(p[1])])));
   const end = `<circle class="enddot" cx="${X(xs.at(-1))}" cy="${Y(ys.at(-1))}" r="${o.axes ? 3.5 : 3}"/>`;
-  return `<svg viewBox="0 0 ${W} ${H}" data-w="${W}" data-h="${H}" data-line="${data}" role="img" aria-label="line chart">${grid}${xl}<path class="area" d="${area}"/><path class="ln" d="${path}"/>${end}<line class="xh" y1="${PAD.t}" y2="${H - PAD.b}" style="display:none"/><circle class="dot" r="4" style="display:none"/></svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" data-w="${W}" data-h="${H}" data-line="${data}" role="img" aria-label="line chart">${bands}${grid}${xl}<path class="area" d="${area}"/><path class="ln" d="${path}"/>${end}<line class="xh" y1="${PAD.t}" y2="${H - PAD.b}" style="display:none"/><circle class="dot" r="4" style="display:none"/></svg>`;
 }
 function barsSvg(pts, fmt, o = BIG, emptyMsg = 'No history yet', fmtTip = fmt) {
   if (!pts || pts.length < 2) return emptySvg(o, emptyMsg);
@@ -189,6 +195,10 @@ const CHARTS = {
   vix: { t: 'VIX', s: 'daily · equity volatility', pts: () => fromRows('vix'), f: (v) => fmtNum(v, 1), ft: (v) => fmtNum(v, 0) },
   corr: { t: 'BTC–Nasdaq 30-day correlation', s: 'daily returns · derived', pts: () => fromRows('corrNdx30'), f: (v) => fmtNum(v, 2), ft: (v) => fmtNum(v, 1) },
   stables: { t: 'Stablecoin supply', s: 'daily · DefiLlama', pts: () => fromRows('stables'), f: (v) => fmtUsd(v, 1), ft: (v) => fmtUsd(v, 0) },
+  cyMvrv: { t: 'MVRV since 2011, with zones', s: 'weekly · Coin Metrics', pts: () => state.a.cycle?.charts?.mvrv || [], f: (v) => fmtNum(v, 2), ft: (v) => fmtNum(v, 1), bands: 'mvrv' },
+  cyPuell: { t: 'Puell Multiple (derived)', s: 'daily · Coin Metrics issuance × price', pts: () => state.a.cycle?.charts?.puell || [], f: (v) => fmtNum(v, 2), ft: (v) => fmtNum(v, 1), bands: 'puell', empty: 'available after the next server run' },
+  cySopr: { t: 'SOPR, 7-day average', s: 'daily · BGeometrics (latest ~7 days withheld on free tier)', pts: () => state.a.cycle?.charts?.sopr || [], f: (v) => fmtNum(v, 3), ft: (v) => fmtNum(v, 2), bands: 'sopr', empty: 'available after the next server run' },
+  cyProfit: { t: '% supply in profit', s: 'daily · BGeometrics ÷ Coin Metrics supply', pts: () => state.a.cycle?.charts?.profit || [], f: (v) => fmtNum(v, 1) + '%', ft: (v) => fmtNum(v, 0) + '%', bands: 'profit', empty: 'available after the next server run' },
   mvrv: { t: 'MVRV (price ÷ on-chain cost basis)', s: 'daily · Coin Metrics', pts: () => fromRows('mvrv'), f: (v) => fmtNum(v, 2), ft: (v) => fmtNum(v, 1) },
 };
 function drawChart(el) {
@@ -198,6 +208,7 @@ function drawChart(el) {
   // draw at the element's real pixel width so text and strokes are never scaled
   const px = Math.round(el.clientWidth - (spark ? 0 : 28));
   const o = { ...base, w: px > 100 ? px : base.w, h: spark ? base.h : (px && px < 500 ? 170 : base.h) };
+  if (c.bands && !spark) o.bands = ZONES[c.bands].map((z, i, t) => ({ lo: z.min, hi: i < t.length - 1 ? t[i + 1].min : Infinity, tone: z.tone, label: z.label }));
   const tick = spark ? c.f : c.ft;
   const svg = c.kind === 'bars' ? barsSvg(pts, tick, o, c.empty, c.f) : lineSvg(pts, tick, o, c.empty, c.f);
   el.innerHTML = spark ? svg : `<div class="ct"><b>${esc(c.t)}</b><span>${esc(c.s)}</span></div>${c.legend ? '<p class="legend" style="margin:0 0 4px"><span><i style="background:var(--series-pos)"></i>Net inflow</span><span><i style="background:var(--series-neg)"></i>Net outflow</span></p>' : ''}${svg}`;
@@ -214,7 +225,7 @@ const rangeBar = () => h`<div class="range" role="group" aria-label="Chart range
 // ---------- tabs ----------
 // Overview is the default 60–90 second read; full research depth lives in the other tabs
 // and in expandable rows. Old section anchors (#forces, #scenarios, #coverage) still resolve.
-const TABS = ['overview', 'report', 'liquidity', 'data', 'archive'];
+const TABS = ['overview', 'cycle', 'report', 'liquidity', 'data', 'archive'];
 const LEGACY = { forces: 'overview', scenarios: 'overview', liqmap: 'overview', watch: 'overview', top3: 'overview', coverage: 'data' };
 const tabFromHash = () => { const k = location.hash.slice(1); return TABS.includes(k) ? k : LEGACY[k] || 'overview'; };
 function showTab(scroll) {
@@ -222,10 +233,18 @@ function showTab(scroll) {
   document.querySelectorAll('[data-tab]').forEach((s) => { s.hidden = s.dataset.tab !== t; });
   document.querySelectorAll('[data-tab-link]').forEach((x) => x.setAttribute('aria-current', x.dataset.tabLink === t ? 'page' : 'false'));
   drawCharts($(`[data-tab="${t}"]`) || document);
-  if (LEGACY[k]) document.getElementById(k)?.scrollIntoView();
+  if (k.startsWith('force-')) openForce(k);
+  else if (LEGACY[k]) document.getElementById(k)?.scrollIntoView();
   else if (scroll) window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', () => { if (state.a) showTab(true); });
+function openForce(id) {
+  const d = document.getElementById(id);
+  if (!d) return;
+  if (d.classList.contains('extra') && !$('#flist').classList.contains('all')) $('#btn-allforces')?.click();
+  d.open = true;
+  d.scrollIntoView();
+}
 
 // ---------- shared pieces ----------
 const stc = (s) => (s === 'met' ? 'met' : s === 'not met' ? 'notmet' : 'unknown');
@@ -240,8 +259,9 @@ function execStrip(b) {
     <div class="exec-row">
       <div class="exec-px"><span class="px num">${fmtPrice(P.spot)}</span>${ch(P.ch24h, '24h')}${ch(P.ch7d, '7d')}${ch(P.ch30d, '30d')}${isStale(['coingecko']) ? raw(' ' + ser(chip('stale', 'stale'))) : ''}</div>
       <div class="exec-regime"><span class="k">Regime</span><b>${b.regime.label}</b><span class="muted"> — ${b.regime.desc}</span>${b.regime.secondary ? h`<span class="muted"> Secondary: ${b.regime.secondary}.</span>` : ''}</div>
+      ${b.cycle ? h`<a class="cybadge t-${TONE_CHIP[b.cycle.tone] || 'neu'}" href="#cycle" title="On-chain cycle position — open the full On-chain cycle page"><span class="k">On-chain cycle</span>${b.cycle.phase ? h`<b>${b.cycle.phase}</b> · ` : ''}${b.cycle.zone}${b.cycle.momentum ? h` · momentum ${b.cycle.momentum.toLowerCase()}` : ''}${b.cycle.stretched ? ' · stretched' : ''} <span class="arr">→</span></a>` : ''}
     </div>
-    ${b.notable.length ? h`<div class="exec-moves"><span class="k">Notable moves</span>${b.notable.map((n) => h`<span class="move">${n.label} ${n.from} → ${n.to} <span class="z">${fmtNum(n.z, 1)}σ</span></span>`)}</div>` : ''}
+    <div class="exec-moves"><span class="k">What changed</span>${b.notable.length ? b.notable.map((n) => h`<span class="move" title="${n.horizon === '7d' ? 'vs the observation a week ago' : 'vs the previous daily observation'}; σ = size vs the typical ${n.horizon === '7d' ? '7-day' : 'daily'} change"><span class="hz">${n.horizon}</span>${n.label} ${n.from} → ${n.to} <span class="z">${fmtNum(n.z, 1)}σ</span></span>`) : h`<span class="dim small">No statistically meaningful moves (≥1.5σ) over 24h or 7d.</span>`}</div>
     <div class="statusbar"><span>Data through ${fmtTime(a.dataThrough)}</span><span>${a.kind === 'browser' ? 'Browser refresh' : a.kind === 'morning' ? '07:00 report' : 'Server refresh'}</span><span>${b.sources.text}</span><a href="#data">Sources</a></div>
   </section>`;
 }
@@ -269,7 +289,7 @@ function forcesBlock(b) {
         <span class="rank">${f.unavailable ? '–' : f.rank}</span>
         <span class="fname">${f.name}${x.moved ? h` <span class="moved" title="${x.moved.label}: ${x.moved.from} → ${x.moved.to}">${fmtNum(x.moved.z, 1)}σ move</span>` : ''}</span>
         <span>${chip(x.dirNote || f.direction, dirClass(f.direction))}</span>
-        <span class="ev-col">${chip(f.confidence, 'ev')}</span>
+        <span class="ev-col">${evMeter(f.confidence)}</span>
         <span class="fstate">${f.unavailable ? f.state : x.line}</span>
         <span class="caret">›</span>
       </summary>
@@ -349,8 +369,8 @@ function accelBlock(b) {
   </article>`; })}</div>`);
 }
 
-// 6. Watch next 24 hours.
-const watchBlock = (b) => sec('watch', 'What to watch in the next 24 hours', null, h`<ol class="watch24">${b.watch.map((w) => h`<li><b>${w.what}</b><span>${w.why}</span></li>`)}</ol>`);
+// 6. Three things to watch.
+const watchBlock = (b) => sec('watch', 'Three things to watch', 'Next 24 hours: dated events first, then on-chain and liquidity.', h`<ol class="watch24">${b.watch.map((w) => h`<li><b>${w.link ? h`<a href="${w.link}">${w.what}</a>` : w.what}</b><span>${w.why}</span></li>`)}</ol>`);
 
 // Collapsed market dashboard: price chart, KPI tiles, move attribution, all changes.
 function dashboard() {
@@ -384,6 +404,123 @@ function dashboard() {
 
 function overviewTab(b) {
   return h`${execStrip(b)}${top3(b)}${forcesBlock(b)}${ladderBlock(b)}${accelBlock(b)}${watchBlock(b)}${dashboard()}<p class="foot-note">${b.footer}</p>`;
+}
+
+// ---------- On-chain cycle tab ----------
+// Summary → composite → metric cards → history → methodology. Every card carries its source,
+// as-of date and a data state (live / delayed / carried forward / unavailable).
+const TONE_CHIP = { bull: 'bull', neu: 'neu', warn: 'caut', bear: 'bear' };
+const zchip = (z) => (z ? chip(z.label, TONE_CHIP[z.tone] || 'neu') : chip('n/a', 'neu'));
+const DATA_STATE = {
+  live: null,
+  delayed: (x) => `Data delayed — last good value as of ${x.asOf}${x.delayNote ? '. ' + x.delayNote : ''}`,
+  carried: (x) => `Source unavailable this run — last good value as of ${x.asOf}, carried forward`,
+};
+const scoreTxt = (v) => (v === null || v === undefined ? '—' : v > 0 ? `+${v}` : v < 0 ? `−${-v}` : '0');
+function cycleCard(x) {
+  if (x.status === 'unavailable') return h`<article class="mcard off"><header><b>${x.name}</b>${chip('unavailable', 'neu')}</header><p class="small muted">${x.unavailableWhy || 'Not available from the free sources this run.'}</p><footer>${x.source}</footer></article>`;
+  const note = DATA_STATE[x.status]?.(x);
+  return h`<article class="mcard${x.status !== 'live' ? ' delayed' : ''}">
+    <header><b>${x.name}</b>${x.scored ? h`<span class="sc" title="score in the composite">${scoreTxt(x.zone?.score)}</span>` : h`<span class="sc dim" title="shown for context, not scored">ctx</span>`}</header>
+    <div class="mv"><span class="num">${x.display}</span>${zchip(x.zone)}</div>
+    ${note ? h`<div class="dstate">${note}</div>` : ''}
+    <p>${x.meaning}</p>
+    ${x.move.length ? h`<div class="mmove"><span class="k">Changes zone if</span>${x.move.join(' · ')}</div>` : ''}
+    ${x.context ? h`<p class="xs dim">${x.context}</p>` : ''}
+    <footer>${x.derived ? 'Derived · ' : ''}${x.source} · as of ${x.asOf || 'n/a'}</footer>
+  </article>`;
+}
+function gauge(score) {
+  const segs = ZONES.composite.map((z, i, t) => ({ ...z, lo: i ? z.min : -2, hi: i < t.length - 1 ? t[i + 1].min : 2 }));
+  const pos = (v) => ((Math.max(-2, Math.min(2, v)) + 2) / 4) * 100;
+  return h`<div class="gauge" role="img" aria-label="Composite valuation score ${score === null ? 'unavailable' : scoreTxt(+score.toFixed(2))} on a −2 to +2 scale">
+    <div class="gbar">${segs.map((s) => h`<i class="g-${TONE_CHIP[s.tone]}" style="left:${pos(s.lo)}%;width:${pos(s.hi) - pos(s.lo)}%" title="${s.label}"></i>`)}${score !== null ? h`<b class="gmark" style="left:${pos(score)}%"></b>` : ''}</div>
+    <div class="glabels">${segs.slice().reverse().map((s) => h`<span style="left:${(pos(s.lo) + pos(s.hi)) / 2}%">${s.label}</span>`)}</div>
+    <div class="gscale"><span>−2 · stretched</span><span>0</span><span>+2 · deep value</span></div>
+  </div>`;
+}
+function cycleTab() {
+  const c = state.a.cycle;
+  if (!c || c.error) return sec('cycle-sec', 'On-chain cycle & momentum', null, h`<p class="muted">On-chain cycle data is unavailable in this analysis${c?.error ? ` (${c.error})` : ''}. It is computed on the next server run.</p>`);
+  const V = c.valuation, M = c.momentum;
+  const val = c.metrics.filter((x) => x.group === 'valuation');
+  const ctx = c.metrics.filter((x) => x.group !== 'valuation');
+  const threshold = (id, unit = '') => ZONES[id].map((z, i, t) => `${i === 0 ? '< ' + t[1].min : i === t.length - 1 ? '≥ ' + z.min : z.min + '–' + t[i + 1].min}${unit} ${z.label}${z.score !== null ? ` (${scoreTxt(z.score)})` : ''}`).join(' · ');
+  return h`<section id="cycle-sec" class="block">
+    <div class="bh"><h2>On-chain cycle &amp; momentum</h2><p class="aside">Where BTC sits in the historical on-chain valuation cycle. Positioning research, not a trading signal.</p></div>
+    <div class="cy-exec">
+      <div class="cy-head">
+        <div><span class="k">Cycle position</span><div class="cy-phase">${c.phase ? c.phase.label : 'n/a'}${c.phase ? h`<span class="muted"> · NUPL ${fmtNum(c.phase.nupl, 2)}</span>` : ''}</div></div>
+        <div><span class="k">Valuation</span><div>${V.zone ? zchip(V.zone) : chip('inputs incomplete', 'neu')} <span class="num small muted">${V.score !== null ? scoreTxt(+V.score.toFixed(2)) : ''}</span></div></div>
+        <div><span class="k">Momentum</span><div>${M.label ? chip(M.label, M.tone) : chip('n/a', 'neu')} <span class="num small muted">${M.score !== null ? scoreTxt(M.score) + ' of ±' + M.n : ''}</span></div></div>
+        ${c.stretched ? h`<div><span class="k">Flag</span><div>${chip('Stretched', 'caut')}</div></div>` : ''}
+      </div>
+      <p class="cy-lean">${V.leaning ? h`<b>Historical leaning:</b> ${V.leaning}.` : h`<b>Composite needs at least 3 valuation inputs</b> — ${V.n} available this run.`}${c.stretched ? ' Valuation is elevated while momentum is still constructive — the profile of late-cycle extensions.' : ''}</p>
+      <ul class="cy-why">${c.bullets.map((x) => h`<li>${x}</li>`)}</ul>
+      <p class="xs dim">Historical regimes only — these zones describe where past cycles sat, not what happens next. No price targets, no probabilities.</p>
+    </div>
+
+    <h3 class="cy-h">Composite valuation index</h3>
+    <div class="twocol cy-comp">
+      <div class="panel">${gauge(V.score)}
+        <table class="cy-tbl"><thead><tr><th>Input</th><th>Zone</th><th class="n">Score</th></tr></thead><tbody>
+          ${val.map((x) => h`<tr class="${x.status === 'unavailable' ? 'dim' : ''}"><td>${x.name}${x.status === 'delayed' ? h` <span class="xs" style="color:var(--warn)">delayed</span>` : ''}</td><td>${x.status === 'unavailable' ? 'unavailable — excluded' : x.zone?.label}</td><td class="n num">${x.status === 'unavailable' ? '—' : scoreTxt(x.zone?.score)}</td></tr>`)}
+          <tr class="tot"><td><b>Composite</b> = average of ${V.n} available inputs</td><td><b>${V.zone?.label || 'n/a'}</b></td><td class="n num"><b>${V.score !== null ? scoreTxt(+V.score.toFixed(2)) : '—'}</b></td></tr>
+        </tbody></table>
+      </div>
+      <div class="panel"><h3>Momentum</h3>
+        <table class="cy-tbl"><thead><tr><th>Component</th><th>Now</th><th class="n">Score</th></tr></thead><tbody>
+          ${M.components.map((x) => h`<tr><td>${x.name}<div class="xs dim">${x.rule}</div></td><td class="num small">${x.value}</td><td class="n num">${scoreTxt(x.score)}</td></tr>`)}
+          <tr class="tot"><td><b>Momentum</b> (sum; ≥ +2 constructive, ≤ −2 weakening)</td><td><b>${M.label || 'n/a'}</b></td><td class="n num"><b>${scoreTxt(M.score)}</b></td></tr>
+        </tbody></table>
+        <p class="xs dim">Hash Ribbons are scored only on a recovery cross and are shown with the miner metrics below.</p>
+      </div>
+    </div>
+
+    <h3 class="cy-h">Valuation metrics</h3>
+    <div class="mcards">${val.map(cycleCard)}</div>
+    <h3 class="cy-h">Context, miners &amp; liquidity</h3>
+    <div class="mcards">${ctx.map(cycleCard)}</div>
+
+    <div class="panel" style="margin-top:14px">${chartEl('cyMvrv')}<p class="xs dim">Shaded bands are the MVRV zones used above. Weekly samples from Coin Metrics since 2011.</p></div>
+    <details class="more"><summary>More history: Puell Multiple, SOPR, % supply in profit</summary><div class="more-body fcharts">${chartEl('cyPuell')}${chartEl('cySopr')}${chartEl('cyProfit')}</div></details>
+
+    <details class="more"><summary>Coming soon / requires additional source</summary><div class="more-body"><ul class="clean small">${c.comingSoon.map((x) => h`<li><b>${x.name}.</b> <span class="muted">${x.why}</span></li>`)}</ul></div></details>
+
+    <details class="more"><summary>Methodology — formulas, zone thresholds, sources and delays</summary><div class="more-body cy-method">
+      <h4>Formulas</h4>
+      <ul class="clean small">
+        <li><b>MVRV</b> = market cap ÷ realised cap (Coin Metrics CapMVRVCur). Realised price = price ÷ MVRV on the same date.</li>
+        <li><b>NUPL</b> = 1 − 1/MVRV (derived; identical to (market cap − realised cap) ÷ market cap). Not scored separately.</li>
+        <li><b>Distance to realised price</b> = spot ÷ realised price − 1. Not scored separately (= MVRV − 1).</li>
+        <li><b>Mayer Multiple</b> = spot ÷ 200-day simple average of daily closes.</li>
+        <li><b>Puell Multiple</b> = (daily issuance BTC × price) ÷ its trailing 365-day average (Coin Metrics IssTotNtv, PriceUSD).</li>
+        <li><b>SOPR</b> = 7-day average of daily spent-output profit ratio (BGeometrics).</li>
+        <li><b>% supply in profit</b> = BTC in profit (BGeometrics) ÷ circulating supply on the same date (Coin Metrics SplyCur).</li>
+        <li><b>Hash Ribbons</b> = 30-day vs 60-day average hash rate (Coin Metrics HashRate). Recovery = 30d crosses back above 60d within 20 days after ≥10 days below.</li>
+        <li><b>Composite valuation</b> = plain average of the scored valuation inputs available this run (minimum 3); each input scores −2…+2 by zone. <b>Momentum</b> = sum of four −1/0/+1 components.</li>
+      </ul>
+      <h4>Zone thresholds (score)</h4>
+      <ul class="clean small">
+        <li><b>MVRV:</b> ${threshold('mvrv')}</li>
+        <li><b>NUPL (context):</b> ${threshold('nupl')}</li>
+        <li><b>Mayer Multiple:</b> ${threshold('mayer')}</li>
+        <li><b>Puell Multiple:</b> ${threshold('puell')}</li>
+        <li><b>SOPR (7d):</b> ${threshold('sopr')}</li>
+        <li><b>% supply in profit:</b> ${threshold('profit', '%')}</li>
+        <li><b>Composite:</b> ≥ +1.25 Deep value · +0.5 to +1.25 Value · −0.5 to +0.5 Neutral / mid-cycle · −1.25 to −0.5 Elevated · ≤ −1.25 Euphoria / stretched. “Stretched” flag = composite ≤ −0.5 while momentum is constructive.</li>
+      </ul>
+      <p class="small muted">Thresholds are set from where these metrics sat at past cycle lows and highs (2011–2025). Recent cycle peaks have been lower than early ones (MVRV peaked near 3.9 in 2021 versus higher in 2013 and 2017), so the upper zones are deliberately below the early-cycle extremes. Thresholds are fixed in code and changed only with a dated methodology note.</p>
+      <h4>Sources and known delays</h4>
+      <ul class="clean small">
+        <li><b>Coin Metrics Community API</b> — MVRV (full history since 2011), price, issuance, hash rate, supply. Daily, typically one day behind.</li>
+        <li><b>BGeometrics free API</b> (bitcoin-data.com) — SOPR and BTC supply in profit. Free tier: 15 requests/day; fetched at most every 20 hours and carried forward between runs. Some metrics are returned with the latest ~7 days withheld (flagged by the provider); those cards show “Data delayed — last good value as of …”.</li>
+        <li><b>CoinGecko</b> — spot and daily closes (200-day average). <b>DefiLlama</b> — stablecoin supply. <b>mempool.space</b> — current hash rate and next difficulty adjustment (shown on the main page).</li>
+        <li>No paid Glassnode / CryptoQuant data is used. A metric that cannot be sourced is shown as unavailable and excluded from the composite rather than estimated.</li>
+      </ul>
+      <p class="small"><b>This is market-structure research, not investment advice.</b> It assigns no price targets and no probabilities, and nothing on this page is a recommendation to buy or sell.</p>
+    </div></details>
+  </section>`;
 }
 
 // ---------- Liquidity detail tab ----------
@@ -478,12 +615,13 @@ function render() {
   else if (a.kind === 'browser') banners.push(h`<div class="banner">Browser refresh: ${liveN} sources retrieved live. ETF flows, FRED, Yahoo and CFTC data cannot be fetched from a browser and show their last server values. Not saved to the archive — use <b>Server run</b> for that.</div>`);
   $('#app').innerHTML = h`${banners}
     <div data-tab="overview">${overviewTab(b)}</div>
+    <div data-tab="cycle" hidden>${cycleTab()}</div>
     <div data-tab="report" hidden>${reportTab()}</div>
     <div data-tab="liquidity" hidden>${liquidityTab()}</div>
     <div data-tab="data" hidden>${coverageSection()}</div>
     <div data-tab="archive" hidden>${archiveTab()}</div>`.s;
-  showTab(false);
   wireSections();
+  showTab(false);
   const np = $('#nav-price');
   if (np) np.innerHTML = h`${fmtPrice(a.metrics.price.spot)} <span class="${cls(a.metrics.price.ch24h)}">${fmtPct(a.metrics.price.ch24h)}</span>`.s;
 }
@@ -501,8 +639,6 @@ function wireSections() {
     all.textContent = on ? `Show top ${TOP_N} only` : `Show all ${state.a.forces.length} forces`;
   });
   // deep links to a force open it (and reveal it if it is outside the top 5)
-  const k = location.hash.slice(1);
-  if (k.startsWith('force-')) { const d = document.getElementById(k); if (d) { if (d.classList.contains('extra')) all?.click(); d.open = true; d.scrollIntoView(); } }
   const setDl = (el, text) => { el.href = URL.createObjectURL(new Blob([text], { type: 'text/markdown' })); };
   setDl($('#rep-dl'), reportText(state.a));
   const sel = $('#rep-sel'), adl = $('#arc-dl');

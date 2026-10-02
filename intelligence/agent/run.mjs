@@ -84,7 +84,7 @@ async function main() {
   let rows = readJSON(path.join(DATA, 'timeseries.json'), { rows: [] }).rows;
 
   log(`Collecting (${fixture ? 'fixture ' + fixture : 'live'})…`);
-  let snap = fixture ? readJSON(fixture) : await collectAll({ scope: 'server', log });
+  let snap = fixture ? readJSON(fixture) : await collectAll({ scope: 'server', log, prev: prevSnap });
   snap = mergeWithPrevious(snap, prevSnap);
   mergeManualEtf(snap);
 
@@ -150,7 +150,8 @@ async function main() {
 
   const index = readJSON(path.join(DATA, 'index.json'), { reports: [] });
   const stamp = `${local.date}${a.kind === 'morning' ? '' : `-${String(local.hour).padStart(2, '0')}${String(local.minute).padStart(2, '0')}`}`;
-  writeJSON(path.join(DATA, 'history', `${stamp}.json`), out);
+  // chart histories are re-derivable; keep them out of the per-run archive
+  writeJSON(path.join(DATA, 'history', `${stamp}.json`), out.cycle?.charts ? { ...out, cycle: { ...out.cycle, charts: undefined } } : out);
   fs.mkdirSync(path.join(DATA, 'reports'), { recursive: true });
   fs.writeFileSync(path.join(DATA, 'reports', `${stamp}.md`), briefMd + '\n\n---\n\n' + reportMd + (narrative?.text ? `\n\n---\n\n# Analyst narrative\n\n${narrative.text}\n` : ''));
   index.reports = index.reports.filter((r) => r.id !== stamp).concat([{ id: stamp, date: local.date, kind: a.kind, generatedAt: a.generatedAt, price: a.metrics.price.spot, regime: a.regime.primary }]).sort((x, y) => (x.id < y.id ? 1 : -1));
