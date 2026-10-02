@@ -7,7 +7,7 @@ import { collectAll, mergeWithPrevious } from '../engine/collect.js';
 import { morningReport, briefReport } from '../engine/report.js';
 import { brief } from '../engine/brief.js';
 import { ZONES } from '../engine/cycle.js';
-import { explain, REMINDER } from '../engine/explain.js';
+import { explain, EXPLAIN, REMINDER } from '../engine/explain.js';
 import { fmtUsd, fmtUsdSigned, fmtPrice, fmtPct, fmtNum, fmtK, ordinal } from '../engine/util.js';
 
 const REPO = 'bitcoincustodystandard/bitcoincustodystandard.github.io';
@@ -37,7 +37,7 @@ function dirClass(d = '') {
 }
 const chip = (txt, c) => h`<span class="chip ${c}">${txt}</span>`;
 // "i" icon that opens a plain-English explanation (hover, keyboard focus, or tap)
-const info = (key, ctx) => h`<button type="button" class="info" data-explain="${key}"${ctx !== undefined ? raw(` data-ctx="${esc(ctx)}"`) : ''} aria-label="What does this mean?">i</button>`;
+const info = (key, ctx) => h`<button type="button" class="info" data-explain="${key}"${ctx !== undefined ? raw(` data-ctx="${esc(ctx)}"`) : ''} aria-label="What is ${EXPLAIN[key]?.title || 'this'}?">i</button>`;
 // evidence strength as a quiet 3-step meter next to its word (weak ●○○ · moderate ●●○ · strong ●●●)
 const EV_N = { weak: 1, moderate: 2, strong: 3 };
 const evMeter = (conf) => h`<span class="evm" title="evidence strength: ${conf}">${[1, 2, 3].map((i) => h`<i class="${i <= (EV_N[conf] || 0) ? 'on' : ''}"></i>`)}<span>${conf}</span></span>`;
@@ -261,10 +261,10 @@ function execStrip(b) {
   return h`<section class="exec" aria-label="Summary">
     <div class="exec-row">
       <div class="exec-px"><span class="px num">${fmtPrice(P.spot)}</span>${ch(P.ch24h, '24h')}${ch(P.ch7d, '7d')}${ch(P.ch30d, '30d')}${isStale(['coingecko']) ? raw(' ' + ser(chip('stale', 'stale'))) : ''}</div>
-      <div class="exec-regime"><span class="k">Regime</span><b>${b.regime.label}</b><span class="muted"> — ${b.regime.desc}</span>${b.regime.secondary ? h`<span class="muted"> Secondary: ${b.regime.secondary}.</span>` : ''}</div>
-      ${b.cycle ? h`<a class="cybadge t-${TONE_CHIP[b.cycle.tone] || 'neu'}" href="#cycle" title="On-chain cycle position — open the full On-chain cycle page"><span class="k">On-chain cycle</span>${b.cycle.phase ? h`<b>${b.cycle.phase}</b> · ` : ''}${b.cycle.zone}${b.cycle.momentum ? h` · momentum ${b.cycle.momentum.toLowerCase()}` : ''}${b.cycle.stretched ? ' · stretched' : ''} <span class="arr">→</span></a>` : ''}
+      <div class="exec-regime"><span class="k">Regime</span><b>${b.regime.label}</b>${info('regime')}<span class="muted"> — ${b.regime.desc}</span>${b.regime.secondary ? h`<span class="muted"> Secondary: ${b.regime.secondary}.</span>` : ''}</div>
+      ${b.cycle ? h`<a class="cybadge t-${TONE_CHIP[b.cycle.tone] || 'neu'}" href="#cycle" title="On-chain cycle position — open the full On-chain cycle page"><span class="k">On-chain cycle</span>${b.cycle.phase ? h`<b>${b.cycle.phase}</b> · ` : ''}${b.cycle.zone}${b.cycle.momentum ? h` · momentum ${b.cycle.momentum.toLowerCase()}` : ''}${b.cycle.stretched ? ' · stretched' : ''} <span class="arr">→</span></a>${info('cyclebadge')}` : ''}
     </div>
-    <div class="exec-moves"><span class="k">What changed</span>${b.notable.length ? b.notable.map((n) => h`<span class="move" title="${n.horizon === '7d' ? 'vs the observation a week ago' : 'vs the previous daily observation'}; σ = size vs the typical ${n.horizon === '7d' ? '7-day' : 'daily'} change"><span class="hz">${n.horizon}</span>${n.label} ${n.from} → ${n.to} <span class="z">${fmtNum(n.z, 1)}σ</span></span>`) : h`<span class="dim small">No statistically meaningful moves (≥1.5σ) over 24h or 7d.</span>`}</div>
+    <div class="exec-moves"><span class="k">What changed${info('changes')}</span>${b.notable.length ? b.notable.map((n) => h`<span class="move" title="${n.horizon === '7d' ? 'vs the observation a week ago' : 'vs the previous daily observation'}; σ = size vs the typical ${n.horizon === '7d' ? '7-day' : 'daily'} change"><span class="hz">${n.horizon}</span>${n.label} ${n.from} → ${n.to} <span class="z">${fmtNum(n.z, 1)}σ</span></span>`) : h`<span class="dim small">No statistically meaningful moves (≥1.5σ) over 24h or 7d.</span>`}</div>
     <div class="statusbar"><span>Data through ${fmtTime(a.dataThrough)}</span><span>${a.kind === 'browser' ? 'Browser refresh' : a.kind === 'morning' ? '07:00 report' : 'Server refresh'}</span><span>${b.sources.text}</span><a href="#data">Sources</a></div>
   </section>`;
 }
@@ -312,7 +312,7 @@ function forcesBlock(b) {
   };
   const more = a.forces.length - TOP_N;
   return sec('forces', 'What is moving BTC', 'Ranked by current importance, not direction.', h`
-    <div class="fhead" aria-hidden="true"><span>#</span><span>Force</span><span>Direction</span><span class="ev-col">Evidence</span><span class="fstate">Summary</span><span></span></div>
+    <div class="fhead"><span>#</span><span>Force</span><span>Direction</span><span class="ev-col">Evidence${info('evidence')}</span><span class="fstate">Summary</span><span></span></div>
     <div class="flist" id="flist">${a.forces.map(row)}</div>
     <div class="block-foot"><p class="note">Expand any row for full evidence, mechanism, invalidation conditions and charts.</p>${more > 0 ? h`<button type="button" class="btn ghost mini" id="btn-allforces" aria-expanded="false" data-more="${more}">Show all ${a.forces.length} forces</button>` : ''}</div>`);
 }
@@ -357,7 +357,7 @@ function accelBlock(b) {
   const a = state.a;
   const title = { up: 'Upside', base: 'Base case range', down: 'Downside' };
   return sec('scenarios', 'Acceleration conditions', 'Conditional, not forecasts. No probabilities are assigned.', h`<div class="acc3">${b.scenarios.map((s, i) => { const full = a.scenarios[i]; return h`<article class="acard s-${s.kind}">
-    <header><b>${title[s.kind]}</b><span class="metc">${s.met} of ${s.total} met</span></header>
+    <header><b>${title[s.kind]}${info('scen:' + s.kind)}</b><span class="metc">${s.met} of ${s.total} met</span></header>
     <ul class="conds">${s.conds.map((c) => h`<li><span class="st ${stc(c.status)}">${stLabel(c.status)}</span><span>${c.text}<span class="val">now ${c.value}</span></span></li>`)}</ul>
     <p class="cm"><span class="k">Mechanism</span>${s.mech}</p>
     ${s.kind !== 'base' ? h`<p class="cm"><span class="k">Fails if</span>${s.fail}</p>` : ''}
@@ -373,30 +373,30 @@ function accelBlock(b) {
 }
 
 // 6. Three things to watch.
-const watchBlock = (b) => sec('watch', 'Three things to watch', 'Next 24 hours: dated events first, then on-chain and liquidity.', h`<ol class="watch24">${b.watch.map((w) => h`<li><b>${w.link ? h`<a href="${w.link}">${w.what}</a>` : w.what}</b><span>${w.why}</span></li>`)}</ol>`);
+const watchBlock = (b) => sec('watch', 'Three things to watch', 'Next 24 hours: dated events first, then on-chain and liquidity.', h`<ol class="watch24">${b.watch.map((w) => h`<li><b>${w.link ? h`<a href="${w.link}">${w.what}</a>` : w.what}${w.key ? info(w.key) : ''}</b><span>${w.why}</span></li>`)}</ol>`);
 
 // Collapsed market dashboard: price chart, KPI tiles, move attribution, all changes.
 function dashboard() {
   const a = state.a, m = a.metrics, P = m.price;
   const dep = m.depth, E = m.etf, D = m.derivs, O = m.options, M = m.macro, L = m.liq, C = m.corr;
-  const tile = (label, ids, v, s, d, sk) => h`<div class="tile${isStale(ids) ? ' stale' : ''}"><div class="label">${label}${d ? raw(' ' + ser(dirChip(d))) : ''}</div><div class="v">${v}</div>${sk ? sparkEl(sk) : ''}<div class="s">${s}</div><div class="src">${srcLine(ids)}</div></div>`;
+  const tile = (label, ids, v, s, d, sk, xk) => h`<div class="tile${isStale(ids) ? ' stale' : ''}"><div class="label">${label}${xk ? info(xk) : ''}${d ? raw(' ' + ser(dirChip(d))) : ''}</div><div class="v">${v}</div>${sk ? sparkEl(sk) : ''}<div class="s">${s}</div><div class="src">${srcLine(ids)}</div></div>`;
   const force = (id) => a.forces.find((f) => f.id === id);
   const sell100 = dep?.impact?.sell?.find((x) => x.sizeUsd === 100e6);
   return h`<details class="more dash" id="dashboard"><summary>Market dashboard <span class="dim">— price chart, key metrics, move attribution and every change since the last observation</span></summary><div class="more-body">
     <div class="dash-top">
       <div class="small muted">${P.drawdownPct !== null ? `${fmtPct(P.drawdownPct)} from ATH${P.ath ? ` (${fmtPrice(P.ath)}, ${P.athDate})` : ''}` : ''}${P.ma200 ? ` · 200-day avg ${fmtPrice(P.ma200)}` : ''}${P.rv30 !== null ? ` · 30d realised vol ${fmtNum(P.rv30, 0)}%` : ''}<div class="xs dim">${srcLine(['coingecko'])}</div></div>
-      <div class="attr">${[a.attribution.d1, a.attribution.d7].map((x) => h`<div class="row"><div class="h">${x.horizon === '1d' ? 'Last 24 hours' : 'Last 7 days'} · ${x.confidence}</div><b>${x.label}</b><div class="small muted">${x.explanation}</div></div>`)}</div>
+      <div class="attr"><div class="label">How price is moving${info('attribution')}</div>${[a.attribution.d1, a.attribution.d7].map((x) => h`<div class="row"><div class="h">${x.horizon === '1d' ? 'Last 24 hours' : 'Last 7 days'} · ${x.confidence}</div><b>${x.label}</b><div class="small muted">${x.explanation}</div></div>`)}</div>
     </div>
     <div class="pricechart">${rangeBar()}${chartEl('price')}</div>
     <div class="kpis">
-      ${tile('Spot liquidity (±1% depth)', dep ? dep.venues.map((v) => 'book_' + v.venue.toLowerCase()) : ['book_binance'], dep ? fmtUsd(dep.d1) : 'n/a', dep ? h`${dep.ch7d !== null ? raw(`<span class="${cls(dep.ch7d)}">${esc(fmtPct(dep.ch7d))}</span> vs 7d · `) : 'no 7d history yet · '}top-2 venues ${Math.round(dep.top2Share * 100)}% · $100M sell ≈ ${sell100 ? (sell100.exhausted ? 'beyond captured depth' : fmtPct(-sell100.slippagePct, 2)) : 'n/a'}` : 'Order books unavailable', force('depth')?.direction, 'depth')}
-      ${tile('ETF flow trend', ['farside'], E ? fmtUsdSigned(E.s5 * 1e6) + ' 5d' : 'n/a', E ? h`20d ${fmtUsdSigned(E.s20 * 1e6)} · last day (${E.lastDate}) ${fmtUsdSigned(E.last * 1e6)} · ${E.streak > 0 ? `${E.streak}-day inflow streak` : E.streak < 0 ? `${-E.streak}-day outflow streak` : 'no streak'} · ${E.accel > 0 ? 'accelerating' : 'decelerating'}` : 'ETF flow data unavailable', force('etf')?.direction, 'etf')}
-      ${tile('Futures open interest', ['okx_deriv', 'deribit_fut', 'hyperliquid', 'bitmex', 'binance_deriv', 'bybit_deriv'].filter((id) => a.quality.some((q) => q.id === id && q.status !== 'error')), D ? fmtUsd(D.totalOi) : 'n/a', D ? h`${fmtNum(D.oiPctMcap)}% of mcap · 1d ${fmtPct(D.oiCh1d)} · 7d ${fmtPct(D.oiCh7d)} · 30d ${fmtPct(D.oiCh30d)} (${D.oiChBasis}) · venues: ${D.coverage.replace(/,/g, ', ')}${D.cot ? ` · CME ≈${fmtNum(D.cot.oiBtc / 1000, 0)}K BTC (CFTC ${D.cot.date})` : ''}` : 'unavailable', force('leverage')?.direction, 'oi')}
-      ${tile('Funding & basis', ['okx_deriv', 'deribit_fut'], D?.fundingAnn !== null && D?.fundingAnn !== undefined ? fmtNum(D.fundingAnn, 1) + '% ann.' : 'n/a', D ? h`OI-weighted perps · dispersion ${fmtNum(D.fundingDispersionBps, 2)} bp/8h${D.basis ? ` · ${Math.round(D.basis.days)}d basis ${fmtNum(D.basis.annPct, 1)}%` : ''}${D.okxFunding7dAnn !== undefined ? ` · OKX 7d avg ${fmtNum(D.okxFunding7dAnn, 1)}%` : ''}` : 'unavailable', force('funding')?.direction, 'funding')}
-      ${tile('Liquidations', ['okx_deriv'], L ? `${fmtUsd(L.longUsd)} L / ${fmtUsd(L.shortUsd)} S` : 'n/a', L ? h`OKX BTC-USDT perp, ${L.count} most recent forced orders (${fmtTime(L.from)} → ${fmtTime(L.to)}). Market-wide liquidation totals require CoinGlass/Kaiko (not available).` : 'Market-wide liquidation data is not available from free sources.', null)}
-      ${tile('Options', ['deribit_opt', 'deribit_dvol'], O ? `IV ${fmtNum(O.atmIv30 ?? O.dvol, 1)}%` : 'n/a', O ? h`skew ${fmtNum(O.skew25, 1)} vp · P/C ${fmtNum(O.pcRatio)} · IV−RV ${fmtNum(O.ivRvSpread, 1)} · ${O.nextBigExpiry ? `${O.nextBigExpiry.expiry}: ${fmtUsd(O.nextBigExpiry.notionalUsd)} expiring, max pain ${fmtK(O.nextBigExpiry.maxPain)}` : ''}` : 'Deribit options unavailable', force('options')?.direction, 'dvol')}
-      ${tile('Macro liquidity', ['fred', 'yahoo'], M?.netLiq ? fmtUsd(M.netLiq[1] * 1e9) : 'n/a', M ? h`net liquidity ${M.netLiq4w !== null ? fmtUsdSigned(M.netLiq4w * 1e9) : 'n/a'} 4w · real 10y ${M.real10y ? fmtNum(M.real10y[1], 2) + '%' : 'n/a'} · ${M.dollarLabel} ${fmtPct(M.dollar20d)} 4w · VIX ${M.vix ? fmtNum(M.vix[1], 1) : 'n/a'} · HY ${M.hy ? fmtNum(M.hy[1], 2) + '%' : 'n/a'}` : 'unavailable', force('macro')?.direction, 'netliq')}
-      ${tile('BTC trading behaviour', ['yahoo', 'coingecko_hist'], C?.behaviour?.label ? C.behaviour.label : 'n/a', C ? h`30d corr: Nasdaq ${fmtNum(C.NDX?.c30)} · gold ${fmtNum(C.GOLD?.c30)} · dollar ${fmtNum(C.DXY?.c30)} · VIX ${fmtNum(C.VIX?.c30)} · dominance ${fmtNum(m.structure?.dominance, 1)}%` : 'unavailable', null, 'corr')}
+      ${tile('Spot liquidity (±1% depth)', dep ? dep.venues.map((v) => 'book_' + v.venue.toLowerCase()) : ['book_binance'], dep ? fmtUsd(dep.d1) : 'n/a', dep ? h`${dep.ch7d !== null ? raw(`<span class="${cls(dep.ch7d)}">${esc(fmtPct(dep.ch7d))}</span> vs 7d · `) : 'no 7d history yet · '}top-2 venues ${Math.round(dep.top2Share * 100)}% · $100M sell ≈ ${sell100 ? (sell100.exhausted ? 'beyond captured depth' : fmtPct(-sell100.slippagePct, 2)) : 'n/a'}` : 'Order books unavailable', force('depth')?.direction, 'depth', 'force:depth')}
+      ${tile('ETF flow trend', ['farside'], E ? fmtUsdSigned(E.s5 * 1e6) + ' 5d' : 'n/a', E ? h`20d ${fmtUsdSigned(E.s20 * 1e6)} · last day (${E.lastDate}) ${fmtUsdSigned(E.last * 1e6)} · ${E.streak > 0 ? `${E.streak}-day inflow streak` : E.streak < 0 ? `${-E.streak}-day outflow streak` : 'no streak'} · ${E.accel > 0 ? 'accelerating' : 'decelerating'}` : 'ETF flow data unavailable', force('etf')?.direction, 'etf', 'force:etf')}
+      ${tile('Futures open interest', ['okx_deriv', 'deribit_fut', 'hyperliquid', 'bitmex', 'binance_deriv', 'bybit_deriv'].filter((id) => a.quality.some((q) => q.id === id && q.status !== 'error')), D ? fmtUsd(D.totalOi) : 'n/a', D ? h`${fmtNum(D.oiPctMcap)}% of mcap · 1d ${fmtPct(D.oiCh1d)} · 7d ${fmtPct(D.oiCh7d)} · 30d ${fmtPct(D.oiCh30d)} (${D.oiChBasis}) · venues: ${D.coverage.replace(/,/g, ', ')}${D.cot ? ` · CME ≈${fmtNum(D.cot.oiBtc / 1000, 0)}K BTC (CFTC ${D.cot.date})` : ''}` : 'unavailable', force('leverage')?.direction, 'oi', 'force:leverage')}
+      ${tile('Funding & basis', ['okx_deriv', 'deribit_fut'], D?.fundingAnn !== null && D?.fundingAnn !== undefined ? fmtNum(D.fundingAnn, 1) + '% ann.' : 'n/a', D ? h`OI-weighted perps · dispersion ${fmtNum(D.fundingDispersionBps, 2)} bp/8h${D.basis ? ` · ${Math.round(D.basis.days)}d basis ${fmtNum(D.basis.annPct, 1)}%` : ''}${D.okxFunding7dAnn !== undefined ? ` · OKX 7d avg ${fmtNum(D.okxFunding7dAnn, 1)}%` : ''}` : 'unavailable', force('funding')?.direction, 'funding', 'force:funding')}
+      ${tile('Liquidations', ['okx_deriv'], L ? `${fmtUsd(L.longUsd)} L / ${fmtUsd(L.shortUsd)} S` : 'n/a', L ? h`OKX BTC-USDT perp, ${L.count} most recent forced orders (${fmtTime(L.from)} → ${fmtTime(L.to)}). Market-wide liquidation totals require CoinGlass/Kaiko (not available).` : 'Market-wide liquidation data is not available from free sources.', null, null, null, 'liquidations')}
+      ${tile('Options', ['deribit_opt', 'deribit_dvol'], O ? `IV ${fmtNum(O.atmIv30 ?? O.dvol, 1)}%` : 'n/a', O ? h`skew ${fmtNum(O.skew25, 1)} vp · P/C ${fmtNum(O.pcRatio)} · IV−RV ${fmtNum(O.ivRvSpread, 1)} · ${O.nextBigExpiry ? `${O.nextBigExpiry.expiry}: ${fmtUsd(O.nextBigExpiry.notionalUsd)} expiring, max pain ${fmtK(O.nextBigExpiry.maxPain)}` : ''}` : 'Deribit options unavailable', force('options')?.direction, 'dvol', 'force:options')}
+      ${tile('Macro liquidity', ['fred', 'yahoo'], M?.netLiq ? fmtUsd(M.netLiq[1] * 1e9) : 'n/a', M ? h`net liquidity ${M.netLiq4w !== null ? fmtUsdSigned(M.netLiq4w * 1e9) : 'n/a'} 4w · real 10y ${M.real10y ? fmtNum(M.real10y[1], 2) + '%' : 'n/a'} · ${M.dollarLabel} ${fmtPct(M.dollar20d)} 4w · VIX ${M.vix ? fmtNum(M.vix[1], 1) : 'n/a'} · HY ${M.hy ? fmtNum(M.hy[1], 2) + '%' : 'n/a'}` : 'unavailable', force('macro')?.direction, 'netliq', 'force:macro')}
+      ${tile('BTC trading behaviour', ['yahoo', 'coingecko_hist'], C?.behaviour?.label ? C.behaviour.label : 'n/a', C ? h`30d corr: Nasdaq ${fmtNum(C.NDX?.c30)} · gold ${fmtNum(C.GOLD?.c30)} · dollar ${fmtNum(C.DXY?.c30)} · VIX ${fmtNum(C.VIX?.c30)} · dominance ${fmtNum(m.structure?.dominance, 1)}%` : 'unavailable', null, 'corr', 'force:riskappetite')}
     </div>
     <div class="panel" style="margin-top:12px"><h3>Every change since the previous observation${m.prevDates?.d1 ? ` (${m.prevDates.d1})` : ''}</h3>
       <ul class="clean">${a.changes.slice(0, 12).map((c) => h`<li>${c.z !== null && c.z !== undefined ? raw(`<span class="z${Math.abs(c.z) >= 1.5 ? ' hot' : ''}">${esc(fmtNum(c.z, 1))}σ</span>`) : ''}${c.text.replace(/ \([^)]*σ[^)]*\)$/, '')}</li>`)}</ul>
@@ -421,7 +421,7 @@ const DATA_STATE = {
 };
 const scoreTxt = (v) => (v === null || v === undefined ? '—' : v > 0 ? `+${v}` : v < 0 ? `−${-v}` : '0');
 function cycleCard(x) {
-  if (x.status === 'unavailable') return h`<article class="mcard off"><header><b>${x.name}</b>${chip('unavailable', 'neu')}</header><p class="small muted">${x.unavailableWhy || 'Not available from the free sources this run.'}</p><footer>${x.source}</footer></article>`;
+  if (x.status === 'unavailable') return h`<article class="mcard off"><header><b>${x.name}${hasExplain(x.id) ? info(x.id) : ''}</b>${chip('unavailable', 'neu')}</header><p class="small muted">${x.unavailableWhy || 'Not available from the free sources this run.'}</p><footer>${x.source}</footer></article>`;
   const note = DATA_STATE[x.status]?.(x);
   return h`<article class="mcard${x.status !== 'live' ? ' delayed' : ''}">
     <header><b>${x.name}${hasExplain(x.id) ? info(x.id) : ''}</b>${x.scored ? h`<span class="sc" title="score in the composite">${scoreTxt(x.zone?.score)}</span>` : h`<span class="sc dim" title="shown for context, not scored">ctx</span>`}</header>
@@ -453,10 +453,10 @@ function cycleTab() {
     <div class="bh"><h2>On-chain cycle &amp; momentum</h2><p class="aside">Where BTC sits in the historical on-chain valuation cycle. Positioning research, not a trading signal.</p></div>
     <div class="cy-exec">
       <div class="cy-head">
-        <div><span class="k">Cycle position</span><div class="cy-phase">${c.phase ? c.phase.label : 'n/a'}${c.phase ? h`<span class="muted"> · NUPL ${fmtNum(c.phase.nupl, 2)}</span>` : ''}</div></div>
-        <div><span class="k">Valuation</span><div>${V.zone ? zchip(V.zone) : chip('inputs incomplete', 'neu')} <span class="num small muted">${V.score !== null ? scoreTxt(+V.score.toFixed(2)) : ''}</span></div></div>
-        <div><span class="k">Momentum</span><div>${M.label ? chip(M.label, M.tone) : chip('n/a', 'neu')} <span class="num small muted">${M.score !== null ? scoreTxt(M.score) + ' of ±' + M.n : ''}</span></div></div>
-        ${c.stretched ? h`<div><span class="k">Flag</span><div>${chip('Stretched', 'caut')}</div></div>` : ''}
+        <div><span class="k">Cycle position${info('phase')}</span><div class="cy-phase">${c.phase ? c.phase.label : 'n/a'}${c.phase ? h`<span class="muted"> · NUPL ${fmtNum(c.phase.nupl, 2)}</span>` : ''}</div></div>
+        <div><span class="k">Valuation${info('composite')}</span><div>${V.zone ? zchip(V.zone) : chip('inputs incomplete', 'neu')} <span class="num small muted">${V.score !== null ? scoreTxt(+V.score.toFixed(2)) : ''}</span></div></div>
+        <div><span class="k">Momentum${info('momentum')}</span><div>${M.label ? chip(M.label, M.tone) : chip('n/a', 'neu')} <span class="num small muted">${M.score !== null ? scoreTxt(M.score) + ' of ±' + M.n : ''}</span></div></div>
+        ${c.stretched ? h`<div><span class="k">Flag${info('stretched')}</span><div>${chip('Stretched', 'caut')}</div></div>` : ''}
       </div>
       <p class="cy-lean">${V.leaning ? h`<b>Historical leaning:</b> ${V.leaning}.` : h`<b>Composite needs at least 3 valuation inputs</b> — ${V.n} available this run.`}${c.stretched ? ' Valuation is elevated while momentum is still constructive — the profile of late-cycle extensions.' : ''}</p>
       <ul class="cy-why">${c.bullets.map((x) => h`<li>${x}</li>`)}</ul>
@@ -471,9 +471,9 @@ function cycleTab() {
           <tr class="tot"><td><b>Composite</b> = average of ${V.n} available inputs</td><td><b>${V.zone?.label || 'n/a'}</b></td><td class="n num"><b>${V.score !== null ? scoreTxt(+V.score.toFixed(2)) : '—'}</b></td></tr>
         </tbody></table>
       </div>
-      <div class="panel"><h3>Momentum</h3>
+      <div class="panel"><h3>Momentum${info('momentum')}</h3>
         <table class="cy-tbl"><thead><tr><th>Component</th><th>Now</th><th class="n">Score</th></tr></thead><tbody>
-          ${M.components.map((x) => h`<tr><td>${x.name}<div class="xs dim">${x.rule}</div></td><td class="num small">${x.value}</td><td class="n num">${scoreTxt(x.score)}</td></tr>`)}
+          ${M.components.map((x) => h`<tr><td>${x.name}${info('mom:' + x.id)}<div class="xs dim">${x.rule}</div></td><td class="num small">${x.value}</td><td class="n num">${scoreTxt(x.score)}</td></tr>`)}
           <tr class="tot"><td><b>Momentum</b> (sum; ≥ +2 constructive, ≤ −2 weakening)</td><td><b>${M.label || 'n/a'}</b></td><td class="n num"><b>${scoreTxt(M.score)}</b></td></tr>
         </tbody></table>
         <p class="xs dim">Hash Ribbons are scored only on a recovery cross and are shown with the miner metrics below.</p>
@@ -534,21 +534,21 @@ function liquidityTab() {
   return sec('liq-detail', 'Liquidity detail', 'Why could BTC accelerate if it crosses a level? $5K bands around spot — a map of where forced or hedging flows could sit, not a prediction.', h`
     ${lmapTable()}
     <div class="twocol" style="margin-top:16px">
-      <div class="panel"><h3>Order-book depth by venue</h3>
+      <div class="panel"><h3>Order-book depth by venue${info('depthVenues')}</h3>
         ${dep ? h`<div class="tbl-wrap" style="border:0"><table><thead><tr><th>Venue</th><th class="n">±0.5%</th><th class="n">±1%</th><th class="n">±2%</th><th class="n">Share ±1%</th><th class="n">Spread</th></tr></thead><tbody>
           ${dep.venues.map((v) => h`<tr><td>${v.venue} <span class="xs dim">${v.pair}</span></td><td class="n">${fmtUsd(v.d05)}</td><td class="n">${fmtUsd(v.d1)}${v.truncated1 ? '*' : ''}</td><td class="n">${fmtUsd(v.d2)}${v.truncated2 ? '*' : ''}</td><td class="n">${Math.round((v.d1 / dep.d1) * 100)}%</td><td class="n">${fmtNum(v.spreadBps, 2)}bp</td></tr>`)}
           <tr><td><b>Aggregate</b></td><td class="n">${fmtUsd(dep.d05)}</td><td class="n"><b>${fmtUsd(dep.d1)}</b></td><td class="n">${fmtUsd(dep.d2)}</td><td class="n">HHI ${Math.round(dep.hhi)}</td><td></td></tr>
         </tbody></table></div>
         <p class="xs dim">Bid/ask imbalance at ±1%: ${fmtPct(dep.imbalance1 * 100, 1)} (positive = more bids). Change vs 1d / 7d / 30d: ${fmtPct(dep.ch1d)} / ${fmtPct(dep.ch7d)} / ${fmtPct(dep.ch30d)} (like-for-like venue set only). * venue book did not extend to the full band. USDT books treated at $1.</p>` : h`<p class="muted">Unavailable.</p>`}
       </div>
-      <div class="panel"><h3>Can the market absorb aggressive flow?</h3>
+      <div class="panel"><h3>Can the market absorb aggressive flow?${info('impact')}</h3>
         ${imp ? h`<div class="tbl-wrap" style="border:0"><table><thead><tr><th>Order</th><th class="n">Sell impact</th><th class="n">Worst fill</th><th class="n">Buy impact</th></tr></thead><tbody>
           ${imp.sell.map((s, i) => { const bb = imp.buy[i]; return h`<tr><td class="num">${fmtUsd(s.sizeUsd)}</td><td class="n">${s.exhausted ? raw('<span class="down">beyond captured depth</span>') : fmtPct(-s.slippagePct, 2)}</td><td class="n">${s.exhausted ? `filled ${fmtUsd(s.filledUsd)}` : fmtPrice(s.worstPrice)}</td><td class="n">${bb.exhausted ? raw('<span class="up">beyond captured depth</span>') : fmtPct(bb.slippagePct, 2)}</td></tr>`; })}
         </tbody></table></div>
         <p class="xs dim">Idealised: walks the combined displayed books of ${imp.venues.join(', ')} with perfect routing. <b>Displayed ≠ executed liquidity</b> — during stress makers cancel quotes, so real impact is typically larger. “Beyond captured depth” means the order is larger than all the liquidity this snapshot captured — not that the market cannot absorb it.${dep.venues.some((v) => v.truncated2) ? ` Several venue APIs return a limited number of price levels, so their books are captured only partway: ${dep.venues.filter((v) => v.truncated2).map((v) => v.venue).join(', ')} (marked * in the depth table). Large-order impact is therefore a lower bound on available liquidity.` : ''}</p>` : h`<p class="muted">Unavailable.</p>`}
       </div>
     </div>
-    ${O ? h`<div class="panel" style="margin-top:12px"><h3>Options expiries (Deribit)</h3><div class="tbl-wrap" style="border:0"><table><thead><tr><th>Expiry</th><th class="n">Days</th><th class="n">Notional</th><th class="n">P/C OI</th><th class="n">Max pain</th><th class="n">ATM IV</th><th class="n">25Δ skew</th><th>Largest strikes</th></tr></thead><tbody>
+    ${O ? h`<div class="panel" style="margin-top:12px"><h3>Options expiries (Deribit)${info('expiries')}</h3><div class="tbl-wrap" style="border:0"><table><thead><tr><th>Expiry</th><th class="n">Days</th><th class="n">Notional</th><th class="n">P/C OI</th><th class="n">Max pain</th><th class="n">ATM IV</th><th class="n">25Δ skew</th><th>Largest strikes</th></tr></thead><tbody>
       ${O.expiries.slice(0, 8).map((e) => h`<tr><td class="num">${e.expiry}</td><td class="n">${fmtNum(e.days, 1)}</td><td class="n">${fmtUsd(e.notionalUsd)}</td><td class="n">${fmtNum(e.callOi ? e.putOi / e.callOi : null)}</td><td class="n">${fmtK(e.maxPain)}</td><td class="n">${fmtNum(e.atmIv, 1)}%</td><td class="n">${fmtNum(e.skew25, 1)}</td><td class="small">${e.topStrikes.map((s) => fmtK(s.strike)).join(', ')}</td></tr>`)}
     </tbody></table></div><p class="xs dim">Max pain = strike minimising option holders’ intrinsic value at expiry — a pinning reference only for large near-dated expiries. Skew = 25Δ call IV − 25Δ put IV (negative = puts richer).</p></div>` : ''}`);
 }
