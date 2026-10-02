@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BTC Intel Market Battlefield</title>
+<meta name="description" content="Live visualization of Bitcoin market structure: order-book liquidity, aggressive trades and liquidations at the price front line.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050a14">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="battle.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="../">BTC Intel <span>/</span> <b>Market Battlefield</b></a>
+  <nav class="links" aria-label="BTC Intel">
+    <a href="../#overview">Overview</a>
+    <a href="../#forces">What is moving BTC</a>
+    <a href="../#liquidity">Liquidity map</a>
+  </nav>
+</header>
+
+<section id="stage" class="stage" aria-label="Market battlefield visualization">
+  <canvas id="field" role="img" aria-label="Bulls (bids) and bears (asks) arrayed along the price axis; the front line is the current BTC price"></canvas>
+  <div class="hud tl">
+    <div class="k">BTC / USD · aggregated mid</div>
+    <div class="px" id="hud-price">—</div>
+    <div class="ch">24h <span id="hud-ch">—</span></div>
+  </div>
+  <div class="hud tc">
+    <div class="k">Aggressive flow · last 60 seconds <span class="badge obs">Observed</span></div>
+    <div class="pbar"><i id="pbar-b"></i></div>
+    <div class="ptxt" id="pbar-txt">Waiting for trades…</div>
+  </div>
+  <div class="hud tr">
+    <div class="moderow"><span id="mode" class="mode connecting">CONNECTING</span></div>
+    <div class="msub" id="mode-sub"></div>
+    <div class="venues" id="venues"></div>
+  </div>
+  <div class="note" id="note" hidden></div>
+</section>
+
+<div class="controls" role="toolbar" aria-label="Battlefield controls">
+  <div class="grp" role="group" aria-label="Source">
+    <button type="button" id="btn-live" aria-pressed="false">Live</button>
+    <button type="button" id="btn-replay" aria-pressed="false">Replay</button>
+    <button type="button" data-speed="1" hidden>1×</button>
+    <button type="button" data-speed="4" hidden>4×</button>
+    <button type="button" data-speed="10" hidden>10×</button>
+  </div>
+  <div class="grp" role="group" aria-label="Field width">
+    <span class="lbl">Field</span>
+    <button type="button" data-range="0.25" aria-pressed="false">±0.25%</button>
+    <button type="button" data-range="0.5" aria-pressed="true">±0.5%</button>
+    <button type="button" data-range="1" aria-pressed="false">±1%</button>
+    <button type="button" data-range="2" aria-pressed="false">±2%</button>
+  </div>
+  <div class="grp">
+    <label class="lbl" for="big">Large trade</label>
+    <select id="big"><option value="100000">≥ $100K</option><option value="250000" selected>≥ $250K</option><option value="1000000">≥ $1M</option></select>
+    <button type="button" id="btn-pause" aria-pressed="false">Pause</button>
+    <button type="button" id="btn-full">Full screen</button>
+  </div>
+</div>
+
+<main class="data">
+  <section class="block">
+    <h2><span class="badge obs">Observed</span> Market data</h2>
+    <div class="tiles">
+      <div class="tile" id="t-price"><div class="l">BTC price</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile" id="t-ch"><div class="l">24h change</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile bull" id="t-bwall"><div class="l">Buy wall</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile bear" id="t-swall"><div class="l">Sell wall</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile" id="t-imb"><div class="l">Order book imbalance</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile bear" id="t-lliq"><div class="l">Long liquidations</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile bull" id="t-sliq"><div class="l">Short liquidations</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile" id="t-big"><div class="l">Large trades</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile" id="t-fund"><div class="l">Funding</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile" id="t-oi"><div class="l">Open interest</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      <div class="tile" id="t-vol"><div class="l">Spot volume</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+    </div>
+  </section>
+  <div class="split">
+    <section class="block">
+      <h2><span class="badge mod">Modeled / estimated</span> Interpretation layer</h2>
+      <div class="tiles two">
+        <div class="tile mod" id="m-press"><div class="l">Pressure index</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+        <div class="tile mod" id="m-army"><div class="l">Army strength (bulls : bears)</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+        <div class="tile mod" id="m-zones"><div class="l">Liquidation zones</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+        <div class="tile mod" id="m-mom"><div class="l">Front-line momentum</div><div class="v">—</div><div class="s"></div><div class="src"></div></div>
+      </div>
+    </section>
+    <section class="block">
+      <h2><span class="badge obs">Observed</span> Battle tape</h2>
+      <ol class="tape" id="tape" aria-live="off"></ol>
+    </section>
+  </div>
+  <section class="block legend">
+    <h2>How to read the battlefield</h2>
+    <dl>
+      <div><dt>Front line</dt><dd>The current BTC price: the median of the venues’ mid-prices. It moves right when bulls advance and left when bears advance; the camera follows slowly so each advance is visible first.</dd></div>
+      <div><dt>Armies</dt><dd>Bulls stand on resting bids, bears on resting asks. Each price band’s formation grows with its displayed order-book liquidity, so a deep book reads as a deep column. Shading on the ground shows the same depth.</dd></div>
+      <div><dt>Champions</dt><dd>Large walls (a $50 price band holding at least 4× the median band and at least $2M) appear as oversized units in the front rank, labelled with size and price.</dd></div>
+      <div><dt>Strikes</dt><dd>Large aggressive trades arc into the front line from the attacking side: green from buyers lifting offers, red from sellers hitting bids.</dd></div>
+      <div><dt>Explosions</dt><dd>Liquidations. A long liquidation bursts inside the bull ranks (forced selling) with a red shockwave; a short liquidation bursts in the bear ranks (forced buying) with a green one. Size scales with the liquidated notional; $1M+ events shake the field.</dd></div>
+      <div><dt>What it is not</dt><dd>A prediction. Displayed liquidity can be pulled at any time, liquidation feeds cover OKX and Binance only (not the whole market), and the liquidation zones are a model estimate.</dd></div>
+    </dl>
+  </section>
+</main>
+<footer class="foot">BTC Intel · Bitcoin Custody Standard. Market-structure visualization, not investment advice.</footer>
+<script type="module" src="battle.js"></script>
+</body>
+</html>

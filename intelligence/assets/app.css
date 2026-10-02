@@ -365,3 +365,5 @@ dialog input { flex: 1; min-width: 200px; }
 
 #overview { padding-top: 14px; }
 #overview .hero { margin-top: 0; }
+
+.secnav a.nav-bf { color: var(--orange-ink); }
