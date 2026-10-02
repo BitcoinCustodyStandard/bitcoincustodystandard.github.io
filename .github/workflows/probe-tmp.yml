@@ -1,0 +1,23 @@
+name: probe-tmp
+# Temporary: one-off probe of the BGeometrics free API from the Actions network. Removed after use.
+on:
+  push:
+    branches: ['claude/bitcoin-market-intelligence-qz1k50']
+    paths: ['.github/workflows/probe-tmp.yml']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sS -m 40 https://bitcoin-data.com/v3/api-docs -o docs.json -w "api-docs HTTP %{http_code}\n" || true
+          python3 - <<'PY'
+          import json
+          try:
+              d=json.load(open('docs.json'))
+              for p in sorted(d.get('paths',{})):
+                  if '/last' in p or p.count('/')<=2: print(p)
+          except Exception as e: print('docs parse failed', e); print(open('docs.json').read()[:500])
+          PY
+          for p in sopr/last nupl/last puell-multiple/last hashribbons/last; do
+            echo "== $p"; curl -sS -m 40 -D - "https://bitcoin-data.com/v1/$p" | head -c 1500; echo; sleep 3
+          done
