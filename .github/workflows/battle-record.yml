@@ -30,7 +30,7 @@ jobs:
           node-version: 22
       - name: Record feeds
         env:
-          RECORD_MIN: ${{ github.event.inputs.minutes || '4' }}
+          RECORD_MIN: ${{ github.event.inputs.minutes || '25' }}
         run: node intelligence/battlefield/record.mjs
       - name: Commit replay
         run: |
