@@ -480,7 +480,7 @@ export function attributeMove(m, horizon) {
 
 // ---------------------------------------------------------------------------
 // REGIME
-function macroTransmission(m) {
+export function macroTransmission(m) {
   // How strongly macro moves currently reach BTC: max |90d corr| with Nasdaq / dollar / yields.
   const c = m.corr || {};
   const vals = [c.NDX?.c90, c.DXY?.c90, c.US10Y?.c90, c.REAL10Y?.c90].filter((x) => x !== null && x !== undefined).map(Math.abs);

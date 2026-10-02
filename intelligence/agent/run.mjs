@@ -13,7 +13,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { collectAll, mergeWithPrevious } from '../engine/collect.js';
 import { analyze, backfillRows } from '../engine/analyze.js';
-import { morningReport } from '../engine/report.js';
+import { morningReport, briefReport } from '../engine/report.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const DATA = process.env.INTEL_DATA_DIR ? path.resolve(process.env.INTEL_DATA_DIR) : path.resolve(here, '../data');
@@ -109,6 +109,7 @@ async function main() {
   a.timezone = TZ;
   a.kind = scheduled ? 'morning' : 'refresh';
   const reportMd = morningReport(a, { localDate: local.date });
+  const briefMd = briefReport(a, { localDate: local.date });
 
   let narrative = null;
   if (process.env.ANTHROPIC_API_KEY) {
@@ -144,14 +145,14 @@ async function main() {
   runs.push({ t: a.dataThrough, ...runPoint(a.row) });
   writeJSON(runsFile, { updated: a.generatedAt, runs: runs.slice(-3000) });
 
-  const out = { ...a, reportMd, narrative };
+  const out = { ...a, briefMd, reportMd, narrative };
   writeJSON(path.join(DATA, 'latest.json'), out);
 
   const index = readJSON(path.join(DATA, 'index.json'), { reports: [] });
   const stamp = `${local.date}${a.kind === 'morning' ? '' : `-${String(local.hour).padStart(2, '0')}${String(local.minute).padStart(2, '0')}`}`;
   writeJSON(path.join(DATA, 'history', `${stamp}.json`), out);
   fs.mkdirSync(path.join(DATA, 'reports'), { recursive: true });
-  fs.writeFileSync(path.join(DATA, 'reports', `${stamp}.md`), reportMd + (narrative?.text ? `\n\n---\n\n# Analyst narrative\n\n${narrative.text}\n` : ''));
+  fs.writeFileSync(path.join(DATA, 'reports', `${stamp}.md`), briefMd + '\n\n---\n\n' + reportMd + (narrative?.text ? `\n\n---\n\n# Analyst narrative\n\n${narrative.text}\n` : ''));
   index.reports = index.reports.filter((r) => r.id !== stamp).concat([{ id: stamp, date: local.date, kind: a.kind, generatedAt: a.generatedAt, price: a.metrics.price.spot, regime: a.regime.primary }]).sort((x, y) => (x.id < y.id ? 1 : -1));
   index.updated = a.generatedAt;
   index.timezone = TZ;

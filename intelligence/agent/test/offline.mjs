@@ -117,14 +117,14 @@ const run = (offset) => {
 run(-1);
 run(0);
 const latest = JSON.parse(fs.readFileSync(path.join(tmp, 'data', 'latest.json'), 'utf8'));
-const must = ['forces', 'map', 'scenarios', 'regime', 'attribution', 'reportMd'];
+const must = ['forces', 'map', 'scenarios', 'regime', 'attribution', 'reportMd', 'briefMd'];
 for (const k of must) if (!latest[k]) throw new Error('missing ' + k);
 if (latest.forces.length < 6) throw new Error('too few forces');
 if (!latest.map.levels.length) throw new Error('empty level map');
 const runsLog = JSON.parse(fs.readFileSync(path.join(tmp, 'data', 'runs.json'), 'utf8')).runs;
 if (runsLog.length !== 2) throw new Error('runs log should have 2 entries, has ' + runsLog.length);
-if (/NaN|undefined/.test(latest.reportMd)) {
-  const bad = latest.reportMd.split('\n').filter((l) => /NaN|undefined/.test(l));
+if (/NaN|undefined/.test(latest.reportMd + latest.briefMd)) {
+  const bad = (latest.reportMd + '\n' + latest.briefMd).split('\n').filter((l) => /NaN|undefined/.test(l));
   throw new Error('report contains NaN/undefined:\n' + bad.join('\n'));
 }
 console.log(`ok — ${latest.forces.length} forces, ${latest.map.levels.length} levels, regime "${latest.regime.primary}", report ${latest.reportMd.length} chars`);

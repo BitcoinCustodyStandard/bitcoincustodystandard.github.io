@@ -23,11 +23,6 @@
       <img src="/bcs-seal.png" alt="" width="26" height="26">
       <span class="t1">BCS</span><span class="brand-sep">/</span><span class="t2">Bitcoin Market Intelligence</span>
     </a>
-    <div class="status" aria-live="polite">
-      <span><span class="k">Last updated</span><b id="st-updated">—</b></span>
-      <span><span class="k">Data through</span><b id="st-through">—</b></span>
-      <span><span class="k">Mode</span><b id="st-mode">—</b></span>
-    </div>
     <div class="actions">
       <button class="btn" id="btn-refresh" type="button" title="Retrieve the latest available data in your browser and regenerate the analysis">Refresh market</button>
       <button class="btn ghost hide-sm" id="btn-server" type="button" title="Run the full agent on GitHub Actions (all sources, persisted)">Server run</button>
@@ -36,15 +31,14 @@
   </div>
   <div class="wrap"><div class="progress" id="progress" role="status"></div></div>
 </header>
-<nav class="secnav" aria-label="Sections">
+<nav class="secnav" aria-label="Views">
   <div class="wrap">
-    <div class="navlinks">
-      <a href="#overview">Overview</a>
-      <a href="#forces">What is moving BTC</a>
-      <a href="#liquidity">Liquidity map</a>
-      <a href="#scenarios">Acceleration</a>
-      <a href="#report">Morning report</a>
-      <a href="#coverage">Data &amp; method</a>
+    <div class="navlinks" role="tablist" aria-label="Views">
+      <a href="#overview" data-tab-link="overview">Overview</a>
+      <a href="#report" data-tab-link="report">Morning report</a>
+      <a href="#liquidity" data-tab-link="liquidity">Liquidity detail</a>
+      <a href="#data" data-tab-link="data">Data &amp; method</a>
+      <a href="#archive" data-tab-link="archive">Archive</a>
       <a href="battlefield/" class="nav-bf">Battlefield ↗</a>
     </div>
     <div class="nav-tools">

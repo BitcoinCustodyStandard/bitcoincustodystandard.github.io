@@ -3,6 +3,7 @@
 // an analyst narrative on top (agent/narrate.mjs) — it never replaces the data.
 
 import { fmtUsd, fmtPrice, fmtPct, fmtNum, fmtK } from './util.js';
+import { brief } from './brief.js';
 
 export function morningReport(a, opts = {}) {
   const m = a.metrics;
@@ -91,5 +92,36 @@ export function morningReport(a, opts = {}) {
   L.push('', '## THE THREE MOST IMPORTANT VARIABLES TODAY', '');
   a.top.forEach((t, i) => L.push(`${i + 1}. **${t.name}** (${t.direction}) — ${t.state} _Watch:_ ${t.watch}`));
   L.push('', '---', '_Observed data and interpretation are separated throughout. This is market-structure research, not investment advice; no price targets or probabilities are given._');
+  return L.join('\n');
+}
+
+// Condensed morning report: same structure as the page's default view. The full
+// report (morningReport) is archived alongside it and shown on demand.
+export function briefReport(a, opts = {}) {
+  const b = brief(a);
+  const L = [];
+  const date = opts.localDate || a.localDate || a.dataThrough.slice(0, 10);
+  const st = (s) => (s === 'met' ? 'Met' : s === 'not met' ? 'Not met' : 'Unknown');
+  L.push(`# BTC Market Intelligence — ${date}`, '');
+  L.push(`**${b.priceLine}**  `);
+  L.push(`**Regime:** ${b.regime.text}  `);
+  L.push(`_Data through ${a.dataThrough.slice(0, 16).replace('T', ' ')} UTC · ${b.sources.text}_`);
+  if (b.notable.length) L.push('', `**Notable moves (≥1.5σ):** ${b.notable.map((n) => `${n.label} ${n.from} → ${n.to} (${fmtNum(n.z, 1)}σ)`).join('; ')}.`);
+  L.push('', '## Today’s three most important variables', '');
+  b.top.forEach((t, i) => L.push(`${i + 1}. **${t.name} — ${t.dirNote}.** ${t.summary} _Watch:_ ${t.watch}`));
+  L.push('', '## Ranked forces (top 5)', '', '| # | Force | Direction | Evidence | Summary |', '|---|---|---|---|---|');
+  a.forces.filter((f) => !f.unavailable).slice(0, 5).forEach((f) => { const x = b.forces.find((y) => y.id === f.id); L.push(`| ${f.rank} | ${f.name} | ${x.dirNote} | ${f.confidence} | ${x.line.replace(/\|/g, '/')} |`); });
+  L.push('', '## Liquidity map (key levels)', '');
+  b.ladder.forEach((l) => L.push(`- **${l.label}**${l.isSpot ? ' (current band)' : ` (${fmtPct(l.distPct, 1)})`}: ${l.what}${l.detail.length ? '; ' + l.detail.join('; ') : ''} → ${l.effect}`));
+  L.push('', '_Liquidation figures are modelled estimates, not observed._');
+  L.push('', '## Acceleration conditions', '');
+  b.scenarios.forEach((s) => {
+    L.push(`**${s.title} — ${s.met} of ${s.total} met.** ${s.mech}${s.kind !== 'base' ? ` _Fails if:_ ${s.fail}` : ''}`, '');
+    s.conds.forEach((c) => L.push(`- [${st(c.status)}] ${c.text} — now ${c.value}`));
+    L.push('');
+  });
+  L.push('## What to watch in the next 24 hours', '');
+  b.watch.forEach((w) => L.push(`- **${w.what}** — ${w.why}`));
+  L.push('', '---', `_${b.footer}_`);
   return L.join('\n');
 }

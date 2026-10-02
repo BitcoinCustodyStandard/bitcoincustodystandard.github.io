@@ -11,10 +11,14 @@ A persistent research system that explains, every day, **which forces are drivin
 ```
 collect (engine/collect.js)  →  merge with last snapshot (stale-labelling)
    →  analyze vs stored history (engine/analyze.js)
-   →  morning report (engine/report.js)  [+ optional Claude analyst narrative]
+   →  brief (engine/brief.js) + condensed and full morning report (engine/report.js)  [+ optional Claude analyst narrative]
    →  persist: timeseries row, history/<date>.json, reports/<date>.md, latest.json
    →  commit → GitHub Pages republishes the page
 ```
+
+### Page layout
+
+The default **Overview** is a 60–90 second read: price and regime with a quiet data-status bar; today's three most important variables; the top 5 ranked forces (each row expands to full evidence, mechanism, invalidation and charts; the rest behind "Show all"); a liquidity ladder of key levels (full band table on expand); three acceleration cards (upside / base case / downside) with condition status; and what to watch in the next 24 hours. The KPI tiles and charts sit in a collapsed **Market dashboard**. Changes are called out on the overview only when they are at least 1.5σ versus the typical daily change. Other tabs: **Morning report** (condensed, full report on expand), **Liquidity detail** (band table, depth by venue, order impact, options expiries), **Data & method**, **Archive**. The short copy is derived mechanically from the analysis (`engine/brief.js`) and adds no figures.
 
 The **same engine** runs in the agent (Node 22) and in the browser. The page's **Refresh market** button re-collects exchange, derivatives, options and on-chain data directly from source APIs in your browser and regenerates the full analysis in place. Sources that block browser requests (Farside ETF flows, FRED, Yahoo, CFTC) keep their last server values, labelled with their own timestamps. **Server run** triggers the full agent (all sources, archived) via `workflow_dispatch`.
 
@@ -103,7 +107,7 @@ intelligence/
   data/timeseries.json         one row per day — the queryable history (feeds the daily charts)
   data/runs.json               one point per agent run — depth, aggregate OI, Coinbase premium charts
   data/history/<id>.json       full analysis for every run (<date> = 07:00 report, <date>-HHMM = refresh)
-  data/reports/<id>.md         the morning report as Markdown
+  data/reports/<id>.md         the morning report as Markdown (condensed brief, then the full report)
   data/index.json              archive index
 ```
 
