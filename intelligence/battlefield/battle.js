@@ -6,6 +6,7 @@
 //   strikes = large aggressive trades, explosions = liquidations
 import { connectLive, BookSet } from './feeds.js';
 import { Sprites } from './sprites.js';
+import { Battle, liqTier } from './model.js';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -24,7 +25,25 @@ const S = {
   trades: [], liqs: [], flowSec: [], tickers: {}, funding: null, oi: null, server: null,
   venues: {}, lastBookAt: 0, sessionStart: null,
   replay: null,
+  source: 'agg3', sourceNote: '', view: '2d', gore: 'stylized', xray: false,
 };
+try { S.gore = localStorage.getItem('bf-gore') || 'stylized'; } catch {}
+// Selected source controls the book, the front line and the trades that become charges.
+// Aggregated = Binance + Coinbase + Kraken (as on Newhedge); falls back to Coinbase + Kraken + OKX when Binance is blocked.
+const SOURCES = { agg3: ['Binance', 'Coinbase', 'Kraken'], all: null, Coinbase: ['Coinbase'], Kraken: ['Kraken'], Binance: ['Binance'], OKX: ['OKX'] };
+function sourceSet() {
+  const want = SOURCES[S.source];
+  if (!want) return null;
+  if (S.source === 'agg3' && live) {
+    const on = live.books.live();
+    if (!on.includes('Binance')) { S.sourceNote = 'Binance unavailable here — aggregate uses Coinbase + Kraken + OKX'; return new Set(['Coinbase', 'Kraken', 'OKX']); }
+  }
+  S.sourceNote = '';
+  return new Set(want);
+}
+const tradeInSource = (venue) => { const set = sourceSet(); return !set || !venue || set.has(venue.replace(/ perp$/, '')); };
+const battle = new Battle({ bigTrade: S.bigTrade });
+let s3 = null;
 let clockOffset = 0; // replay maps wall time to recorded time
 const clock = () => Date.now() + clockOffset;
 
@@ -35,6 +54,7 @@ function onEvent(e) {
   switch (e.type) {
     case 'trade':
       if (!(e.usd > 0)) return;
+      if (tradeInSource(e.venue)) battle.trade(e);
       S.flowSec.push({ t: e.t, side: e.side, usd: e.usd });
       if (e.usd >= Math.min(S.bigTrade, S.fxTrade)) {
         S.trades.push(e);
@@ -42,8 +62,8 @@ function onEvent(e) {
         if (e.usd >= S.bigTrade) tape(e);
       }
       break;
-    case 'flow': S.flowSec.push({ t: e.t, side: e.side, usd: e.usd }); break;
-    case 'liq': S.liqs.push(e); fx.explode(e); tape(e); break;
+    case 'flow': S.flowSec.push({ t: e.t, side: e.side, usd: e.usd }); battle.trade({ t: e.t, px: S.mid, usd: e.usd, side: e.side }); break;
+    case 'liq': S.liqs.push(e); battle.liq(e); if (S.view !== '3d') fx.explode(e); tape(e); break;
     case 'ticker': S.tickers[e.venue] = { ...e }; break;
     case 'funding': S.funding = e; break;
     case 'oi': S.oi = e; break;
@@ -58,9 +78,12 @@ function startLive() {
   live = connectLive(onEvent);
   const iv = setInterval(() => {
     if (!live) return clearInterval(iv);
-    const mid = live.books.mid(20000);
+    const only = sourceSet();
+    const mid = live.books.mid(20000, only);
     if (!mid) return;
-    S.book = live.books.aggregate(mid, 2, bucketFor(mid));
+    S.book = live.books.aggregate(mid, 2, bucketFor(mid), 30000, only);
+    battle.book(clock(), S.book, mid);
+    s3?.layout();
     S.lastBookAt = Date.now();
     setMid(mid);
     if (S.mode !== 'live') { S.mode = 'live'; renderMode(); }
@@ -74,7 +97,7 @@ function stopAll() {
   if (live) { clearInterval(live.iv); live.stop(); live = null; }
   if (S.replay) { S.replay.stop = true; S.replay = null; }
 }
-function resetSession() { S.trades = []; S.liqs = []; S.flowSec = []; S.tickers = {}; S.funding = null; S.oi = null; S.book = null; S.mid = null; S.cam = null; S.prevMids = []; S.sessionStart = null; tapeEl.replaceChildren(); $('#feed')?.replaceChildren(); fx.clear(); }
+function resetSession() { battle.reset(); S.trades = []; S.liqs = []; S.flowSec = []; S.tickers = {}; S.funding = null; S.oi = null; S.book = null; S.mid = null; S.cam = null; S.prevMids = []; S.sessionStart = null; tapeEl.replaceChildren(); $('#feed')?.replaceChildren(); fx.clear(); }
 
 async function startReplay() {
   stopAll();
@@ -104,6 +127,8 @@ async function startReplay() {
       S.book = { mid: f.mid, bucketUsd: data.bucketUsd, venues: Array(f.v).fill(''), bids: f.b, asks: f.a };
       S.lastBookAt = Date.now();
       setMid(f.mid);
+      battle.book(vt, S.book, f.mid);
+      s3?.layout();
     }
     const E = data.events;
     while (R.j < E.length && E[R.j].t <= vt) onEvent(E[R.j++]);
@@ -275,6 +300,9 @@ function frame(now) {
   if (!W) return;
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
   if (S.mid && S.cam !== null) S.cam += (S.mid - S.cam) * (1 - Math.exp(-dt / 2600));
+  battle.flush(clock());
+  for (const e of battle.drain()) { feedEvent(e); s3?.event(e); }
+  if (S.view === '3d' && s3) { s3.frame(); drawDepthChart(); return; }
   if (CAM.auto && !reduced) CAM.yaw += dt * 0.00004;
   let sx = 0, sy = 0;
   if (fx.shake > 0.2) { sx = (Math.random() - 0.5) * fx.shake; sy = (Math.random() - 0.5) * fx.shake * 0.6; fx.shake *= Math.exp(-dt / 180); } else fx.shake = 0;
@@ -660,7 +688,34 @@ function tape(e) {
   else { li.className = e.side === 'buy' ? 'ev bull' : 'ev bear'; li.innerHTML = `<span class="tm">${time}</span><b>Large ${e.side === 'buy' ? 'buy' : 'sell'}</b> <span class="amt">${fmtUsd(e.usd)}</span> <span class="dim">@ ${fmtPx(e.px)} · ${esc(e.venue)}</span>`; }
   tapeEl.prepend(li);
   while (tapeEl.children.length > 60) tapeEl.lastChild.remove();
-  const fe = $('#feed'); if (fe) { fe.prepend(li.cloneNode(true)); while (fe.children.length > 6) fe.lastChild.remove(); }
+}
+// Market feed: one plain-language, past-tense line per meaningful model event, with its fidelity badge.
+const TIER_NAME = ['', 'infantry fall', 'cavalry ride in', 'siege strike', 'trebuchet volley'];
+function feedEvent(e) {
+  const px = (p) => '$' + Math.round(p).toLocaleString('en-US');
+  let text = null, cls = '';
+  switch (e.kind) {
+    case 'charge': text = `<b>${fmtUsd(e.usd)} market ${e.side === 'bull' ? 'buy' : 'sell'}</b> in 1 s · ${esc(e.venues.join(', ') || 'recorded flow')} — ${e.side === 'bull' ? 'bull' : 'bear'} cavalry charge`; cls = e.side; break;
+    case 'liq': if (!e.tier) return; text = `<b>${fmtUsd(e.usd)} ${e.liqSide} liquidation${e.count > 1 ? `s (${e.count})` : ''}</b> · ${esc(e.venues.join(', '))} · ${px(e.px)} — forced ${e.liqSide === 'long' ? 'selling' : 'buying'}; ${e.side === 'bull' ? 'bull' : 'bear'} ${TIER_NAME[e.tier]}`; cls = e.side === 'bull' ? 'bear' : 'bull'; break;
+    case 'wall-hit': text = `<b>${fmtUsd(e.usd)} ${e.side === 'bull' ? 'buy' : 'sell'} wall</b> at ${px(e.price)} broken by trades`; cls = e.side === 'bull' ? 'bear' : 'bull'; break;
+    case 'wall-pulled': text = `<b>${fmtUsd(e.usd)} ${e.side === 'bull' ? 'buy' : 'sell'} wall</b> at ${px(e.price)} withdrawn (cancelled, not filled)`; break;
+    case 'rout': text = `<b>${e.side === 'bull' ? 'Bull' : 'Bear'} lines break</b> — ${e.side === 'bull' ? 'bids' : 'asks'} within 1% fell ${Math.round(e.drop * 100)}% in a minute`; cls = e.side === 'bull' ? 'bear' : 'bull'; break;
+    case 'rally': text = `<b>${e.side === 'bull' ? 'Bull' : 'Bear'} lines re-form</b> — depth within 1% recovered`; cls = e.side; break;
+    case 'range-won': text = `<b>${e.side === 'bull' ? 'Bulls' : 'Bears'} take ${px(e.marker)}</b> — price held ${e.side === 'bull' ? 'above' : 'below'} it for ${Math.round(e.holdMs / 1000)} s`; cls = e.side; announce(`${e.side === 'bull' ? 'Bulls' : 'Bears'} take ${px(e.marker)}`, `Price held ${e.side === 'bull' ? 'above' : 'below'} it for ${Math.round(e.holdMs / 1000)} s · a recap, not a forecast`); break;
+    default: return;
+  }
+  if (e.kind === 'liq' && e.tier >= 3) announce(`${fmtUsd(e.usd)} ${e.liqSide} liquidation`, `${e.venues.join(', ')} · ${px(e.px)} · forced ${e.liqSide === 'long' ? 'selling' : 'buying'} (sampled feed)`);
+  const li = document.createElement('li');
+  li.className = 'ev ' + cls;
+  li.innerHTML = `<span class="tm">${new Date(e.t).toISOString().slice(11, 19)}</span>${text} <span class="bdg ${e.badge === 'Sampled' ? 'smp' : 'obs'}">${e.badge}</span>`;
+  const fe = $('#feed'); if (fe) { fe.prepend(li); while (fe.children.length > 7) fe.lastChild.remove(); }
+  if (e.kind !== 'liq' && e.kind !== 'charge') { tapeEl.prepend(li.cloneNode(true)); while (tapeEl.children.length > 60) tapeEl.lastChild.remove(); }
+}
+let annT = 0;
+function announce(title, sub) {
+  const a = $('#announce'); if (!a) return;
+  a.querySelector('b').textContent = title; a.querySelector('span').textContent = sub;
+  a.hidden = false; clearTimeout(annT); annT = setTimeout(() => { a.hidden = true; }, 3400);
 }
 function note(t) { const n = $('#note'); n.textContent = t; n.hidden = !t; }
 function renderMode() {
@@ -668,7 +723,8 @@ function renderMode() {
   const rec = S.replay?.data?.recordedAt;
   b.className = 'mode ' + S.mode;
   b.textContent = S.mode === 'live' ? 'LIVE' : S.mode === 'replay' ? 'REPLAY' : S.mode === 'none' ? 'NO DATA' : 'CONNECTING';
-  $('#mode-sub').textContent = S.mode === 'replay' && rec ? `Recorded ${new Date(rec).toUTCString().slice(5, 22)} UTC · real exchange data · ${S.speed}×` : S.mode === 'live' ? 'Streaming from exchange WebSockets' : '';
+  $('#mode-sub').textContent = S.mode === 'replay' && rec ? `Recorded ${new Date(rec).toUTCString().slice(5, 22)} UTC · real exchange data · all venues · ${S.speed}×` : S.mode === 'live' ? `Streaming from exchange WebSockets${S.sourceNote ? ' · ' + S.sourceNote : ''}` : '';
+  $('#source').disabled = S.mode === 'replay';
   $('#btn-live').setAttribute('aria-pressed', String(S.mode === 'live' || (S.mode === 'connecting' && !!live)));
   $('#btn-replay').setAttribute('aria-pressed', String(S.mode === 'replay'));
   document.querySelectorAll('[data-speed]').forEach((x) => { x.hidden = S.mode !== 'replay'; x.setAttribute('aria-pressed', String(+x.dataset.speed === S.speed)); });
@@ -734,12 +790,37 @@ function renderData() {
 // ---------------------------------------------------------------- controls
 document.querySelectorAll('[data-range]').forEach((b) => b.addEventListener('click', () => { S.rangePct = +b.dataset.range; document.querySelectorAll('[data-range]').forEach((x) => x.setAttribute('aria-pressed', String(+x.dataset.range === S.rangePct))); }));
 document.querySelectorAll('[data-speed]').forEach((b) => b.addEventListener('click', () => { S.speed = +b.dataset.speed; renderMode(); }));
-$('#big').addEventListener('change', (e) => { S.bigTrade = +e.target.value; });
+$('#big').addEventListener('change', (e) => { S.bigTrade = +e.target.value; battle.big = S.bigTrade; });
+$('#source').addEventListener('change', (e) => { S.source = e.target.value; battle.reset(); });
+$('#gore').value = S.gore;
+$('#gore').addEventListener('change', (e) => { S.gore = e.target.value; try { localStorage.setItem('bf-gore', S.gore); } catch {} });
+$('#btn-xray').addEventListener('click', () => toggleXray());
+function toggleXray() { S.xray = !S.xray; $('#btn-xray').setAttribute('aria-pressed', String(S.xray)); }
+$('#cam-mode').addEventListener('change', (e) => s3?.setMode(e.target.value));
+document.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+window.addEventListener('keydown', (e) => { if (/^(input|select|textarea)$/i.test(e.target.tagName)) return; if (e.key === 'x' || e.key === 'X') toggleXray(); });
+// 3D on desktops with WebGL2; the 2.5D canvas stays as the mobile and fallback view.
+async function setView(v) {
+  if (v === '3d' && !s3) {
+    try {
+      const { createScene3D } = await import('./scene3d.js');
+      s3 = createScene3D({ host: $('#stage'), overlay: cv, get: () => ({ mid: S.mid, cam: S.cam, rangePct: S.rangePct, bands: battle.bands, priceAtAge, now: clock(), gore: S.gore, xray: S.xray, reduced }), onFocus: (m) => { $('#cam-mode').value = m; } });
+    } catch (err) { console.warn('3D unavailable', err); s3 = null; }
+    if (!s3) { note('3D view needs WebGL2, which this browser does not provide — showing the 2.5D battlefield.'); v = '2d'; }
+    else s3.layout();
+  }
+  S.view = v;
+  s3?.show(v === '3d');
+  document.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+  $('#cam-mode').disabled = v !== '3d';
+  $('#stage').classList.toggle('is3d', v === '3d');
+}
+const want3d = (() => { const q = new URLSearchParams(location.search).get('view'); if (q) return q === '3d'; return innerWidth >= 900 && !matchMedia('(pointer: coarse)').matches; })();
 $('#btn-live').addEventListener('click', () => { note(''); startLive(); });
 $('#btn-replay').addEventListener('click', () => { note(''); startReplay(); });
 $('#btn-pause').addEventListener('click', (e) => { S.paused = !S.paused; e.currentTarget.setAttribute('aria-pressed', String(S.paused)); e.currentTarget.textContent = S.paused ? 'Resume' : 'Pause'; });
 $('#v-full').addEventListener('click', () => { const st = $('#stage'); (document.fullscreenElement ? document.exitFullscreen() : st.requestFullscreen?.())?.catch?.(() => {}); });
-$('#v-reset').addEventListener('click', () => resetView());
+$('#v-reset').addEventListener('click', () => { resetView(); s3?.reset(); });
 $('#v-orbit').addEventListener('click', () => { CAM.auto = !CAM.auto; syncOrbit(); });
 
 // ---------------------------------------------------------------- boot
@@ -749,6 +830,9 @@ $('#v-orbit').addEventListener('click', () => { CAM.auto = !CAM.auto; syncOrbit(
 resize();
 measureHud();
 requestAnimationFrame(frame);
+setView(want3d ? '3d' : '2d');
+// test hook for automated checks only (?debug); injected events go through the same model path
+if (new URLSearchParams(location.search).has('debug')) window.__bf = { S, battle, inject: (e) => onEvent({ t: clock(), ...e }), get s3() { return s3; } };
 setInterval(renderData, 500);
 if (window.BMI_PREVIEW || new URLSearchParams(location.search).has('replay')) { if (window.BMI_PREVIEW) note('Preview: this page cannot open live exchange connections, so it replays real data recorded from the exchanges. On the site it streams live.'); startReplay(); }
 else startLive();

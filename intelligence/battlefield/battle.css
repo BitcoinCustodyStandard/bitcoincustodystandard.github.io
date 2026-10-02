@@ -159,3 +159,17 @@ a:hover { text-decoration: underline; }
   .tile .v { font-size: 17px; }
   .note { bottom: 96px; }
 }
+
+/* 3D view: WebGL canvas under the 2D overlay (labels, X-ray) */
+.stage canvas.gl { position: absolute; inset: 0; display: block; }
+.stage.is3d #field { background: transparent; }
+.announce { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 22px; background: rgba(6, 10, 20, 0.82); border: 1px solid rgba(245, 194, 122, 0.55); border-radius: 6px; pointer-events: none; text-align: center; animation: ann 3.4s ease both; }
+.announce[hidden] { display: none; }
+.announce b { font: 600 20px/1.2 var(--sans); color: #f5e6c8; letter-spacing: 0.02em; }
+.announce span { font-size: 12px; color: var(--text2); }
+@keyframes ann { 0% { opacity: 0; transform: translate(-50%, 8px); } 10%, 85% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .announce { animation: none; } }
+.bdg { font: 600 9px/1 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 4px; border-radius: 3px; margin-left: 4px; vertical-align: 1px; }
+.bdg.obs { color: #7fe0c0; border: 1px solid rgba(127, 224, 192, 0.4); }
+.bdg.smp { color: #f5c27a; border: 1px solid rgba(245, 194, 122, 0.45); }
+.controls select:disabled { opacity: 0.5; }

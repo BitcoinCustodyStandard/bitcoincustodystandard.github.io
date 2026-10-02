@@ -50,9 +50,28 @@
   <div class="hud bl panel"><div class="k">Order book depth <span class="dim">· cumulative, aggregated spot</span></div><canvas id="depth"></canvas><div class="hint">Drag to rotate · scroll / pinch to zoom · double-click to reset</div></div>
   <div class="hud br panel"><div class="k">Market feed <span id="feed-mode" class="dim"></span></div><ol id="feed"></ol></div>
   <div class="note" id="note" hidden></div>
+  <div class="announce" id="announce" role="status" hidden><b></b><span></span></div>
 </section>
 
 <div class="controls" role="toolbar" aria-label="Battlefield controls">
+  <div class="grp" role="group" aria-label="View">
+    <button type="button" data-view="3d" aria-pressed="false" title="Three.js battlefield (desktop)">3D</button>
+    <button type="button" data-view="2d" aria-pressed="false" title="Lightweight 2.5D battlefield">2.5D</button>
+    <label class="lbl" for="cam-mode">Camera</label>
+    <select id="cam-mode"><option value="cinematic">Cinematic</option><option value="free">Free (WASD + drag)</option><option value="orbit">Orbit</option></select>
+  </div>
+  <div class="grp">
+    <label class="lbl" for="source">Source</label>
+    <select id="source" title="Controls the order book, the front line and which trades become charges">
+      <option value="agg3">Aggregated: Binance + Coinbase + Kraken</option><option value="all">All venues</option>
+      <option value="Coinbase">Coinbase</option><option value="Kraken">Kraken</option><option value="Binance">Binance</option><option value="OKX">OKX</option>
+    </select>
+  </div>
+  <div class="grp">
+    <label class="lbl" for="gore">Gore</label>
+    <select id="gore"><option value="clean">Clean</option><option value="stylized">Stylized</option><option value="brutal">Brutal</option></select>
+    <button type="button" id="btn-xray" aria-pressed="false" title="Show the dollars behind every band (X)">X-ray</button>
+  </div>
   <div class="grp" role="group" aria-label="Source">
     <button type="button" id="btn-live" aria-pressed="false">Live</button>
     <button type="button" id="btn-replay" aria-pressed="false">Replay</button>
@@ -109,6 +128,13 @@
   <section class="block legend">
     <h2>How to read the battlefield</h2>
     <dl>
+      <div><dt>What this is</dt><dd>A picture of the Bitcoin order book right now: the buy and sell orders waiting on exchanges, and the trades and forced closures hitting them. Every soldier, wall and explosion stands for real dollars at a real price — press X (or X-ray) to see the numbers. It shows pressure, not the future.</dd></div>
+      <div><dt>Soldiers</dt><dd>Bulls (blue, horned, round shields) stand on resting buy orders below the price; bears (black and ember, spiked, tower shields) on resting sell orders above it. Soldiers per $50 band = 12 × log2(1 + USD ÷ $250k): $250k is 12 soldiers, $1M 28, $4M 49. Orders can be cancelled at any moment, so an army can vanish without a fight.</dd></div>
+      <div><dt>Walls: broken or withdrawn</dt><dd>A band holding at least 4× the median band and $2M becomes a palisade ($10M+: stone). If trades eat it, it is smashed; if it disappears without trades, it sinks into the fog and the feed says “withdrawn” — a wall is only a promise.</dd></div>
+      <div><dt>Charges, surges, volleys</dt><dd>Market orders are grouped per side per second: under $50k an archer volley, $50k to the large-trade setting an infantry surge, above it a cavalry charge (riders = USD ÷ $100k). Charges move the front because they consume the orders in their path.</dd></div>
+      <div><dt>Liquidations</dt><dd>A forced exit of a borrowed bet. Long liquidations are forced selling, so bulls fall; short liquidations are forced buying, so bears fall. $50k+ infantry fall · $150k+ enemy cavalry ride in · $500k+ siege strike · $2M+ trebuchet volley, lightning and a local rout. Exchanges publish only a sample of liquidations, so the true toll is usually higher.</dd></div>
+      <div><dt>Routs and ranges</dt><dd>A side routs when its orders within 1% of price drop 30% or more within a minute, and re-forms when they recover. A side “takes” a $500 marker when price crosses it and stays beyond it for 60 seconds — a recap of ground taken, not a signal.</dd></div>
+      <div><dt>Blood on the ground</dt><dd>Blood (or, on Clean, scorch) soaks the ground at the price where each liquidation hit and dries over about ten minutes, so the terrain doubles as a recent liquidation map. The gore setting changes only the effects, never the data.</dd></div>
       <div><dt>Front line</dt><dd>A glowing trench at the current BTC price (the median of the venues’ mid-prices). Its near section is now; the far section bends to trace the last three minutes of price, so you can see where the fighting moved. Drag to rotate the map, scroll or pinch to zoom.</dd></div>
       <div><dt>Breakthrough cost</dt><dd>The price a $25M market sell (left) or buy (right) would reach by consuming the displayed aggregated book. The closer that price, the thinner that side’s defence.</dd></div>
       <div><dt>Armies</dt><dd>Bulls stand on resting bids, bears on resting asks. Each price band’s formation grows with its displayed order-book liquidity, so a deep book reads as a deep column. Shading on the ground shows the same depth.</dd></div>

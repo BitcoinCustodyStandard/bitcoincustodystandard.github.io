@@ -36,6 +36,7 @@ export class BookSet {
       for (const k of ks.slice(keep)) v[s].delete(k);
     }
   }
+  live(maxAgeMs = 30000) { return [...this.venues].filter(([, v]) => now() - v.t <= maxAgeMs && v.bids.size && v.asks.size).map(([k]) => k); }
   best(venue) {
     const v = this.venues.get(venue);
     if (!v || !v.bids.size || !v.asks.size) return null;
@@ -45,9 +46,11 @@ export class BookSet {
     return bb < ba ? { bid: bb, ask: ba, mid: (bb + ba) / 2 } : null;
   }
   // Median of venue mids = robust aggregated front line.
-  mid(maxAgeMs = 30000) {
+  // `only` (optional Set of venue names) restricts both to the selected source.
+  mid(maxAgeMs = 30000, only = null) {
     const mids = [];
     for (const [venue, v] of this.venues) {
+      if (only && !only.has(venue)) continue;
       if (now() - v.t > maxAgeMs) continue;
       const b = this.best(venue);
       if (b) mids.push(b.mid);
@@ -57,11 +60,12 @@ export class BookSet {
     return mids[Math.floor(mids.length / 2)];
   }
   // USD liquidity per price bucket within ±rangePct of mid, summed across venues.
-  aggregate(mid, rangePct, bucketUsd, maxAgeMs = 30000) {
+  aggregate(mid, rangePct, bucketUsd, maxAgeMs = 30000, only = null) {
     const lo = mid * (1 - rangePct / 100), hi = mid * (1 + rangePct / 100);
     const bids = new Map(), asks = new Map();
     const venues = [];
     for (const [venue, v] of this.venues) {
+      if (only && !only.has(venue)) continue;
       if (now() - v.t > maxAgeMs) continue;
       venues.push(venue);
       for (const [p, q] of v.bids) if (p >= lo && p <= mid) { const k = Math.floor(p / bucketUsd) * bucketUsd; bids.set(k, (bids.get(k) || 0) + p * q); }
