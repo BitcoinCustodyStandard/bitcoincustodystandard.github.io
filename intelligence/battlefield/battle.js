@@ -717,7 +717,8 @@ function announce(title, sub) {
   a.querySelector('b').textContent = title; a.querySelector('span').textContent = sub;
   a.hidden = false; clearTimeout(annT); annT = setTimeout(() => { a.hidden = true; }, 3400);
 }
-function note(t) { const n = $('#note'); n.textContent = t; n.hidden = !t; }
+let noteT = 0;
+function note(t) { const n = $('#note'); n.textContent = t; n.hidden = !t; clearTimeout(noteT); if (t) noteT = setTimeout(() => { n.hidden = true; }, 9000); }
 function renderMode() {
   const b = $('#mode');
   const rec = S.replay?.data?.recordedAt;
