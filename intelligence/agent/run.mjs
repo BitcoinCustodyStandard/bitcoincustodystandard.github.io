@@ -74,6 +74,8 @@ function mergeManualEtf(snap) {
   log(`Merged ${added} manual ETF flow rows.`);
 }
 
+const runPoint = (r) => ({ price: r.price, depth1: r.depth1, depthVenues: r.depthVenues, depthBid1: r.depthBid1, depthAsk1: r.depthAsk1, oiTotal: r.oiTotal, oiCoverage: r.oiCoverage, fundingAnn: r.fundingAnn, iv30: r.iv30, cbPremium: r.cbPremium });
+
 async function main() {
   if (scheduled && !(await gate())) { fs.writeFileSync(path.join(DATA, '.skipped'), '1'); return; }
   try { fs.unlinkSync(path.join(DATA, '.skipped')); } catch {}
@@ -127,6 +129,20 @@ async function main() {
   // Raw book levels are only needed for today's analysis; keep the stored snapshot lean.
   const lean = snap.books ? { ...snap, books: { ...snap.books, venues: snap.books.venues.map(({ levels, ...v }) => v) } } : snap;
   writeJSON(path.join(DATA, 'snapshot.json'), lean);
+
+  // Per-run log (every scheduled or manual run) — feeds charts for series that have no
+  // free historical source (order-book depth, aggregate OI, Coinbase premium).
+  const runsFile = path.join(DATA, 'runs.json');
+  let runs = readJSON(runsFile, null)?.runs;
+  if (!runs) {
+    runs = [];
+    for (const f of fs.existsSync(path.join(DATA, 'history')) ? fs.readdirSync(path.join(DATA, 'history')).sort() : []) {
+      const h = readJSON(path.join(DATA, 'history', f));
+      if (h?.row) runs.push({ t: h.dataThrough, ...runPoint(h.row) });
+    }
+  }
+  runs.push({ t: a.dataThrough, ...runPoint(a.row) });
+  writeJSON(runsFile, { updated: a.generatedAt, runs: runs.slice(-3000) });
 
   const out = { ...a, reportMd, narrative };
   writeJSON(path.join(DATA, 'latest.json'), out);

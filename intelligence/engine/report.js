@@ -83,15 +83,7 @@ export function morningReport(a, opts = {}) {
   scen(12, a.scenarios[2]);
   L.push('', `_Base case (range):_ ${a.scenarios[1].first.map((c) => `[${c.status}] ${c.text}`).join('; ')}. No probabilities are assigned: there is no statistically defensible basis for them.`);
 
-  sec(13, 'Comparison with February 2026');
-  L.push(`**${a.feb.verdict}**`, '');
-  L.push('| Dimension | Jan–Feb 2026 | Today | Assessment |', '|---|---|---|---|');
-  a.feb.dims.forEach((d) => L.push(`| ${d.label} | ${d.feb} | ${d.today} | ${d.verdict}${d.note ? ` — _${d.note}_` : ''} |`));
-  L.push('', `**Current risk amplifiers:** ${a.feb.amplifiers.length ? a.feb.amplifiers.join('; ') : 'none flagged'}.`);
-  L.push(`**Current risk dampeners:** ${a.feb.dampeners.length ? a.feb.dampeners.join('; ') : 'none flagged'}.`);
-  L.push('', `_${a.feb.note}_`);
-
-  sec(14, 'What to watch today');
+  sec(13, 'What to watch today');
   a.forces.filter((x) => !x.unavailable).slice(0, 5).forEach((x) => bullet(`**${x.name}:** ${x.watch}`));
   const exp = m.options?.nextBigExpiry;
   if (exp) bullet(`Deribit expiry ${exp.expiry} 08:00 UTC: ${fmtUsd(exp.notionalUsd)} notional, max pain ${fmtK(exp.maxPain)}.`);

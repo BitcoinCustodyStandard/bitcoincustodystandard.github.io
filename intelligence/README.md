@@ -72,13 +72,11 @@ If the repository secret `ANTHROPIC_API_KEY` is set, each run adds an analyst na
 
 **Options.** Gamma from Black-Scholes with Deribit mark IV, expressed as $ hedge change per 1% move. Dealer sign is not observable, so the page states both possibilities (pinning if dealers are long gamma, acceleration if short).
 
-**February 2026 comparison.** Seven dimensions (pre-existing weakness, ETF flows, depth, leverage, funding, macro shock, options) are each assessed *similar / partly similar / different / unknown* against the sourced case study in `engine/reference.js`. No composite score: the dimensions are not commensurable and a single reference episode cannot support statistical weighting.
-
 **Scenarios** list what must happen first (with today's status), confirming and contradicting indicators, acceleration levels from the map, the liquidity mechanism and the failure condition. No probabilities.
 
 ## Asking the archive
 
-On the page: *Historical context → Ask the archive*. From a checkout:
+From a checkout:
 
 ```bash
 node intelligence/agent/query.mjs between 2026-02-05 2026-03-05   # what changed between two dates
@@ -102,7 +100,8 @@ intelligence/
   agent/query.mjs              archive questions (CLI);  agent/test/offline.mjs  synthetic end-to-end test
   data/latest.json             current analysis (what the page shows)
   data/snapshot.json           last raw snapshot (for stale carry-forward)
-  data/timeseries.json         one row per day — the queryable history
+  data/timeseries.json         one row per day — the queryable history (feeds the daily charts)
+  data/runs.json               one point per agent run — depth, aggregate OI, Coinbase premium charts
   data/history/<id>.json       full analysis for every run (<date> = 07:00 report, <date>-HHMM = refresh)
   data/reports/<id>.md         the morning report as Markdown
   data/index.json              archive index

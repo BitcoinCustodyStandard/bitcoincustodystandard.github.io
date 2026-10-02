@@ -5,14 +5,12 @@
 import { analyze } from '../engine/analyze.js';
 import { collectAll, mergeWithPrevious } from '../engine/collect.js';
 import { morningReport } from '../engine/report.js';
-import { QUERIES } from '../engine/history.js';
-import { ANALOGUES, FEB2026 } from '../engine/reference.js';
 import { fmtUsd, fmtUsdSigned, fmtPrice, fmtPct, fmtNum, fmtK, ordinal } from '../engine/util.js';
 
 const REPO = 'bitcoincustodystandard/bitcoincustodystandard.github.io';
 const WORKFLOW = 'market-intel.yml';
 const SERVER_ONLY = ['farside', 'fred', 'yahoo', 'cftc_cot'];
-const state = { a: null, rows: [], index: null, snapshot: null, range: 90, query: 'between' };
+const state = { a: null, rows: [], runs: [], index: null, snapshot: null, range: 90 };
 const $ = (s, r = document) => r.querySelector(s);
 
 // ---------- safe templating ----------
@@ -84,86 +82,139 @@ function md(src) {
 }
 
 // ---------- charts (inline SVG, single axis, hover layer) ----------
-const W = 600, H = 190, PAD = { l: 52, r: 12, t: 10, b: 24 };
 function niceTicks(min, max, n = 4) {
-  if (min === max) { min -= 1; max += 1; }
+  if (min === max) { const d = Math.abs(min) * 0.05 || 1; min -= d; max += d; }
   const step0 = (max - min) / n, mag = 10 ** Math.floor(Math.log10(step0));
   const step = [1, 2, 2.5, 5, 10].map((s) => s * mag).find((s) => s >= step0);
   const lo = Math.floor(min / step) * step, hi = Math.ceil(max / step) * step;
   const t = []; for (let v = lo; v <= hi + step / 2; v += step) t.push(+v.toFixed(10));
   return t;
 }
-function chartShell(title, sub, svg, legend = '') {
-  return h`<div class="chart"><div class="ct"><b>${title}</b><span>${sub}</span></div>${legend ? raw(legend) : ''}${raw(svg)}</div>`;
+const BIG = { w: 600, h: 200, pad: { l: 56, r: 14, t: 10, b: 24 }, axes: true };
+const SPARK = { w: 300, h: 64, pad: { l: 2, r: 6, t: 6, b: 4 }, axes: false };
+const xLabel = (d) => (d.length > 10 ? `${d.slice(5, 10)} ${d.slice(11, 16)}` : d.slice(2));
+const tipLabel = (d) => (d.length > 10 ? fmtTime(d) : d);
+function emptySvg(o, msg) {
+  return `<svg viewBox="0 0 ${o.w} ${o.h}" data-w="${o.w}" data-h="${o.h}" role="img"><text class="empty" x="${o.w / 2}" y="${o.h / 2 + 4}" text-anchor="middle">${esc(msg)}</text></svg>`;
 }
-function lineSvg(pts, fmt) {
-  if (!pts || pts.length < 2) return `<svg viewBox="0 0 ${W} ${H}" role="img"><text class="empty" x="${W / 2}" y="${H / 2}" text-anchor="middle">Not enough stored history yet</text></svg>`;
-  const xs = pts.map((p) => new Date(p[0]).getTime()), ys = pts.map((p) => p[1]);
+function lineSvg(pts, fmt, o = BIG, emptyMsg = 'Not enough history yet', fmtTip = fmt) {
+  if (!pts || pts.length < 2) return emptySvg(o, pts?.length === 1 ? `1 observation so far (${fmtTip(pts[0][1])}) — ${emptyMsg}` : emptyMsg);
+  const { w: W, h: H, pad: PAD } = o;
+  const xs = pts.map((p) => new Date(p[0].length > 10 ? p[0] : p[0] + 'T00:00:00Z').getTime()), ys = pts.map((p) => p[1]);
   const x0 = Math.min(...xs), x1 = Math.max(...xs);
   const ticks = niceTicks(Math.min(...ys), Math.max(...ys));
-  const y0 = ticks[0], y1 = ticks.at(-1);
+  const y0 = o.axes ? ticks[0] : Math.min(...ys), y1 = o.axes ? ticks.at(-1) : Math.max(...ys);
   const X = (x) => PAD.l + ((x - x0) / (x1 - x0 || 1)) * (W - PAD.l - PAD.r);
   const Y = (y) => PAD.t + (1 - (y - y0) / (y1 - y0 || 1)) * (H - PAD.t - PAD.b);
   const path = pts.map((p, i) => `${i ? 'L' : 'M'}${X(xs[i]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
-  const grid = ticks.map((t) => `<line class="gridl" x1="${PAD.l}" x2="${W - PAD.r}" y1="${Y(t)}" y2="${Y(t)}"/><text class="axis" x="${PAD.l - 6}" y="${Y(t) + 3}" text-anchor="end">${esc(fmt(t))}</text>`).join('');
-  const xl = [0, Math.floor(pts.length / 2), pts.length - 1].map((i) => `<text class="axis" x="${X(xs[i])}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === pts.length - 1 ? 'end' : 'middle'}">${esc(pts[i][0].slice(2))}</text>`).join('');
-  const data = esc(JSON.stringify(pts.map((p, i) => [X(xs[i]), Y(p[1]), p[0], fmt(p[1])])));
-  return `<svg viewBox="0 0 ${W} ${H}" data-line="${data}" role="img" aria-label="line chart">${grid}${xl}<path class="ln" d="${path}"/><line class="xh" y1="${PAD.t}" y2="${H - PAD.b}" style="display:none"/><circle class="dot" r="4" style="display:none"/></svg>`;
+  const area = `${path}L${X(xs.at(-1)).toFixed(1)},${H - PAD.b}L${X(xs[0]).toFixed(1)},${H - PAD.b}Z`;
+  const grid = o.axes ? ticks.map((t) => `<line class="gridl" x1="${PAD.l}" x2="${W - PAD.r}" y1="${Y(t)}" y2="${Y(t)}"/><text class="axis" x="${PAD.l - 6}" y="${Y(t) + 3}" text-anchor="end">${esc(fmt(t))}</text>`).join('') : '';
+  const xl = o.axes ? [0, Math.floor(pts.length / 2), pts.length - 1].map((i) => `<text class="axis" x="${X(xs[i])}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === pts.length - 1 ? 'end' : 'middle'}">${esc(xLabel(pts[i][0]))}</text>`).join('') : '';
+  const data = esc(JSON.stringify(pts.map((p, i) => [+X(xs[i]).toFixed(1), +Y(p[1]).toFixed(1), tipLabel(p[0]), fmtTip(p[1])])));
+  const end = `<circle class="enddot" cx="${X(xs.at(-1))}" cy="${Y(ys.at(-1))}" r="${o.axes ? 3.5 : 3}"/>`;
+  return `<svg viewBox="0 0 ${W} ${H}" data-w="${W}" data-h="${H}" data-line="${data}" role="img" aria-label="line chart">${grid}${xl}<path class="area" d="${area}"/><path class="ln" d="${path}"/>${end}<line class="xh" y1="${PAD.t}" y2="${H - PAD.b}" style="display:none"/><circle class="dot" r="4" style="display:none"/></svg>`;
 }
-function barsSvg(pts, fmt) {
-  if (!pts || pts.length < 2) return `<svg viewBox="0 0 ${W} ${H}"><text class="empty" x="${W / 2}" y="${H / 2}" text-anchor="middle">No flow history</text></svg>`;
+function barsSvg(pts, fmt, o = BIG, emptyMsg = 'No history yet', fmtTip = fmt) {
+  if (!pts || pts.length < 2) return emptySvg(o, emptyMsg);
+  const { w: W, h: H, pad: PAD } = o;
   const ys = pts.map((p) => p[1]);
   const ticks = niceTicks(Math.min(0, ...ys), Math.max(0, ...ys));
   const y0 = ticks[0], y1 = ticks.at(-1);
   const Y = (y) => PAD.t + (1 - (y - y0) / (y1 - y0 || 1)) * (H - PAD.t - PAD.b);
   const bw = (W - PAD.l - PAD.r) / pts.length;
-  const grid = ticks.map((t) => `<line class="${t === 0 ? 'zero' : 'gridl'}" x1="${PAD.l}" x2="${W - PAD.r}" y1="${Y(t)}" y2="${Y(t)}"/><text class="axis" x="${PAD.l - 6}" y="${Y(t) + 3}" text-anchor="end">${esc(fmt(t))}</text>`).join('');
+  const grid = ticks.map((t) => (t === 0 || o.axes ? `<line class="${t === 0 ? 'zero' : 'gridl'}" x1="${PAD.l}" x2="${W - PAD.r}" y1="${Y(t)}" y2="${Y(t)}"/>` : '') + (o.axes ? `<text class="axis" x="${PAD.l - 6}" y="${Y(t) + 3}" text-anchor="end">${esc(fmt(t))}</text>` : '')).join('');
   const bars = pts.map(([d, v], i) => {
     const x = PAD.l + i * bw + Math.min(1, bw * 0.15), w = Math.max(1, bw - Math.min(2, bw * 0.3));
     const y = v >= 0 ? Y(v) : Y(0), hh = Math.max(1, Math.abs(Y(v) - Y(0)));
-    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${hh.toFixed(1)}" rx="${Math.min(2, w / 2)}" fill="var(${v >= 0 ? '--series-pos' : '--series-neg'})" data-tip="${esc(d + '|' + fmt(v))}" tabindex="-1"/>`;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${hh.toFixed(1)}" rx="${Math.min(2, w / 2)}" fill="var(${v >= 0 ? '--series-pos' : '--series-neg'})" data-tip="${esc(tipLabel(d) + '|' + fmtTip(v))}"/>`;
   }).join('');
-  const xl = [0, pts.length - 1].map((i) => `<text class="axis" x="${PAD.l + i * bw + (i ? bw : 0)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}">${esc(pts[i][0].slice(2))}</text>`).join('');
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="bar chart">${grid}${bars}${xl}</svg>`;
+  const xl = o.axes ? [0, pts.length - 1].map((i) => `<text class="axis" x="${PAD.l + i * bw + (i ? bw : 0)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}">${esc(xLabel(pts[i][0]))}</text>`).join('') : '';
+  return `<svg viewBox="0 0 ${W} ${H}" data-w="${W}" data-h="${H}" role="img" aria-label="bar chart">${grid}${bars}${xl}</svg>`;
 }
-function wireCharts(root) {
-  root.querySelectorAll('.chart').forEach((c) => {
-    const svg = c.querySelector('svg');
-    let tip = c.querySelector('.tip');
-    if (!tip) { tip = document.createElement('div'); tip.className = 'tip'; tip.style.display = 'none'; c.appendChild(tip); }
-    const show = (x, y, d, v) => {
-      tip.replaceChildren();
-      const b = document.createElement('b'); b.textContent = v; const s = document.createElement('span'); s.textContent = d;
-      tip.append(b, s); tip.style.display = 'block';
-      const r = svg.getBoundingClientRect(), cr = c.getBoundingClientRect();
-      const px = (x / W) * r.width + (r.left - cr.left), py = (y / H) * r.height + (r.top - cr.top);
-      tip.style.left = Math.min(px + 10, cr.width - tip.offsetWidth - 6) + 'px'; tip.style.top = Math.max(py - 40, 4) + 'px';
-    };
-    if (svg.dataset.line) {
-      const pts = JSON.parse(svg.dataset.line);
-      const xh = svg.querySelector('.xh'), dot = svg.querySelector('.dot');
-      svg.addEventListener('pointermove', (e) => {
-        const r = svg.getBoundingClientRect(); const x = ((e.clientX - r.left) / r.width) * W;
-        let best = pts[0]; for (const p of pts) if (Math.abs(p[0] - x) < Math.abs(best[0] - x)) best = p;
-        xh.setAttribute('x1', best[0]); xh.setAttribute('x2', best[0]); xh.style.display = '';
-        dot.setAttribute('cx', best[0]); dot.setAttribute('cy', best[1]); dot.style.display = '';
-        show(best[0], best[1], best[2], best[3]);
-      });
-      svg.addEventListener('pointerleave', () => { xh.style.display = 'none'; dot.style.display = 'none'; tip.style.display = 'none'; });
-    } else {
-      svg.querySelectorAll('rect[data-tip]').forEach((rc) => {
-        rc.addEventListener('pointerenter', () => { const [d, v] = rc.dataset.tip.split('|'); rc.style.opacity = 0.75; show(+rc.getAttribute('x'), +rc.getAttribute('y'), d, v); });
-        rc.addEventListener('pointerleave', () => { rc.style.opacity = ''; tip.style.display = 'none'; });
-      });
-    }
-  });
+function wireChart(c) {
+  const svg = c.querySelector('svg');
+  if (!svg) return;
+  const W = +svg.dataset.w, H = +svg.dataset.h;
+  let tip = c.querySelector('.tip');
+  if (!tip) { tip = document.createElement('div'); tip.className = 'tip'; tip.style.display = 'none'; c.appendChild(tip); }
+  const show = (x, y, d, v) => {
+    tip.replaceChildren();
+    const b = document.createElement('b'); b.textContent = v; const s = document.createElement('span'); s.textContent = d;
+    tip.append(b, s); tip.style.display = 'block';
+    const r = svg.getBoundingClientRect(), cr = c.getBoundingClientRect();
+    const px = (x / W) * r.width + (r.left - cr.left), py = (y / H) * r.height + (r.top - cr.top);
+    tip.style.left = Math.max(4, Math.min(px + 10, cr.width - tip.offsetWidth - 4)) + 'px'; tip.style.top = Math.max(py - 44, -6) + 'px';
+  };
+  if (svg.dataset.line) {
+    const pts = JSON.parse(svg.dataset.line);
+    const xh = svg.querySelector('.xh'), dot = svg.querySelector('.dot');
+    svg.addEventListener('pointermove', (e) => {
+      const r = svg.getBoundingClientRect(); const x = ((e.clientX - r.left) / r.width) * W;
+      let best = pts[0]; for (const p of pts) if (Math.abs(p[0] - x) < Math.abs(best[0] - x)) best = p;
+      xh.setAttribute('x1', best[0]); xh.setAttribute('x2', best[0]); xh.style.display = '';
+      dot.setAttribute('cx', best[0]); dot.setAttribute('cy', best[1]); dot.style.display = '';
+      show(best[0], best[1], best[2], best[3]);
+    });
+    svg.addEventListener('pointerleave', () => { xh.style.display = 'none'; dot.style.display = 'none'; tip.style.display = 'none'; });
+  } else {
+    svg.querySelectorAll('rect[data-tip]').forEach((rc) => {
+      rc.addEventListener('pointerenter', () => { const [d, v] = rc.dataset.tip.split('|'); rc.style.opacity = 0.7; show(+rc.getAttribute('x'), +rc.getAttribute('y'), d, v); });
+      rc.addEventListener('pointerleave', () => { rc.style.opacity = ''; tip.style.display = 'none'; });
+    });
+  }
 }
+
+// Chart registry: every chart on the page is declared once here and drawn into
+// <div data-chart="key"> (full size) or <div data-spark="key"> (tile size).
+const cutDate = () => new Date(Date.now() - state.range * 864e5).toISOString().slice(0, 10);
+const fromRows = (k) => { const c = cutDate(); return state.rows.filter((r) => r.date >= c && r[k] !== null && r[k] !== undefined).map((r) => [r.date, r[k]]); };
+// Only runs measured on the same venue set as the latest are plotted together (no silent methodology mixing).
+const fromRuns = (k, setKey) => { const c = cutDate(); const runs = state.runs || []; const latest = setKey ? runs.at(-1)?.[setKey] : null; return runs.filter((r) => r.t.slice(0, 10) >= c && r[k] !== null && r[k] !== undefined && (!setKey || r[setKey] === latest)).map((r) => [r.t, r[k]]); };
+const etfPts = () => { const c = cutDate(); const m = new Map(); for (const r of state.rows) if (r.etfDate && r.etfDate >= c && r.etfLast !== null) m.set(r.etfDate, r.etfLast); return [...m.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1)); };
+const RUNS_MSG = 'history builds with every agent run (started Oct 1, 2026)';
+const CHARTS = {
+  price: { t: 'BTC price', s: 'daily close · CoinGecko', pts: () => fromRows('price'), f: (v) => fmtPrice(v), ft: (v) => fmtK(v) },
+  depth: { t: '±1% order-book depth', s: 'per run · aggregate of 5 venues', pts: () => fromRuns('depth1', 'depthVenues'), f: (v) => fmtUsd(v, 1), ft: (v) => fmtUsd(v, 0), empty: RUNS_MSG },
+  etf: { t: 'US spot ETF net flows', s: 'daily · Farside', kind: 'bars', pts: etfPts, f: (v) => fmtUsdSigned(v * 1e6), ft: (v) => fmtUsd(v * 1e6, 0), legend: true, empty: 'flow history builds daily (started Sep 2026)' },
+  oi: { t: 'Open interest — OKX', s: 'daily · consistent single-venue series', pts: () => fromRows('oiOkx'), f: (v) => fmtUsd(v, 2), ft: (v) => fmtUsd(v, 1) },
+  oiAgg: { t: 'Open interest — 5 major venues', s: 'per run · OKX, Binance, Bybit, Deribit, Hyperliquid', pts: () => fromRuns('oiTotal', 'oiCoverage'), f: (v) => fmtUsd(v, 2), ft: (v) => fmtUsd(v, 1), empty: RUNS_MSG },
+  funding: { t: 'Perpetual funding (annualised)', s: 'daily avg · OKX BTC-USDT', pts: () => fromRows('fundingAnn'), f: (v) => fmtNum(v, 1) + '%', ft: (v) => fmtNum(v, 0) + '%' },
+  premium: { t: 'Coinbase premium vs offshore', s: 'per run · US spot demand proxy', pts: () => fromRuns('cbPremium'), f: (v) => fmtPct(v, 3), ft: (v) => fmtNum(v, 2) + '%', empty: RUNS_MSG },
+  dvol: { t: 'Implied volatility (DVOL)', s: 'daily · Deribit 30-day', pts: () => fromRows('dvol'), f: (v) => fmtNum(v, 1), ft: (v) => fmtNum(v, 0) },
+  netliq: { t: 'US net liquidity (Fed − TGA − RRP)', s: 'weekly · FRED', pts: () => fromRows('netLiq'), f: (v) => fmtUsd(v * 1e9, 2), ft: (v) => fmtUsd(v * 1e9, 1) },
+  real10y: { t: '10-year real yield', s: 'daily · FRED (TIPS)', pts: () => fromRows('real10y'), f: (v) => fmtNum(v, 2) + '%', ft: (v) => fmtNum(v, 1) + '%' },
+  dxy: { t: 'US dollar index', s: 'daily · DXY', pts: () => fromRows('dxy'), f: (v) => fmtNum(v, 2), ft: (v) => fmtNum(v, 0) },
+  us10y: { t: '10-year Treasury yield', s: 'daily · FRED', pts: () => fromRows('us10y'), f: (v) => fmtNum(v, 2) + '%', ft: (v) => fmtNum(v, 1) + '%' },
+  vix: { t: 'VIX', s: 'daily · equity volatility', pts: () => fromRows('vix'), f: (v) => fmtNum(v, 1), ft: (v) => fmtNum(v, 0) },
+  corr: { t: 'BTC–Nasdaq 30-day correlation', s: 'daily returns · derived', pts: () => fromRows('corrNdx30'), f: (v) => fmtNum(v, 2), ft: (v) => fmtNum(v, 1) },
+  stables: { t: 'Stablecoin supply', s: 'daily · DefiLlama', pts: () => fromRows('stables'), f: (v) => fmtUsd(v, 1), ft: (v) => fmtUsd(v, 0) },
+  mvrv: { t: 'MVRV (price ÷ on-chain cost basis)', s: 'daily · Coin Metrics', pts: () => fromRows('mvrv'), f: (v) => fmtNum(v, 2), ft: (v) => fmtNum(v, 1) },
+};
+function drawChart(el) {
+  const key = el.dataset.chart || el.dataset.spark, spark = !!el.dataset.spark, c = CHARTS[key];
+  if (!c) return;
+  const pts = c.pts(), base = spark ? SPARK : BIG;
+  // draw at the element's real pixel width so text and strokes are never scaled
+  const px = Math.round(el.clientWidth - (spark ? 0 : 28));
+  const o = { ...base, w: px > 100 ? px : base.w, h: spark ? base.h : (px && px < 500 ? 170 : base.h) };
+  const tick = spark ? c.f : c.ft;
+  const svg = c.kind === 'bars' ? barsSvg(pts, tick, o, c.empty, c.f) : lineSvg(pts, tick, o, c.empty, c.f);
+  el.innerHTML = spark ? svg : `<div class="ct"><b>${esc(c.t)}</b><span>${esc(c.s)}</span></div>${c.legend ? '<p class="legend" style="margin:0 0 4px"><span><i style="background:var(--series-pos)"></i>Net inflow</span><span><i style="background:var(--series-neg)"></i>Net outflow</span></p>' : ''}${svg}`;
+  wireChart(el);
+}
+function drawCharts(root = document) { root.querySelectorAll('[data-chart],[data-spark]').forEach(drawChart); }
+let resizeT;
+window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => drawCharts(document), 200); });
+document.addEventListener('toggle', (e) => { if (e.target.matches?.('details.force') && e.target.open) drawCharts(e.target); }, true);
+const chartEl = (key) => h`<div class="chart" data-chart="${key}"></div>`;
+const sparkEl = (key) => h`<div class="chart spark" data-spark="${key}"></div>`;
+const rangeBar = () => h`<div class="range" role="group" aria-label="Chart range">${[[30, '30D'], [90, '90D'], [180, '6M'], [365, '1Y']].map(([r, l]) => h`<button type="button" data-range="${r}" aria-pressed="${state.range === r}">${l}</button>`)}</div>`;
 
 // ---------- sections ----------
 function overview() {
   const a = state.a, m = a.metrics, P = m.price;
   const dep = m.depth, E = m.etf, D = m.derivs, O = m.options, M = m.macro, L = m.liq, C = m.corr;
-  const tile = (label, ids, v, s, d) => h`<div class="tile${isStale(ids) ? ' stale' : ''}"><div class="label">${label}${d ? raw(' ' + ser(dirChip(d))) : ''}</div><div class="v">${v}</div><div class="s">${s}</div><div class="src">${srcLine(ids)}</div></div>`;
+  const tile = (label, ids, v, s, d, sk) => h`<div class="tile${isStale(ids) ? ' stale' : ''}"><div class="label">${label}${d ? raw(' ' + ser(dirChip(d))) : ''}</div><div class="v">${v}</div>${sk ? sparkEl(sk) : ''}<div class="s">${s}</div><div class="src">${srcLine(ids)}</div></div>`;
   const force = (id) => a.forces.find((f) => f.id === id);
   const sell100 = dep?.impact?.sell?.find((x) => x.sizeUsd === 100e6);
   return h`<section id="overview">
@@ -190,15 +241,16 @@ function overview() {
         ${[a.attribution.d1, a.attribution.d7].map((x) => h`<div class="row"><div class="h">${x.horizon === '1d' ? 'Last 24 hours' : 'Last 7 days'} · ${x.confidence}</div><b>${x.label}</b><div class="small muted">${x.explanation}</div></div>`)}
       </div>
     </div>
+    <div class="pricechart">${rangeBar()}${chartEl('price')}</div>
     <div class="kpis">
-      ${tile('Spot liquidity (±1% depth)', dep ? dep.venues.map((v) => 'book_' + v.venue.toLowerCase()) : ['book_binance'], dep ? fmtUsd(dep.d1) : 'n/a', dep ? h`${dep.ch7d !== null ? raw(`<span class="${cls(dep.ch7d)}">${esc(fmtPct(dep.ch7d))}</span> vs 7d · `) : 'no 7d history yet · '}top-2 venues ${Math.round(dep.top2Share * 100)}% · $100M sell ≈ ${sell100 ? (sell100.exhausted ? 'beyond captured depth' : fmtPct(-sell100.slippagePct, 2)) : 'n/a'}` : 'Order books unavailable', force('depth')?.direction)}
-      ${tile('ETF flow trend', ['farside'], E ? fmtUsdSigned(E.s5 * 1e6) + ' 5d' : 'n/a', E ? h`20d ${fmtUsdSigned(E.s20 * 1e6)} · last day (${E.lastDate}) ${fmtUsdSigned(E.last * 1e6)} · ${E.streak > 0 ? `${E.streak}-day inflow streak` : E.streak < 0 ? `${-E.streak}-day outflow streak` : 'no streak'} · ${E.accel > 0 ? 'accelerating' : 'decelerating'}` : 'ETF flow data unavailable', force('etf')?.direction)}
-      ${tile('Futures open interest', ['okx_deriv', 'deribit_fut', 'hyperliquid', 'bitmex', 'binance_deriv', 'bybit_deriv'].filter((id) => a.quality.some((q) => q.id === id && q.status !== 'error')), D ? fmtUsd(D.totalOi) : 'n/a', D ? h`${fmtNum(D.oiPctMcap)}% of mcap · 1d ${fmtPct(D.oiCh1d)} · 7d ${fmtPct(D.oiCh7d)} · 30d ${fmtPct(D.oiCh30d)} (${D.oiChBasis}) · venues: ${D.coverage.replace(/,/g, ', ')}${D.cot ? ` · CME ≈${fmtNum(D.cot.oiBtc / 1000, 0)}K BTC (CFTC ${D.cot.date})` : ''}` : 'unavailable', force('leverage')?.direction)}
-      ${tile('Funding & basis', ['okx_deriv', 'deribit_fut'], D?.fundingAnn !== null && D?.fundingAnn !== undefined ? fmtNum(D.fundingAnn, 1) + '% ann.' : 'n/a', D ? h`OI-weighted perps · dispersion ${fmtNum(D.fundingDispersionBps, 2)} bp/8h${D.basis ? ` · ${Math.round(D.basis.days)}d basis ${fmtNum(D.basis.annPct, 1)}%` : ''}${D.okxFunding7dAnn !== undefined ? ` · OKX 7d avg ${fmtNum(D.okxFunding7dAnn, 1)}%` : ''}` : 'unavailable', force('funding')?.direction)}
+      ${tile('Spot liquidity (±1% depth)', dep ? dep.venues.map((v) => 'book_' + v.venue.toLowerCase()) : ['book_binance'], dep ? fmtUsd(dep.d1) : 'n/a', dep ? h`${dep.ch7d !== null ? raw(`<span class="${cls(dep.ch7d)}">${esc(fmtPct(dep.ch7d))}</span> vs 7d · `) : 'no 7d history yet · '}top-2 venues ${Math.round(dep.top2Share * 100)}% · $100M sell ≈ ${sell100 ? (sell100.exhausted ? 'beyond captured depth' : fmtPct(-sell100.slippagePct, 2)) : 'n/a'}` : 'Order books unavailable', force('depth')?.direction, 'depth')}
+      ${tile('ETF flow trend', ['farside'], E ? fmtUsdSigned(E.s5 * 1e6) + ' 5d' : 'n/a', E ? h`20d ${fmtUsdSigned(E.s20 * 1e6)} · last day (${E.lastDate}) ${fmtUsdSigned(E.last * 1e6)} · ${E.streak > 0 ? `${E.streak}-day inflow streak` : E.streak < 0 ? `${-E.streak}-day outflow streak` : 'no streak'} · ${E.accel > 0 ? 'accelerating' : 'decelerating'}` : 'ETF flow data unavailable', force('etf')?.direction, 'etf')}
+      ${tile('Futures open interest', ['okx_deriv', 'deribit_fut', 'hyperliquid', 'bitmex', 'binance_deriv', 'bybit_deriv'].filter((id) => a.quality.some((q) => q.id === id && q.status !== 'error')), D ? fmtUsd(D.totalOi) : 'n/a', D ? h`${fmtNum(D.oiPctMcap)}% of mcap · 1d ${fmtPct(D.oiCh1d)} · 7d ${fmtPct(D.oiCh7d)} · 30d ${fmtPct(D.oiCh30d)} (${D.oiChBasis}) · venues: ${D.coverage.replace(/,/g, ', ')}${D.cot ? ` · CME ≈${fmtNum(D.cot.oiBtc / 1000, 0)}K BTC (CFTC ${D.cot.date})` : ''}` : 'unavailable', force('leverage')?.direction, 'oi')}
+      ${tile('Funding & basis', ['okx_deriv', 'deribit_fut'], D?.fundingAnn !== null && D?.fundingAnn !== undefined ? fmtNum(D.fundingAnn, 1) + '% ann.' : 'n/a', D ? h`OI-weighted perps · dispersion ${fmtNum(D.fundingDispersionBps, 2)} bp/8h${D.basis ? ` · ${Math.round(D.basis.days)}d basis ${fmtNum(D.basis.annPct, 1)}%` : ''}${D.okxFunding7dAnn !== undefined ? ` · OKX 7d avg ${fmtNum(D.okxFunding7dAnn, 1)}%` : ''}` : 'unavailable', force('funding')?.direction, 'funding')}
       ${tile('Liquidations', ['okx_deriv'], L ? `${fmtUsd(L.longUsd)} L / ${fmtUsd(L.shortUsd)} S` : 'n/a', L ? h`OKX BTC-USDT perp, ${L.count} most recent forced orders (${fmtTime(L.from)} → ${fmtTime(L.to)}). Market-wide liquidation totals require CoinGlass/Kaiko (not available).` : 'Market-wide liquidation data is not available from free sources.', null)}
-      ${tile('Options', ['deribit_opt', 'deribit_dvol'], O ? `IV ${fmtNum(O.atmIv30 ?? O.dvol, 1)}%` : 'n/a', O ? h`skew ${fmtNum(O.skew25, 1)} vp · P/C ${fmtNum(O.pcRatio)} · IV−RV ${fmtNum(O.ivRvSpread, 1)} · ${O.nextBigExpiry ? `${O.nextBigExpiry.expiry}: ${fmtUsd(O.nextBigExpiry.notionalUsd)} expiring, max pain ${fmtK(O.nextBigExpiry.maxPain)}` : ''}` : 'Deribit options unavailable', force('options')?.direction)}
-      ${tile('Macro liquidity', ['fred', 'yahoo'], M?.netLiq ? fmtUsd(M.netLiq[1] * 1e9) : 'n/a', M ? h`net liquidity ${M.netLiq4w !== null ? fmtUsdSigned(M.netLiq4w * 1e9) : 'n/a'} 4w · real 10y ${M.real10y ? fmtNum(M.real10y[1], 2) + '%' : 'n/a'} · ${M.dollarLabel} ${fmtPct(M.dollar20d)} 4w · VIX ${M.vix ? fmtNum(M.vix[1], 1) : 'n/a'} · HY ${M.hy ? fmtNum(M.hy[1], 2) + '%' : 'n/a'}` : 'unavailable', force('macro')?.direction)}
-      ${tile('BTC trading behaviour', ['yahoo', 'coingecko_hist'], C?.behaviour?.label ? C.behaviour.label : 'n/a', C ? h`30d corr: Nasdaq ${fmtNum(C.NDX?.c30)} · gold ${fmtNum(C.GOLD?.c30)} · dollar ${fmtNum(C.DXY?.c30)} · VIX ${fmtNum(C.VIX?.c30)} · dominance ${fmtNum(m.structure?.dominance, 1)}%` : 'unavailable', null)}
+      ${tile('Options', ['deribit_opt', 'deribit_dvol'], O ? `IV ${fmtNum(O.atmIv30 ?? O.dvol, 1)}%` : 'n/a', O ? h`skew ${fmtNum(O.skew25, 1)} vp · P/C ${fmtNum(O.pcRatio)} · IV−RV ${fmtNum(O.ivRvSpread, 1)} · ${O.nextBigExpiry ? `${O.nextBigExpiry.expiry}: ${fmtUsd(O.nextBigExpiry.notionalUsd)} expiring, max pain ${fmtK(O.nextBigExpiry.maxPain)}` : ''}` : 'Deribit options unavailable', force('options')?.direction, 'dvol')}
+      ${tile('Macro liquidity', ['fred', 'yahoo'], M?.netLiq ? fmtUsd(M.netLiq[1] * 1e9) : 'n/a', M ? h`net liquidity ${M.netLiq4w !== null ? fmtUsdSigned(M.netLiq4w * 1e9) : 'n/a'} 4w · real 10y ${M.real10y ? fmtNum(M.real10y[1], 2) + '%' : 'n/a'} · ${M.dollarLabel} ${fmtPct(M.dollar20d)} 4w · VIX ${M.vix ? fmtNum(M.vix[1], 1) : 'n/a'} · HY ${M.hy ? fmtNum(M.hy[1], 2) + '%' : 'n/a'}` : 'unavailable', force('macro')?.direction, 'netliq')}
+      ${tile('BTC trading behaviour', ['yahoo', 'coingecko_hist'], C?.behaviour?.label ? C.behaviour.label : 'n/a', C ? h`30d corr: Nasdaq ${fmtNum(C.NDX?.c30)} · gold ${fmtNum(C.GOLD?.c30)} · dollar ${fmtNum(C.DXY?.c30)} · VIX ${fmtNum(C.VIX?.c30)} · dominance ${fmtNum(m.structure?.dominance, 1)}%` : 'unavailable', null, 'corr')}
     </div>
     <div class="twocol" style="margin-top:12px">
       <div class="panel"><h3>What changed since the previous observation${m.prevDates?.d1 ? ` (${m.prevDates.d1})` : ''}</h3>
@@ -212,6 +264,7 @@ function overview() {
   </section>`;
 }
 
+const FORCE_CHARTS = { etf: ['etf'], depth: ['depth'], leverage: ['oi', 'oiAgg'], funding: ['funding'], spot: ['premium'], macro: ['netliq', 'real10y'], dollar: ['dxy', 'us10y'], options: ['dvol'], onchain: ['stables', 'mvrv'], riskappetite: ['corr', 'vix'] };
 function forcesSection() {
   const a = state.a;
   const ev = (e) => h`<tr><td>${e.label}</td><td>${e.value}${e.source || e.derived ? raw(`<span class="srcl">${e.derived ? 'Derived by this system' : ''}${e.derived && e.source ? ' from ' : ''}${e.source ? esc(e.source) : ''}${e.asOf ? ' · ' + esc(fmtTime(e.asOf)) : ''}${e.frequency ? ' · ' + esc(e.frequency) : ''}${e.status && e.status !== 'ok' && e.status !== 'unavailable' ? ' · ' + esc(e.status.toUpperCase()) : ''}</span>`) : ''}</td></tr>`;
@@ -228,6 +281,7 @@ function forcesSection() {
       </summary>
       ${f.unavailable ? h`<div class="fbody"><p class="full">${f.state}</p></div>` : h`<div class="fbody">
         <div class="full"><h4>Current state <span class="tag">observed</span></h4><p>${f.state}</p></div>
+        ${FORCE_CHARTS[f.id] ? h`<div class="full fcharts">${FORCE_CHARTS[f.id].map(chartEl)}</div>` : ''}
         <div class="full"><h4>Evidence</h4><div class="tbl-wrap"><table class="ev"><tbody>${f.evidence.map(ev)}</tbody></table></div></div>
         <div class="full"><h4>Transmission mechanism</h4><p class="mech">${f.mechanism}</p></div>
         <div><h4>Interpretation <span class="tag">analysis</span></h4><p>${f.interpretation}</p></div>
@@ -305,33 +359,11 @@ function scenariosSection() {
   </section>`;
 }
 
-function febSection() {
-  const a = state.a, F = a.feb;
-  const vcls = (v) => (v === 'similar' ? 'similar' : v === 'partly similar' ? 'partly' : v === 'different' ? 'different' : 'unknown');
-  return h`<section id="feb2026">
-    <div class="sec-h"><h2><span class="n">04</span>February 2026 comparison</h2><div class="aside">How similar is today’s market structure to the January–February 2026 setup (≈$90K → ≈$60–63K)? Assessed dimension by dimension.</div></div>
-    <div class="verdict">${F.verdict}</div>
-    <div class="tbl-wrap"><table><thead><tr><th>Dimension</th><th>January–February 2026</th><th>Today</th><th>Assessment</th></tr></thead><tbody>
-      ${F.dims.map((d) => h`<tr><td><b>${d.label}</b></td><td class="small">${d.feb}</td><td class="small">${d.today}${d.note ? raw(`<div class="xs dim" style="margin-top:4px">${esc(d.note)}</div>`) : ''}</td><td><span class="vd ${vcls(d.verdict)}">${d.verdict}</span></td></tr>`)}
-    </tbody></table></div>
-    <div class="twocol" style="margin-top:12px">
-      <div class="panel"><h3>Current risk amplifiers</h3><ul class="clean">${F.amplifiers.length ? F.amplifiers.map((x) => h`<li>${x}</li>`) : h`<li class="muted">None flagged on current data.</li>`}</ul></div>
-      <div class="panel"><h3>Current risk dampeners</h3><ul class="clean">${F.dampeners.length ? F.dampeners.map((x) => h`<li>${x}</li>`) : h`<li class="muted">None flagged on current data.</li>`}</ul></div>
-    </div>
-    <p class="xs dim" style="margin-top:8px">${F.note}</p>
-    <div class="panel flat" style="margin-top:14px;padding-left:0;padding-right:0">
-      <h3>Reference case: the February 2026 mechanism chain</h3>
-      <p class="lead">${FEB2026.summary}</p>
-      <div class="chain">${FEB2026.chain.map((s) => h`<div class="step"><div><b>${s.step}</b><p>${s.text}</p>${s.evidence.map((e) => h`<p class="evi">${e.text} — ${safeUrl(e.url) ? h`<a href="${safeUrl(e.url)}" target="_blank" rel="noopener">${e.source}</a>` : e.source}</p>`)}</div></div>`)}</div>
-    </div>
-  </section>`;
-}
-
 function reportSection() {
   const a = state.a;
   const opts = (state.index?.reports || []).slice(0, 120);
   return h`<section id="report">
-    <div class="sec-h"><h2><span class="n">05</span>Morning report</h2><div class="aside">Generated daily at 07:00 ${state.index?.timezone || ''} by the agent; archived permanently. Manual refreshes are archived with a time suffix.</div></div>
+    <div class="sec-h"><h2><span class="n">04</span>Morning report</h2><div class="aside">Generated daily at 07:00 ${state.index?.timezone || ''} by the agent; archived permanently. Manual refreshes are archived with a time suffix.</div></div>
     <div class="report-bar">
       <label class="small muted" for="rep-sel">Report</label>
       <select id="rep-sel"><option value="">Current (${a.kind === 'browser' ? 'browser refresh' : a.kind || 'latest'} · ${fmtTime(a.generatedAt)})</option>${opts.map((r) => h`<option value="${r.id}">${r.id}${r.kind === 'morning' ? ' · 07:00 report' : ' · refresh'}${r.price ? ' · ' + fmtPrice(r.price) : ''}</option>`)}</select>
@@ -341,47 +373,11 @@ function reportSection() {
   </section>`;
 }
 
-function historySection() {
-  return h`<section id="history">
-    <div class="sec-h"><h2><span class="n">06</span>Historical context</h2><div class="aside">Analogues are documented episodes, not templates — each lists similarities and the mechanism, so differences from today are explicit.</div></div>
-    <div class="analogues">${ANALOGUES.map((x) => h`<div class="panel analogue"><div class="type">${x.type}</div><h3>${x.label}</h3><p><span class="k">Trigger</span><br>${x.trigger}</p><p><span class="k">Mechanism</span><br>${x.mechanism}</p><p><span class="k">Data</span><br>${x.data}</p><p><span class="k">Lesson</span><br>${x.lesson}</p><p class="xs dim">${x.sources.map((s) => (safeUrl(s.url) ? h`<a href="${safeUrl(s.url)}" target="_blank" rel="noopener">${s.name}</a>` : s.name)).reduce((acc, v, i) => (i ? h`${acc} · ${v}` : h`${v}`), '')}</p></div>`)}</div>
-    <div class="sec-h" style="margin-top:28px"><h2 style="font-size:12px">Stored observations</h2><div class="range" role="group" aria-label="Range">${[30, 90, 365].map((r) => h`<button type="button" data-range="${r}" aria-pressed="${state.range === r}">${r === 365 ? '1Y' : r + 'D'}</button>`)}</div></div>
-    <div class="charts" id="charts">${raw(chartsHtml())}</div>
-    <p class="xs dim" style="margin-top:6px">Dates before the system’s first live run are reconstructed from historical series (price, ETF flows, OKX OI, funding, DVOL, macro). Order-book depth, aggregate OI and the options surface exist only from the first live run.</p>
-    <div class="sec-h" style="margin-top:28px"><h2 style="font-size:12px">Ask the archive</h2></div>
-    <div class="qgrid">
-      <div class="qlist">${Object.entries(QUERIES).map(([k, q]) => h`<button type="button" data-q="${k}" aria-pressed="${state.query === k}">${q.label}</button>`)}
-        <div class="qdates"><input type="date" id="q-a" value="2026-02-05"><span class="dim">→</span><input type="date" id="q-b" value="2026-03-05"></div>
-      </div>
-      <div class="panel" id="q-out"></div>
-    </div>
-  </section>`;
-}
-
-function chartsHtml() {
-  const cut = new Date(Date.now() - state.range * 864e5).toISOString().slice(0, 10);
-  const rows = state.rows.filter((r) => r.date >= cut);
-  const s = (k) => rows.filter((r) => r[k] !== null && r[k] !== undefined).map((r) => [r.date, r[k]]);
-  const etf = new Map(); for (const r of state.rows) if (r.etfDate && r.etfDate >= cut) etf.set(r.etfDate, r.etfLast);
-  const etfPts = [...etf.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1));
-  const usdM = (v) => fmtUsd(v * 1e6, 0);
-  return [
-    chartShell('BTC price', 'daily · CoinGecko', lineSvg(s('price'), (v) => fmtK(v))),
-    chartShell('US spot ETF net flows', 'daily · Farside', barsSvg(etfPts, usdM), '<p class="legend" style="margin:0 0 4px"><span><i style="background:var(--series-pos)"></i>Net inflow</span><span><i style="background:var(--series-neg)"></i>Net outflow</span></p>'),
-    chartShell('Open interest (OKX, consistent series)', 'daily · OKX', lineSvg(s('oiOkx'), (v) => fmtUsd(v, 1))),
-    chartShell('Perpetual funding (annualised)', 'daily avg · OKX / OI-weighted', lineSvg(s('fundingAnn'), (v) => fmtNum(v, 0) + '%')),
-    chartShell('±1% order-book depth (aggregate)', 'per run · exchange books', lineSvg(s('depth1'), (v) => fmtUsd(v, 0))),
-    chartShell('Implied volatility (DVOL)', 'daily · Deribit', lineSvg(s('dvol'), (v) => fmtNum(v, 0))),
-    chartShell('BTC–Nasdaq 30-day correlation', 'daily returns · derived', lineSvg(s('corrNdx30'), (v) => fmtNum(v, 1))),
-    chartShell('US net liquidity (Fed − TGA − RRP)', 'weekly · FRED', lineSvg(s('netLiq'), (v) => fmtUsd(v * 1e9, 1))),
-  ].map((x) => x.s).join('');
-}
-
 function coverageSection() {
   const a = state.a;
   const st = (q) => chip(q.status === 'server-only' ? 'server value' : q.status, q.status === 'ok' ? 'ok' : q.status === 'error' ? 'err' : 'stale');
   return h`<section id="coverage">
-    <div class="sec-h"><h2><span class="n">07</span>Data coverage &amp; methodology</h2><div class="aside">Every number on this page traces to one of these sources. Failed sources keep their last value, marked stale with its original timestamp.</div></div>
+    <div class="sec-h"><h2><span class="n">05</span>Data coverage &amp; methodology</h2><div class="aside">Every number on this page traces to one of these sources. Failed sources keep their last value, marked stale with its original timestamp.</div></div>
     <div class="tbl-wrap"><table><thead><tr><th>Source</th><th>Status</th><th>As of</th><th>Frequency</th><th>Method / notes</th></tr></thead><tbody>
       ${a.quality.slice().sort((x, y) => (x.status === y.status ? 0 : x.status === 'ok' ? 1 : -1)).map((q) => h`<tr><td>${safeUrl(q.url) ? h`<a href="${safeUrl(q.url)}" target="_blank" rel="noopener">${q.name}</a>` : q.name}</td><td>${st(q)}</td><td class="small num">${fmtTime(q.asOf || q.fetchedAt)}</td><td class="small">${q.frequency || ''}</td><td class="small">${q.method || ''}${q.note ? raw(`<div class="xs" style="color:var(--warn)">${esc(q.note)}</div>`) : ''}${q.error ? raw(`<div class="xs" style="color:var(--down)">${esc(q.error)}</div>`) : ''}</td></tr>`)}
     </tbody></table></div>
@@ -415,21 +411,19 @@ function render() {
   if (a.kind === 'browser' && liveN < 5) banners.push(h`<div class="banner warn">Browser refresh could reach only ${liveN} of ${a.quality.length} sources from this network (blocked, rate-limited or no cross-origin access). All other values are the last server values, marked stale with their original timestamps. Try again later or start a <b>Server run</b>.</div>`);
   else if (a.kind === 'browser') banners.push(h`<div class="banner">Browser refresh: ${liveN} sources were retrieved live (exchange, derivatives, options and on-chain data where reachable). ETF flows, FRED macro, Yahoo markets and CFTC data cannot be fetched from a browser and show their last server values (marked “server value”). This refresh is not saved to the archive — use <b>Server run</b> for that.</div>`);
   else if (staleN || errN) banners.push(h`<div class="banner warn">${staleN ? `${staleN} source(s) could not be refreshed and show their last known values, marked stale. ` : ''}${errN ? `${errN} source(s) were unavailable in the last run (e.g. venues that block US servers); where an alternative exists it is used and labelled. ` : ''}See <a href="#coverage">Data &amp; method</a>.</div>`);
-  $('#app').innerHTML = [h`${banners}`, overview(), forcesSection(), liquiditySection(), scenariosSection(), febSection(), reportSection(), historySection(), coverageSection()].map((x) => x.s).join('');
-  wireCharts($('#app'));
+  $('#app').innerHTML = [h`${banners}`, overview(), forcesSection(), liquiditySection(), scenariosSection(), reportSection(), coverageSection()].map((x) => x.s).join('');
+  drawCharts($('#app'));
   wireSections();
-  runQuery();
+  const np = $('#nav-price');
+  if (np) np.innerHTML = h`${fmtPrice(a.metrics.price.spot)} <span class="${cls(a.metrics.price.ch24h)}">${fmtPct(a.metrics.price.ch24h)}</span>`.s;
 }
 
 function wireSections() {
   document.querySelectorAll('[data-range]').forEach((b) => b.addEventListener('click', () => {
     state.range = +b.dataset.range;
     document.querySelectorAll('[data-range]').forEach((x) => x.setAttribute('aria-pressed', String(+x.dataset.range === state.range)));
-    $('#charts').innerHTML = chartsHtml();
-    wireCharts($('#charts'));
+    drawCharts($('#app'));
   }));
-  document.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => { state.query = b.dataset.q; document.querySelectorAll('[data-q]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.q === state.query))); runQuery(); }));
-  ['#q-a', '#q-b'].forEach((s) => $(s).addEventListener('change', () => { state.query = 'between'; runQuery(); }));
   const sel = $('#rep-sel'), dl = $('#rep-dl');
   const setDl = (text) => { dl.href = URL.createObjectURL(new Blob([text], { type: 'text/markdown' })); };
   setDl(state.a.reportMd + (state.a.narrative?.text ? '\n\n# Analyst narrative\n\n' + state.a.narrative.text : ''));
@@ -444,20 +438,13 @@ function wireSections() {
   });
 }
 
-function runQuery() {
-  const q = QUERIES[state.query];
-  const out = $('#q-out');
-  if (!q || !out) return;
-  if (!state.rows.length) { out.innerHTML = '<p class="muted">No stored history yet.</p>'; return; }
-  const r = q.run(state.rows, $('#q-a').value, $('#q-b').value);
-  out.innerHTML = h`<h3>${r.title}</h3><ul class="clean">${r.findings.map((f) => h`<li>${f}</li>`)}</ul>${r.table?.length ? h`<div class="tbl-wrap" style="margin-top:10px"><table><thead><tr><th>Metric</th><th class="n">From</th><th class="n">To</th><th class="n">Change</th></tr></thead><tbody>${r.table.map((t) => h`<tr><td>${t.metric}</td><td class="n">${t.from}</td><td class="n">${t.to}</td><td class="n">${t.change}</td></tr>`)}</tbody></table></div>` : ''}`.s;
-}
-
 // ---------- data ----------
+const runPoint = (r) => ({ price: r.price, depth1: r.depth1, depthVenues: r.depthVenues, depthBid1: r.depthBid1, depthAsk1: r.depthAsk1, oiTotal: r.oiTotal, oiCoverage: r.oiCoverage, fundingAnn: r.fundingAnn, iv30: r.iv30, cbPremium: r.cbPremium });
 async function getJSON(u) { const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) throw new Error(`${u}: HTTP ${r.status}`); return r.json(); }
 
 async function load() {
-  const [latest, ts, idx] = await Promise.allSettled([getJSON('data/latest.json'), getJSON('data/timeseries.json'), getJSON('data/index.json')]);
+  const [latest, ts, idx, runs] = await Promise.allSettled([getJSON('data/latest.json'), getJSON('data/timeseries.json'), getJSON('data/index.json'), getJSON('data/runs.json')]);
+  state.runs = runs.status === 'fulfilled' ? runs.value.runs || [] : [];
   state.rows = ts.status === 'fulfilled' ? ts.value.rows || [] : [];
   state.index = idx.status === 'fulfilled' ? idx.value : null;
   if (latest.status === 'fulfilled' && latest.value?.metrics) { state.a = latest.value; render(); return; }
@@ -487,6 +474,7 @@ async function liveRefresh() {
     a.reportMd = morningReport(a);
     a.narrative = null;
     state.a = a;
+    state.runs = (state.runs || []).concat([{ t: a.dataThrough, live: true, ...runPoint(a.row) }]);
     render();
     const ok = a.quality.filter((q) => q.status === 'ok').length;
     progress(`Refreshed in ${((Date.now() - t0) / 1000).toFixed(0)}s — ${ok} of ${a.quality.length} sources live.`);
@@ -525,6 +513,7 @@ async function dispatch() {
 }
 
 $('#btn-refresh').addEventListener('click', liveRefresh);
+$('#btn-refresh2')?.addEventListener('click', liveRefresh);
 $('#btn-server').addEventListener('click', serverDialog);
 $('#btn-dispatch').addEventListener('click', dispatch);
 $('#btn-close').addEventListener('click', () => $('#dlg-server').close());

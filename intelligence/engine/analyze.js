@@ -11,7 +11,7 @@ import {
   mean, std, sum, pct, percentileRank, pearson, alignedReturns, alignedReturnsVsDiff, beta, realizedVol,
   valueAt, lastPoint, shiftDate, isoDate, fmtUsd, fmtUsdSigned, ordinal, fmtPrice, fmtPct, fmtNum, fmtK, clamp, DAY,
 } from './util.js';
-import { FEB2026, UNAVAILABLE } from './reference.js';
+import { UNAVAILABLE } from './reference.js';
 
 export const ENGINE_VERSION = '1.0.0';
 
@@ -127,7 +127,6 @@ export function computeMetrics(snap, rows) {
     let usd = 0, btc = 0;
     for (const r of etfDaily) { usd += r.totalUsdM * 1e6; btc += (r.totalUsdM * 1e6) / priceOn(r.date); }
     const ytd = etfDaily.filter((r) => r.date >= today.slice(0, 4) + '-01-01');
-    const feb = etfDaily.filter((r) => r.date >= FEB2026.window.start && r.date <= FEB2026.window.end);
     const funds = {};
     for (const r of lastN(5)) for (const [k, v] of Object.entries(r.funds || {})) funds[k] = (funds[k] || 0) + (v || 0);
     const pos10 = lastN(10).filter((r) => r.totalUsdM > 0).length;
@@ -143,7 +142,6 @@ export function computeMetrics(snap, rows) {
       cumulativeUsdM: usd / 1e6, cumulativeBtc: btc, flowBasis: etfDaily[0].date <= '2024-01-31' && btc > 0 && usd > 0 ? usd / btc : null,
       fullHistory: etfDaily[0].date <= '2024-01-31', firstDate: etfDaily[0].date,
       ytdUsdM: sum(ytd.map((r) => r.totalUsdM)),
-      feb2026UsdM: feb.length ? sum(feb.map((r) => r.totalUsdM)) : null, feb2026Days: feb.length,
       historyDays: etfDaily.length,
       daysOld: Math.round((new Date(today) - new Date(last.date)) / DAY),
       weekly: weeklyEtf(etfDaily).slice(-12),
@@ -471,7 +469,7 @@ export function attributeMove(m, horizon) {
     const cascadeC = P <= -cascade && has(OI) && OI < oiF && ((has(depthCh) && depthCh < -10) || (liq && liq.longUsd > 2 * liq.shortUsd) || !has(depthCh));
     const longLiq = has(OI) && OI < oiF / 2 && (!has(fundPrev) || fundPrev > 3);
     const spotDown = (!has(OI) || OI > oiF / 2) && has(etf) && etf < 0;
-    if (cascadeC) { label = 'Reflexive liquidation cascade'; type = 'cascade'; explanation = 'A large price fall coincided with a sharp drop in open interest and deteriorating depth/long liquidations: forced selling was moving price, which triggered further forced selling. This is the February-2026 signature.'; }
+    if (cascadeC) { label = 'Reflexive liquidation cascade'; type = 'cascade'; explanation = 'A large price fall coincided with a sharp drop in open interest and deteriorating depth/long liquidations: forced selling was moving price, which triggered further forced selling.'; }
     else if (longLiq) { label = 'Leveraged long liquidation'; type = 'long-liq'; explanation = 'Price fell while open interest fell after a period of positive funding: crowded longs were being closed (voluntarily or by liquidation). Once the leverage is gone, selling pressure usually fades.'; }
     else if (spotDown) { label = 'Spot-driven decline'; type = 'spot-down'; explanation = 'Price fell with ETF outflows while open interest held up: the selling is coming from cash holders, not forced deleveraging. These declines can be persistent because they reflect a change in demand rather than positioning.'; }
     else { label = 'Decline — mixed drivers'; type = 'mixed-down'; explanation = 'The fall is not cleanly attributable to spot or leverage on available data.'; }
@@ -573,7 +571,7 @@ export function buildForces(snap, m) {
       mechanism: dir >= 0
         ? 'Net creations oblige authorised participants to buy spot BTC (directly or via prime brokers such as Coinbase) → that buying lifts offers on the order book → if depth is thin, each dollar moves price more. Price impact depends on whether sellers (miners, long-term holders, basis traders unwinding) absorb the bid.'
         : 'Net redemptions oblige APs to sell spot BTC → selling hits bids on Coinbase and OTC desks → with thin books the price impact is magnified and can trigger leveraged long liquidations, which add forced selling.',
-      interpretation: `${persistent ? 'Flows are persistent rather than a one-day event, which is what historically mattered for trend (Q1 2024, Sep 2026; and in reverse Nov 2025–Feb 2026).' : 'Flows are not (yet) persistent; single-day prints have little lasting price effect.'} ${E.daysOld > 3 ? `Note: latest flow data is ${E.daysOld} days old.` : ''}`,
+      interpretation: `${persistent ? 'Flows are persistent rather than a one-day event, which is what historically mattered for trend.' : 'Flows are not (yet) persistent; single-day prints have little lasting price effect.'} ${E.daysOld > 3 ? `Note: latest flow data is ${E.daysOld} days old.` : ''}`,
       invalidation: dir >= 0 ? 'Two or more consecutive outflow days, or 5-day net turning negative, would undercut the ETF-demand interpretation.' : 'A run of inflow days large enough to turn the 5-day sum positive would invalidate the outflow-pressure reading.',
       watch: `Tonight's Farside print (US close). IBIT share of flows. Whether 5-day net stays ${dir >= 0 ? `above +$${T.etf5dStrong}M` : 'negative'}.`,
     };
@@ -600,7 +598,7 @@ export function buildForces(snap, m) {
         { label: 'Est. impact of $25M / $100M market sell', value: `${sell25 ? (sell25.exhausted ? 'beyond captured depth' : fmtPct(-sell25.slippagePct, 2)) : 'n/a'} / ${sell100 ? (sell100.exhausted ? 'beyond captured depth (lower bound)' : fmtPct(-sell100.slippagePct, 2)) : 'n/a'}`, derived: true },
         { label: 'Coinbase premium vs USDT venues', value: D.coinbasePremiumPct !== null ? fmtPct(D.coinbasePremiumPct, 3) : 'n/a', derived: true },
       ],
-      mechanism: 'Depth is the market’s shock absorber. Price impact of a flow ≈ flow ÷ available liquidity, so the same ETF redemption or liquidation moves price far more in a thin book. Displayed depth also withdraws during volatility (market makers widen or pull quotes), so realised liquidity in a sell-off is lower than the snapshot suggests — the reflexive part of February 2026.',
+      mechanism: 'Depth is the market’s shock absorber. Price impact of a flow ≈ flow ÷ available liquidity, so the same ETF redemption or liquidation moves price far more in a thin book. Displayed depth also withdraws during volatility (market makers widen or pull quotes), so realised liquidity in a sell-off is lower than the snapshot suggests — which is how thin markets turn ordinary selling into cascades.',
       interpretation: `${det ? 'Liquidity is deteriorating: the market is becoming more fragile to any forced flow.' : imp2 ? 'Liquidity is improving: flows are being absorbed with less impact.' : 'Liquidity is broadly stable versus last week.'} ${D.top2Share > 0.65 ? 'Liquidity is concentrated in two venues — a pull-back by makers there would remove most of the cushion.' : ''} Displayed ≠ executed liquidity: treat impact estimates as a best case.`,
       invalidation: det ? '±1% depth recovering above its 7-day-ago level.' : '±1% depth falling more than 15% within a week, especially during a price decline.',
       watch: 'Depth during US hours and around macro releases; bid-side depth on Coinbase (ETF execution venue); whether depth falls as price falls (withdrawal) or holds (absorption).',
@@ -979,73 +977,10 @@ export function buildScenarios(m, map) {
       confirm: ['Coinbase discount during US hours', 'OI falling fast while price falls (forced closing)', 'Put skew steepening and IV jumping', 'Bid depth withdrawing as price approaches modelled long-liquidation bands'],
       contradict: ['Price falling while OI is flat and funding negative (shorts already crowded)', 'ETF inflows on down days (dip buying)', 'Depth increasing into the decline'],
       levels: dn.filter((l) => l.tags.some((t) => !/no notable/.test(t))).slice(0, 4).map((l) => ({ level: l.level, tags: l.tags })),
-      mechanism: `Spot selling (ETF redemptions) in thin books pushes price into ${lvl(dnAcc)}, where modelled long liquidations become forced market sells; makers widen quotes, depth falls further, and the cascade continues until leverage is exhausted — the February 2026 chain.`,
+      mechanism: `Spot selling (ETF redemptions) in thin books pushes price into ${lvl(dnAcc)}, where modelled long liquidations become forced market sells; makers widen quotes, depth falls further, and the cascade continues until leverage is exhausted — a reflexive liquidation chain.`,
       failure: 'Leverage is too small to cascade, or dip-buying (ETF creations, stablecoin deployment) absorbs the forced flow.',
     },
   ];
-}
-
-// ---------------------------------------------------------------------------
-// FEBRUARY 2026 COMPARISON
-export function compareFeb2026(m) {
-  const R = FEB2026.reference;
-  const dims = [];
-  const add = (label, feb, today, verdict, note) => dims.push({ label, feb, today, verdict, note });
-  const P = m.price, E = m.etf, D = m.derivs, dep = m.depth, M = m.macro, O = m.options;
-
-  add('Pre-existing price weakness', 'BTC ≈30–35% below its Oct 2025 high, below the 200-day average, after a failed recovery.',
-    P.drawdownPct !== null ? `${fmtPct(P.drawdownPct)} from ATH; ${P.vsMa200Pct !== null ? fmtPct(P.vsMa200Pct) + ' vs 200-day average' : '200d n/a'}.` : 'n/a',
-    P.drawdownPct === null ? 'unknown' : P.drawdownPct < -25 && (P.vsMa200Pct ?? 0) < 0 ? 'similar' : P.drawdownPct < -15 ? 'partly similar' : 'different');
-  add('ETF flows', 'Three consecutive weekly outflows; ≈$4.6B redeemed Nov–Dec 2025; Jan 2026 net ≈−$1.1B.',
-    E ? `5d ${fmtUsd(E.s5 * 1e6)}, 20d ${fmtUsd(E.s20 * 1e6)}; ${E.consecOutWeeks ? E.consecOutWeeks + ' consecutive outflow weeks' : E.consecInWeeks ? E.consecInWeeks + ' consecutive inflow weeks' : 'mixed weeks'}.${E.feb2026UsdM !== null ? ` (System-measured flows ${FEB2026.window.start}→${FEB2026.window.end}: ${fmtUsd(E.feb2026UsdM * 1e6)}.)` : ''}` : 'n/a',
-    !E ? 'unknown' : E.consecOutWeeks >= 2 && E.s20 < 0 ? 'similar' : E.s20 < 0 ? 'partly similar' : 'different');
-  add('Market depth', 'Binance ±1% depth <$400M vs >$600M at the Oct 2025 peak; aggregate ±2% ≈30% below 2025 high (Kaiko).',
-    dep ? `±1% ${fmtUsd(dep.d1)} across ${dep.venueCount} venues${dep.venues.find((v) => v.venue === 'Binance') ? ` (Binance ${fmtUsd(dep.venues.find((v) => v.venue === 'Binance').d1)})` : ''}; ${dep.ch30d !== null ? fmtPct(dep.ch30d) + ' vs 30d' : 'no 30d history yet'}${dep.pctile !== null ? `; ${ordinal(dep.pctile)} pct of system history` : ''}.` : 'n/a',
-    !dep || dep.pctile === null ? 'unknown' : dep.pctile < 20 || (dep.ch30d !== null && dep.ch30d < -25) ? 'similar' : dep.pctile < 40 ? 'partly similar' : 'different',
-    dep && dep.pctile === null ? `Needs ≥10 days of this system’s own depth history (${dep.historyDays} so far). Kaiko’s published figures use a different method (time-averaged, all pairs) and are not compared directly.` : 'Judged against this system’s own depth history only; Kaiko’s published Feb-2026 figures use a different method and are not compared directly.');
-  add('Leverage (OI)', 'Long leverage rebuilt during January’s attempted recovery; ≈$2.5B and ≈$2.7B long-dominated liquidation waves.',
-    D ? `OI ${fmtUsd(D.totalOi)} (${fmtNum(D.oiPctMcap)}% of mcap); ${fmtPct(D.oiCh30d)} 30d.` : 'n/a',
-    !D || D.oiCh30d === null ? 'unknown' : D.oiCh30d > 10 && (D.fundingAnn ?? 0) > 5 ? 'similar' : D.oiCh30d > 0 ? 'partly similar' : 'different',
-    'Pre-crash OI/funding levels for Feb 2026 are not documented in this system’s sources; comparison is on direction of build-up.');
-  add('Funding', 'Positive (long-paying) before the cascade; exact levels not sourced.',
-    D?.fundingAnn !== null && D?.fundingAnn !== undefined ? `${fmtNum(D.fundingAnn, 1)}% annualised.` : 'n/a',
-    D?.fundingAnn === null || D?.fundingAnn === undefined ? 'unknown' : D.fundingAnn > 8 ? 'similar' : D.fundingAnn > 0 ? 'partly similar' : 'different');
-  add('Macro / Fed liquidity shock', 'Hawkish Fed-chair nomination: expected tighter policy, higher real rates, smaller balance sheet.',
-    M ? `Real 10y ${M.real10y20d !== null ? (M.real10y20d >= 0 ? '+' : '') + fmtNum(M.real10y20d * 100, 0) + 'bp' : 'n/a'} 4w; ${M.dollarLabel} ${fmtPct(M.dollar20d)} 4w; net liquidity ${M.netLiq4w !== null ? fmtUsdSigned(M.netLiq4w * 1e9) : 'n/a'} 4w; VIX ${M.vix ? fmtNum(M.vix[1], 1) : 'n/a'}.` : 'n/a',
-    (() => {
-      if (!M) return 'unknown';
-      const v = (M.real10y20d ?? 0) > 0.2 || (M.dollar20d ?? 0) > 2 || (M.netLiq4w ?? 0) < -150 ? 'similar' : (M.real10y20d ?? 0) > 0.08 || (M.netLiq4w ?? 0) < -50 ? 'partly similar' : 'different';
-      const tm = macroTransmission(m);
-      return v === 'similar' && tm.link !== null && tm.link < 0.2 ? 'partly similar' : v;
-    })(),
-    `A discrete policy shock is an event; this system measures its footprint (yields, dollar, liquidity), not the headline.${macroTransmission(m).link !== null && macroTransmission(m).link < 0.2 ? ` Tightening is present, but BTC’s link to macro assets is weak (max 90d correlation ${fmtNum(macroTransmission(m).link)}), unlike the risk-asset behaviour of early 2026 — downgraded to partly similar.` : ''}`);
-  add('Options / volatility', 'Volatility expanded sharply into the cascade; downside protection bid.',
-    O ? `IV ${fmtNum(O.atmIv30 ?? O.dvol, 1)}% vs RV ${fmtNum(P.rv30, 1)}%; skew ${fmtNum(O.skew25, 1)}.` : 'n/a',
-    !O ? 'unknown' : (O.skew25 ?? 0) < -5 ? 'similar' : (O.skew25 ?? 0) < -2 ? 'partly similar' : 'different');
-
-  const amplifiers = [], dampeners = [];
-  if (dep?.ch7d !== null && dep?.ch7d !== undefined && dep.ch7d < -10) amplifiers.push(`Depth down ${fmtPct(dep.ch7d)} in a week`);
-  if (dep?.top2Share > 0.65) amplifiers.push(`Liquidity concentrated: top two venues hold ${Math.round(dep.top2Share * 100)}% of ±1% depth`);
-  if (D?.oiCh7d > T.oi7dBuild) amplifiers.push(`OI up ${fmtPct(D.oiCh7d)} in 7 days`);
-  if (D?.fundingAnn > T.fundingHotAnn) amplifiers.push(`Funding ${fmtNum(D.fundingAnn, 1)}% annualised (crowded longs)`);
-  if (E && E.s5 < -300) amplifiers.push(`ETF outflows ${fmtUsd(E.s5 * 1e6)} over 5 days`);
-  if (O?.ivRvSpread !== null && O?.ivRvSpread < -5) amplifiers.push('Implied vol below realised (volatility under-priced)');
-  if (M?.real10y20d > 0.2) amplifiers.push('Real yields rising');
-  if (D?.fundingAnn !== null && D?.fundingAnn !== undefined && D.fundingAnn < 3) dampeners.push(`Funding ${fmtNum(D.fundingAnn, 1)}% — little long crowding`);
-  if (D?.oiCh30d !== null && D?.oiCh30d !== undefined && D.oiCh30d < -5) dampeners.push(`OI down ${fmtPct(D.oiCh30d)} over 30 days (leverage flushed)`);
-  if (E && E.s5 > 300) dampeners.push(`ETF inflows ${fmtUsd(E.s5 * 1e6)} over 5 days`);
-  if (dep?.ch7d > 10) dampeners.push(`Depth improving (${fmtPct(dep.ch7d)} vs 7d)`);
-  if (m.onchain?.stables30d > 3e9) dampeners.push(`Stablecoin supply +${fmtUsd(m.onchain.stables30d)} in 30d`);
-  if (M?.netLiq4w > 100) dampeners.push('Net dollar liquidity rising');
-
-  const counts = dims.reduce((a, d) => ((a[d.verdict] = (a[d.verdict] || 0) + 1), a), {});
-  const sim = (counts.similar || 0) + 0.5 * (counts['partly similar'] || 0);
-  const known = dims.filter((d) => d.verdict !== 'unknown').length;
-  const verdict = known < 4 ? 'Insufficient data for a structural comparison.'
-    : sim / known >= 0.6 ? 'Structurally similar: most of the February preconditions are present. A trigger would meet a fragile market.'
-    : sim / known >= 0.35 ? 'Partly similar: some February preconditions are present, others are absent. Fragility is elevated in specific channels, not across the board.'
-    : 'Structurally different: most February preconditions are absent. A February-style cascade would require several conditions to change first.';
-  return { dims, amplifiers, dampeners, counts, verdict, note: 'Each dimension is assessed separately; no composite score is computed because the dimensions are not commensurable and the reference set (one episode) does not support statistical weighting.' };
 }
 
 // ---------------------------------------------------------------------------
@@ -1157,7 +1092,6 @@ export function analyze(snap, rows = []) {
   const attribution = { d1: attributeMove(m, '1d'), d7: attributeMove(m, '7d') };
   const map = buildLevelMap(snap, m);
   const scenarios = buildScenarios(m, map);
-  const feb = compareFeb2026(m);
   const changes = whatChanged(m, rows);
   const top = forces.filter((f) => !f.unavailable).slice(0, 3).map((f) => ({ id: f.id, name: f.name, direction: f.direction, watch: f.watch, state: f.state }));
   const quality = Object.entries(snap.sources || {}).map(([id, s]) => ({ id, name: s.name, status: s.status, asOf: s.asOf || null, fetchedAt: s.fetchedAt, frequency: s.frequency, method: s.method, url: s.url, error: s.error || s.lastError || null, note: s.note || null, staleSince: s.staleSince || null }));
@@ -1169,7 +1103,7 @@ export function analyze(snap, rows = []) {
     dataThrough: snap.collectedAt,
     scope: snap.scope,
     metrics: stripHeavy(m),
-    regime, attribution, forces, map, scenarios, feb, changes, top,
+    regime, attribution, forces, map, scenarios, changes, top,
     quality, unavailable: UNAVAILABLE,
     row,
   };

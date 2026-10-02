@@ -17,7 +17,7 @@ Hard rules:
 Write in sober, precise institutional prose. Structure:
 1. The one-paragraph answer to "What is driving BTC right now?" (rank the top forces and say why they dominate).
 2. "How the forces interact today" — the transmission chain as it currently stands (who is the marginal buyer/seller, is there enough liquidity, is leverage involved).
-3. "Is today's structure capable of producing a February 2026-style move?" — similarities, differences, amplifiers, dampeners.
+3. "Could today's structure produce a sharp liquidation-driven move?" — current amplifiers and dampeners (depth, leverage, flows).
 4. "What would change my reading" — specific observable thresholds.
 Keep it under 900 words.`;
 
@@ -28,7 +28,6 @@ export async function narrate(analysis, reportMd, rows) {
     regime: analysis.regime,
     attribution: analysis.attribution,
     forces: analysis.forces.map(({ id, name, rank, direction, confidence, state, evidence, interpretation, invalidation, d1, d7 }) => ({ id, name, rank, direction, confidence, state, evidence: evidence.map((e) => `${e.label}: ${e.value}`), interpretation, invalidation, d1, d7 })),
-    feb2026: analysis.feb,
     scenarios: analysis.scenarios,
     changes: analysis.changes.slice(0, 10).map((c) => c.text),
     staleOrMissing: analysis.quality.filter((q) => q.status !== 'ok').map((q) => `${q.name}: ${q.status}`),
