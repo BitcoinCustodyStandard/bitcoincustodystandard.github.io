@@ -75,13 +75,16 @@ export class BookSet {
   }
 }
 
+let debugHook = null;
+export function setDebug(fn) { debugHook = fn; }
+
 function socket(url, { onOpen, onMessage, venue, emit, pingMs, ping }) {
   let ws, timer, closed = false, retry = 0;
   const open = () => {
     emit({ type: 'status', venue, state: 'connecting' });
     try { ws = new WebSocket(url); } catch (e) { emit({ type: 'status', venue, state: 'error', note: String(e.message || e) }); return schedule(); }
     ws.onopen = () => { retry = 0; emit({ type: 'status', venue, state: 'live' }); onOpen(ws); if (pingMs) timer = setInterval(() => { try { ws.send(ping); } catch {} }, pingMs); };
-    ws.onmessage = (m) => { if (m.data === 'pong') return; let j; try { j = JSON.parse(m.data); } catch { return; } try { onMessage(j, ws); } catch (e) { /* tolerate one bad message */ } };
+    ws.onmessage = (m) => { if (m.data === 'pong') return; let j; try { j = JSON.parse(m.data); } catch { return; } if (debugHook) debugHook(venue, j); try { onMessage(j, ws); } catch (e) { if (debugHook) debugHook(venue, { parseError: String(e) }); } };
     ws.onerror = () => emit({ type: 'status', venue, state: 'error', note: 'connection error (blocked, or venue unavailable in this region)' });
     ws.onclose = () => { clearInterval(timer); if (!closed) { emit({ type: 'status', venue, state: 'closed' }); schedule(); } };
   };

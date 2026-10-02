@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { connectLive } from './feeds.js';
+import { connectLive, setDebug } from './feeds.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const MIN = +(process.env.RECORD_MIN || 15);
@@ -36,6 +36,20 @@ const emit = (e) => {
   events.push(e);
 };
 
+// Diagnostics: subscription acks/errors and the first raw liquidation messages per venue.
+const seen = {};
+setDebug((venue, j) => {
+  const key = venue + ':' + (j.arg?.channel || j.e || j.channel || j.event || j.type || (j.parseError ? 'parseError' : 'other'));
+  seen[key] = (seen[key] || 0) + 1;
+  if (j.event || j.parseError || /liquidation|forceOrder/i.test(key)) { if (seen[key] <= 3) console.log('DEBUG', key, JSON.stringify(j).slice(0, 400)); }
+});
+// Cross-check: Binance all-market liquidation stream (every symbol). If this is silent too, the venue is not delivering liquidations to this location.
+let allLiq = 0, allBtc = 0;
+try {
+  const ws = new WebSocket('wss://fstream.binance.com/ws/!forceOrder@arr');
+  ws.onmessage = (m) => { allLiq++; try { const j = JSON.parse(m.data); if (/^BTC/.test(j.o?.s)) allBtc++; if (allLiq <= 2) console.log('DEBUG binance-all', String(m.data).slice(0, 300)); } catch {} };
+  setTimeout(() => ws.close(), MIN * 60000 - 1000);
+} catch {}
 const { books, stop } = connectLive(emit);
 const frames = [];
 const t0 = Date.now();
@@ -59,6 +73,8 @@ setTimeout(() => {
   const counts = events.reduce((m, e) => ((m[e.type] = (m[e.type] || 0) + 1), m), {});
   const liqUsd = events.filter((e) => e.type === 'liq').reduce((s, e) => s + e.usd, 0);
   console.log('summary', JSON.stringify({ frames: frames.length, counts, liqUsd: r0(liqUsd), status }));
+  console.log('message counts', JSON.stringify(seen));
+  console.log('binance all-market liquidations', allLiq, 'of which BTC', allBtc);
   if (frames.length < 10) { console.error('Too few frames recorded — not writing replay.'); process.exit(1); }
   fs.writeFileSync(path.join(here, 'replay.json'), JSON.stringify(out));
   console.log('wrote replay.json', (fs.statSync(path.join(here, 'replay.json')).size / 1e6).toFixed(2), 'MB');
