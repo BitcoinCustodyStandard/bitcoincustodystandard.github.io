@@ -3,14 +3,13 @@ name: battle-record
 # Records real exchange feed data for the Battlefield replay mode
 # (used when a viewer cannot open live WebSocket connections).
 on:
+  schedule:
+    - cron: '20 14 * * *'   # US session: more liquidations and large trades
   workflow_dispatch:
     inputs:
       minutes:
         description: Recording length in minutes
         default: '15'
-  push:
-    branches: ['claude/bitcoin-market-intelligence-qz1k50']
-    paths: ['intelligence/battlefield/record.mjs', 'intelligence/battlefield/feeds.js', '.github/workflows/battle-record.yml']
 
 permissions:
   contents: write
@@ -30,7 +29,7 @@ jobs:
           node-version: 22
       - name: Record feeds
         env:
-          RECORD_MIN: ${{ github.event.inputs.minutes || '6' }}
+          RECORD_MIN: ${{ github.event.inputs.minutes || '25' }}
         run: node intelligence/battlefield/record.mjs
       - name: Commit replay
         run: |
