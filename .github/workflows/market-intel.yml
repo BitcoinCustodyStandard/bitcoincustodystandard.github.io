@@ -10,9 +10,6 @@ on:
     - cron: '45 10 * * *'
     - cron: '45 11 * * *'
   workflow_dispatch:
-  push:
-    branches: ['claude/bitcoin-market-intelligence-qz1k50']
-    paths: ['.github/workflows/market-intel.yml']
 
 permissions:
   contents: write
