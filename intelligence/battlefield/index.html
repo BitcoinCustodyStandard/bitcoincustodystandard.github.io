@@ -24,22 +24,31 @@
 </header>
 
 <section id="stage" class="stage" aria-label="Market battlefield visualization">
-  <canvas id="field" role="img" aria-label="Bulls (bids) and bears (asks) arrayed along the price axis; the front line is the current BTC price"></canvas>
+  <canvas id="field" role="img" aria-label="3D map: bulls on bid liquidity and bears on ask liquidity either side of a glowing front line at the current BTC price; drag to rotate, scroll or pinch to zoom"></canvas>
   <div class="hud tl">
-    <div class="k">BTC / USD · aggregated mid</div>
-    <div class="px" id="hud-price">—</div>
-    <div class="ch">24h <span id="hud-ch">—</span></div>
-  </div>
-  <div class="hud tc">
-    <div class="k">Aggressive flow · last 60 seconds <span class="badge obs">Observed</span></div>
-    <div class="pbar"><i id="pbar-b"></i></div>
-    <div class="ptxt" id="pbar-txt">Waiting for trades…</div>
-  </div>
-  <div class="hud tr">
-    <div class="moderow"><span id="mode" class="mode connecting">CONNECTING</span></div>
+    <div class="moderow"><span id="mode" class="mode connecting">CONNECTING</span> <span class="mstate" id="mstate">—</span></div>
     <div class="msub" id="mode-sub"></div>
     <div class="venues" id="venues"></div>
   </div>
+  <div class="hud tc">
+    <div class="k">BTC / USD · aggregated spot mid</div>
+    <div class="px" id="hud-price">—</div>
+    <div class="ch">24h <span id="hud-ch">—</span></div>
+    <div class="brk">
+      <div class="brk-row"><span class="bear-t" id="brk-sell">—</span><span class="brk-mid" id="brk-mid">Breakthrough cost</span><span class="bull-t" id="brk-buy">—</span></div>
+      <div class="brk-bar"><i id="brk-mark"></i></div>
+      <div class="brk-sub">Price reached by <span id="brk-size">$25M</span> of market selling ← | → market buying · <span class="badge obs">Observed book</span></div>
+    </div>
+  </div>
+  <div class="hud tr">
+    <button type="button" class="vbtn" id="v-reset" title="Reset view" aria-label="Reset view">⌖</button>
+    <button type="button" class="vbtn" id="v-orbit" title="Slow orbit" aria-label="Slow orbit" aria-pressed="false">⟲</button>
+    <button type="button" class="vbtn" id="v-full" title="Full screen" aria-label="Full screen">⛶</button>
+  </div>
+  <div class="hud lm"><div class="k">Bid liquidity ±1%</div><div class="lv bull-t" id="bidliq">—</div></div>
+  <div class="hud rm"><div class="k">Ask liquidity ±1%</div><div class="lv bear-t" id="askliq">—</div></div>
+  <div class="hud bl panel"><div class="k">Order book depth <span class="dim">· cumulative, aggregated spot</span></div><canvas id="depth"></canvas><div class="hint">Drag to rotate · scroll / pinch to zoom · double-click to reset</div></div>
+  <div class="hud br panel"><div class="k">Market feed <span id="feed-mode" class="dim"></span></div><ol id="feed"></ol></div>
   <div class="note" id="note" hidden></div>
 </section>
 
@@ -62,7 +71,6 @@
     <label class="lbl" for="big">Large trade</label>
     <select id="big"><option value="100000">≥ $100K</option><option value="250000" selected>≥ $250K</option><option value="1000000">≥ $1M</option></select>
     <button type="button" id="btn-pause" aria-pressed="false">Pause</button>
-    <button type="button" id="btn-full">Full screen</button>
   </div>
 </div>
 
@@ -101,11 +109,12 @@
   <section class="block legend">
     <h2>How to read the battlefield</h2>
     <dl>
-      <div><dt>Front line</dt><dd>The current BTC price: the median of the venues’ mid-prices. It moves right when bulls advance and left when bears advance; the camera follows slowly so each advance is visible first.</dd></div>
+      <div><dt>Front line</dt><dd>A glowing trench at the current BTC price (the median of the venues’ mid-prices). Its near section is now; the far section bends to trace the last three minutes of price, so you can see where the fighting moved. Drag to rotate the map, scroll or pinch to zoom.</dd></div>
+      <div><dt>Breakthrough cost</dt><dd>The price a $25M market sell (left) or buy (right) would reach by consuming the displayed aggregated book. The closer that price, the thinner that side’s defence.</dd></div>
       <div><dt>Armies</dt><dd>Bulls stand on resting bids, bears on resting asks. Each price band’s formation grows with its displayed order-book liquidity, so a deep book reads as a deep column. Shading on the ground shows the same depth.</dd></div>
-      <div><dt>Champions</dt><dd>Large walls (a $50 price band holding at least 4× the median band and at least $2M) appear as oversized units in the front rank, labelled with size and price.</dd></div>
+      <div><dt>Walls</dt><dd>Large walls (a $50 price band holding at least 4× the median band and at least $2M) appear as glowing barriers with an oversized champion in front, labelled with size and price.</dd></div>
       <div><dt>Strikes</dt><dd>Large aggressive trades arc into the front line from the attacking side: green from buyers lifting offers, red from sellers hitting bids.</dd></div>
-      <div><dt>Explosions</dt><dd>Liquidations. A long liquidation bursts inside the bull ranks (forced selling) with a red shockwave; a short liquidation bursts in the bear ranks (forced buying) with a green one. Size scales with the liquidated notional; $1M+ events shake the field.</dd></div>
+      <div><dt>Explosions</dt><dd>Liquidations. A long liquidation bursts inside the bull ranks (forced selling) with a red shockwave; a short liquidation bursts in the bear ranks (forced buying) with a green one. Size scales with the liquidated notional; $1M+ events shake the field, and every liquidation leaves a scorch mark that fades over a minute.</dd></div>
       <div><dt>What it is not</dt><dd>A prediction. Displayed liquidity can be pulled at any time, liquidation feeds cover OKX, Deribit and Binance (where reachable) — not the whole market, and the liquidation zones are a model estimate.</dd></div>
     </dl>
   </section>
