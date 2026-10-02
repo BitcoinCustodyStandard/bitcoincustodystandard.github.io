@@ -1,5 +1,5 @@
 name: probe-tmp
-# Temporary: one-off probe of the BGeometrics free API from the Actions network. Removed after use.
+# Temporary: one-off probe of free on-chain APIs from the Actions network. Removed after use.
 on:
   push:
     branches: ['claude/bitcoin-market-intelligence-qz1k50']
@@ -9,15 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          curl -sS -m 40 https://bitcoin-data.com/v3/api-docs -o docs.json -w "api-docs HTTP %{http_code}\n" || true
-          python3 - <<'PY'
-          import json
-          try:
-              d=json.load(open('docs.json'))
-              for p in sorted(d.get('paths',{})):
-                  if '/last' in p or p.count('/')<=2: print(p)
-          except Exception as e: print('docs parse failed', e); print(open('docs.json').read()[:500])
-          PY
-          for p in sopr/last nupl/last puell-multiple/last hashribbons/last; do
-            echo "== $p"; curl -sS -m 40 -D - "https://bitcoin-data.com/v1/$p" | head -c 1500; echo; sleep 3
+          for p in supply-profit percent-supply-profit profit-supply; do
+            echo "== $p"; curl -sS -m 40 "https://bitcoin-data.com/v1/$p/last" -w "\nHTTP %{http_code}\n" | head -c 600; echo; sleep 3
           done
+          echo "== sopr range"; curl -sS -m 40 "https://bitcoin-data.com/v1/sopr?startday=2026-08-01" | head -c 400; echo
+          echo "== coinmetrics"
+          curl -sS -m 60 "https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=CapMVRVCur,PriceUSD&frequency=1d&start_time=2011-01-01&page_size=10000" -o cm.json -w "HTTP %{http_code} %{size_download}\n"
+          python3 -c "import json;d=json.load(open('cm.json'));x=d.get('data',[]);print(len(x),x[:1],x[-1:],'next' in json.dumps(d)[-300:], d.get('error'))"
